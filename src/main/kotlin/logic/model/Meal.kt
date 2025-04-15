@@ -5,7 +5,7 @@ import java.util.Date
 data class Meal(
     val name:String?,
     val id: Long?,
-    val minutes: String?,
+    val minutes: Long?,
     val contributorId: Long?,
     val submitted: Date,
     val tags:List<String>?,
