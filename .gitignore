@@ -45,3 +45,5 @@ bin/
 .DS_Store
 ###app data###
 /src/main/food.csv
+
+.idea/
