@@ -47,7 +47,7 @@ class App (
         val inputDate = readln()
 
         try {
-            val meals = searchMealsByDateUseCase.searchMealsByDate(inputDate)
+            val meals = searchMealsByDateUseCase(inputDate)
             println("Meals on $inputDate:")
             meals.forEach {meal->
                 println("ID : ${meal.id}, Name : ${meal.name}")

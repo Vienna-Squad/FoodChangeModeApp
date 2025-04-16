@@ -21,7 +21,7 @@ class SearchFoodsByDateUseCase(
         }
     }
 
-    fun searchMealsByDate(date:String):List<Meal> {
+    operator fun invoke(date:String):List<Meal> {
 
         val mealsByDate=mealsRepository.getAllMeals().filter { meal ->
                 meal.submitted == dateFormat(date)
