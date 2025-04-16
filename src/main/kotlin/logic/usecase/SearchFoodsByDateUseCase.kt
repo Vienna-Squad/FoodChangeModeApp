@@ -21,7 +21,7 @@ class SearchFoodsByDateUseCase(
         }
     }
 
-    fun SearchMealsByDate(date:String):List<Pair<String?,Long?>> {
+    fun SearchMealsByDate(date:String):List<Pair<Long?,String?>> {
 
         val mealsByDate=mealsRepository.getAllMeals().filter { meal ->
                 meal.submitted == dateFormat(date)
@@ -33,7 +33,7 @@ class SearchFoodsByDateUseCase(
 
         else {
             return mealsByDate.map { meal ->
-                meal.name to meal.id
+                meal.id to meal.name
             }
         }
 
@@ -43,8 +43,8 @@ class SearchFoodsByDateUseCase(
 
 
     fun getMealDetailsById(id:Long):Meal?{
-        return mealsRepository.getAllMeals().find {
-            it.id==id
+        return mealsRepository.getAllMeals().find {meal->
+            meal.id==id
         }
     }
 
