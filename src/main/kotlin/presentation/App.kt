@@ -1,9 +1,11 @@
 package org.example.presentation
 
+import org.example.logic.usecase.ItalianGroupMealUseCase
+import org.example.logic.usecase.NoItalianGroupMealsException
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App(private  val italianMealForGroupsUseCase: ItalianGroupMealUseCase) {
 
     fun start() {
         do {
@@ -35,4 +37,18 @@ class App {
         } while (selectedAction != MenuItem.EXIT)
 
     }
+    private fun handleItalianMealForGroups() {
+        try {
+            val meals = italianMealForGroupsUseCase.getMeals()
+            println("Italian meals suitable for groups:")
+            meals.forEachIndexed { index, meal ->
+                println("${index + 1}. ${meal.name}")
+            }
+        } catch (e: NoItalianGroupMealsException) {
+            println("No Italian meals for groups found.")
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
+    }
+
 }
