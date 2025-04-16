@@ -1,4 +1,6 @@
 package org.example.presentation
+import org.example.logic.usecase.NoMealFoundByNameException
+import org.example.logic.usecase.SearchForMealByName
 import org.example.logic.usecase.SearchFoodsByDateUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
@@ -12,6 +14,7 @@ import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 
 class App (
+    private val searchByNameUseCase:SearchForMealByName,
     private val searchMealsByDateUseCase:SearchFoodsByDateUseCase,
     private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
@@ -28,7 +31,7 @@ class App (
             println()
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
-                MenuItem.MEAL_BY_NAME -> TODO()
+                MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
                 MenuItem.IRAQI_MEALS -> TODO()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
@@ -51,6 +54,22 @@ class App (
 
     }
 
+    private fun handleTheMealSearchByName(){
+
+        print("Enter Name to search for a meal: ")
+        val inputName = readln()
+
+        try {
+            val meal = searchByNameUseCase(inputName)
+
+            println("\n Meal found:")
+            println(meal)
+        }catch (e:NoMealFoundByNameException){
+            println(e.message)
+        }
+
+    }
+}
     private fun handleSearchByDate() {
 
         print("Enter date (dd/MM/yyyy): ")
