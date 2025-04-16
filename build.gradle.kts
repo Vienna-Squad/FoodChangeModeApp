@@ -13,7 +13,6 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation("io.insert-koin:koin-core:4.0.2")
     implementation("me.xdrop:fuzzywuzzy:1.4.0")
-
 }
 
 tasks.test {

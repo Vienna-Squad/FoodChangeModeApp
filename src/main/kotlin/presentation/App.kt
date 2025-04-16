@@ -1,5 +1,6 @@
 package org.example.presentation
 
+import org.example.logic.usecase.ExploreCountryMealsUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
 import org.example.logic.usecase.*
@@ -8,7 +9,8 @@ import org.example.utils.toMenuItem
 import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
 import org.example.logic.usecase.exceptions.NoMealFoundByNameException
 
-class App(
+class App (
+  private val exploreCountryMealsUseCase: ExploreCountryMealsUseCase,
     private val searchByNameUseCase: SearchForMealByName,
     private val searchMealsByDateUseCase: SearchFoodsByDateUseCase,
     private val getEasyFoodSuggestionUseCase: GetEasyFoodSuggestionUseCase,
@@ -47,6 +49,23 @@ class App(
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+    private fun handleMealByCountry() {
+        print("Enter the country name to explore its meals: ")
+        val countryInput = readln()
+        try {
+            val meals = exploreCountryMealsUseCase.exploreMealsByCountry(countryInput)
+            if (meals.isEmpty()) {
+                println("No meals found for '$countryInput'.")
+            } else {
+                println("Meals from '$countryInput':")
+                meals.forEachIndexed { index, meal ->
+                    println("${index + 1}. ${meal.name}")
+                }
+            }
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
     }
 
     private fun handleTheMealSearchByName() {
@@ -138,5 +157,3 @@ class App(
         }
     }
 }
-
-
