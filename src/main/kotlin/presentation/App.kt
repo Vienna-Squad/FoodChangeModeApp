@@ -1,10 +1,10 @@
 package org.example.presentation
 
-import org.example.logic.usecase.ExploreCountryFoodUseCase
+import org.example.logic.usecase.ExploreCountryMealsUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App (private val exploreCountryFoodUseCase: ExploreCountryFoodUseCase){
+class App (private val exploreCountryMealsUseCase: ExploreCountryMealsUseCase){
 
     fun start() {
         do {
@@ -40,7 +40,7 @@ class App (private val exploreCountryFoodUseCase: ExploreCountryFoodUseCase){
         print("Enter the country name to explore its meals: ")
         val countryInput = readln()
         try {
-            val meals = exploreCountryFoodUseCase.getMeals(countryInput)
+            val meals = exploreCountryMealsUseCase.exploreMealsByCountry(countryInput)
             if (meals.isEmpty()) {
                 println("No meals found for '$countryInput'.")
             } else {

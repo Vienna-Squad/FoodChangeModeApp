@@ -4,7 +4,7 @@ import org.example.logic.repository.MealsRepository
 import org.example.utils.fuzzysearch.FuzzyCountryMatcher
 
 class NotACountryException(message: String) : Exception(message)
-class ExploreCountryFoodUseCase(
+class ExploreCountryMealsUseCase(
     private val mealsRepository: MealsRepository,
     private val fuzzyCountryMatcher: FuzzyCountryMatcher = FuzzyCountryMatcher()
 ) {
@@ -18,7 +18,7 @@ class ExploreCountryFoodUseCase(
      * @return A list of up to 20 meals associated with the specified country, randomly shuffled.
      * @throws NotACountryException If the country input is blank or does not match any valid country name.
      */
-    fun getMeals(countryInput: String): List<Meal> {
+    fun exploreMealsByCountry(countryInput: String): List<Meal> {
         if (countryInput.isBlank()) {
             throw NotACountryException("Country name cannot be empty.")
         }
