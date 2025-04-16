@@ -38,7 +38,7 @@ class App (
                 MenuItem.KETO_DIET_MEAL -> TODO()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
-                MenuItem.MEAL_BY_COUNTRY -> TODO()
+                MenuItem.MEAL_BY_COUNTRY -> handleMealByCountry()
                 MenuItem.INGREDIENT_GAME -> TODO()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.FOR_THIN_MEAL -> TODO()
