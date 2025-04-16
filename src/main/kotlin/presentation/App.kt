@@ -1,13 +1,15 @@
 package org.example.presentation
 
+import org.example.logic.usecase.GuessPrepareTimeGameException
+import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App (
-    private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase
-){
-
+class App(
+    private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
+  private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
+) {
     fun start() {
         do {
             MenuItem.entries.forEachIndexed { index, action ->
@@ -38,6 +40,25 @@ class App (
         } while (selectedAction != MenuItem.EXIT)
 
     }
+    private fun startPreparationTimeGuessingGame() {
+        with(guessPrepareTimeGameUseCase.getMeal()) {
+            minutes?.let { minutes ->
+                var attempt = 3
+                print("guess its preparation time of $name: ")
+                while (true) {
+                    val guessMinutes = readln().toLongOrNull() ?: -1
+                    try {
+                        println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
+                        break
+                    } catch (exception: GuessPrepareTimeGameException) {
+                        attempt = exception.attempt
+                        print("${exception.message} try again: ")
+                    }
+                }
+            }
+        }
+    }
+
         private fun showPotatoesMeals(){
             getRandomPotatoMealsUseCase.getMeals().forEach { meal ->
                 println(" Name: ${meal.name}")
