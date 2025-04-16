@@ -2,13 +2,27 @@ package org.example.presentation
 
 import org.example.logic.model.Meal
 import org.example.logic.usecase.SuggestKetoMealUseCase
+import org.example.logic.usecase.NoMealFoundByNameException
+import org.example.logic.usecase.SearchForMealByName
+import org.example.logic.usecase.SearchFoodsByDateUseCase
+import org.example.logic.usecase.exceptions.IncorrectDateFormatException
+import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
+import org.example.logic.usecase.EasyFoodSuggestionUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
-
-class App(
-private val suggestKetoMealUseCase: SuggestKetoMealUseCase
+import org.example.logic.usecase.GetIraqiMealsUseCase
+import org.example.logic.usecase.GuessPrepareTimeGameException
+import org.example.logic.usecase.GuessPrepareTimeGameUseCase
+import org.example.logic.usecase.GetRandomPotatoMealsUseCase
+class App (
+    private val searchByNameUseCase:SearchForMealByName,
+    private val searchMealsByDateUseCase:SearchFoodsByDateUseCase,
+    private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
+    private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
+    private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
+    private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
+    private val suggestKetoMealUseCase: SuggestKetoMealUseCase
 ) {
-
     fun start() {
         do {
             MenuItem.entries.forEachIndexed { index, action ->
@@ -19,13 +33,15 @@ private val suggestKetoMealUseCase: SuggestKetoMealUseCase
             println()
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
-                MenuItem.MEAL_BY_NAME -> TODO()
+                MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
                 MenuItem.IRAQI_MEALS -> TODO()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
+                MenuItem.IRAQI_MEALS -> showIraqiMeals()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> TODO()
-                MenuItem.MEAL_BY_DATE -> TODO()
+                MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
@@ -41,45 +57,140 @@ private val suggestKetoMealUseCase: SuggestKetoMealUseCase
     }
 
     private fun suggestKetoMeals() {
-    val seenMeals = mutableSetOf<Meal>()
-    while (true) {
-        val meal = suggestKetoMealUseCase.getMeal(seenMeals)
+        val seenMeals = mutableSetOf<Meal>()
+        while (true) {
+            val meal = suggestKetoMealUseCase.getMeal(seenMeals)
 
-        if (meal == null) {
-            println(" You've seen all keto meals")
-            break
-        }
-
-        println("Meal: ${meal.name}")
-        println(meal.description ?: "No description available.")
-        println("1 - Like    |   2 - Dislike ")
-        print("Your choice: ")
-
-        when (readlnOrNull()) {
-            "1" -> {
-                println("\n Full Details of ${meal.name}")
-                println("Time: ${meal.minutes} ")
-                println("Ingredients: ${meal.ingredients}")
-                println("Steps: ${meal.steps }")
-                println("Nutrition Info:")
-                println("  Calories: ${meal.nutrition?.calories}")
-                println("  Fat: ${meal.nutrition?.totalFatL}")
-                println("  Carbs: ${meal.nutrition?.carbohydrates}")
-                println("  Protein: ${meal.nutrition?.protein}")
+            if (meal == null) {
+                println(" You've seen all keto meals")
                 break
             }
 
-            "2" -> {
-                seenMeals.add(meal)
-                println("\n try another one\n")
-            }
+            println("Meal: ${meal.name}")
+            println(meal.description ?: "No description available.")
+            println("1 - Like    |   2 - Dislike ")
+            print("Your choice: ")
 
-            else -> {
-                println("Exiting Keto Meal Suggestions")
-                break
+            when (readlnOrNull()) {
+                "1" -> {
+                    println("\n Full Details of ${meal.name}")
+                    println("Time: ${meal.minutes} ")
+                    println("Ingredients: ${meal.ingredients}")
+                    println("Steps: ${meal.steps}")
+                    println("Nutrition Info:")
+                    println("  Calories: ${meal.nutrition?.calories}")
+                    println("  Fat: ${meal.nutrition?.totalFatL}")
+                    println("  Carbs: ${meal.nutrition?.carbohydrates}")
+                    println("  Protein: ${meal.nutrition?.protein}")
+                    break
+                }
+
+                "2" -> {
+                    seenMeals.add(meal)
+                    println("\n try another one\n")
+                }
+
+                else -> {
+                    println("Exiting Keto Meal Suggestions")
+                    break
+                }
             }
         }
     }
-}
 
+    private fun handleTheMealSearchByName() {
+
+        print("Enter Name to search for a meal: ")
+        val inputName = readln()
+
+        try {
+            val meal = searchByNameUseCase(inputName)
+
+            println("\n Meal found:")
+            println(meal)
+        } catch (e: NoMealFoundByNameException) {
+            println(e.message)
+        }
+
+    }
+
+    private fun handleSearchByDate() {
+
+        print("Enter date (dd/MM/yyyy): ")
+        val inputDate = readln()
+
+        try {
+            val meals = searchMealsByDateUseCase(inputDate)
+            println("Meals on $inputDate:")
+            meals.forEach { meal ->
+                println("ID : ${meal.id}, Name : ${meal.name}")
+
+            }
+
+            print("Enter meal ID to view details: ")
+            val id = readln().toLongOrNull()
+            val meal = id?.let { id ->
+                meals.find { meal ->
+                    meal.id == id
+                }
+            }
+            println()
+            println(meal ?: "No meal found with this ID.")
+
+        } catch (e: IncorrectDateFormatException) {
+            println("${e.message} Please use dd/MM/yyyy format.")
+        } catch (e: MealsNotFoundForThisDateException) {
+            println(e.message)
+        }
+    }
+
+    private fun showEasyMeal() {
+        val meals = easyFoodSuggestionUseCase.getMeals()
+        if (meals.isEmpty()) {
+            println("No meals found")
+        } else {
+            println("Easy meals:")
+            meals.forEach { meal ->
+                println(meal)
+            }
+        }
+    }
+
+
+    private fun showIraqiMeals() {
+        getIraqiMealsUseCase().let { meals ->
+            if (meals.isEmpty()) {
+                println("IraqiMealsNotFound")
+            } else {
+                meals.forEach { println(it) }
+            }
+        }
+    }
+
+    private fun startPreparationTimeGuessingGame() {
+        with(guessPrepareTimeGameUseCase.getMeal()) {
+            minutes?.let { minutes ->
+                var attempt = 3
+                print("guess its preparation time of $name: ")
+                while (true) {
+                    val guessMinutes = readln().toLongOrNull() ?: -1
+                    try {
+                        println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
+                        break
+                    } catch (exception: GuessPrepareTimeGameException) {
+                        attempt = exception.attempt
+                        print("${exception.message} try again: ")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showPotatoesMeals() {
+        getRandomPotatoMealsUseCase.getMeals().forEach { meal ->
+            println(" Name: ${meal.name}")
+            println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
+            println("------------------------------------------------------------")
+        }
+    }
 }
