@@ -44,6 +44,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 ###app data###
-/src/main/food.csv
-
+food.csv
 .idea/
