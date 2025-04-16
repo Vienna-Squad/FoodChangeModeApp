@@ -9,6 +9,7 @@ import org.example.logic.usecase.GuessPrepareTimeGameException
 import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 
+
 class App (
     private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
