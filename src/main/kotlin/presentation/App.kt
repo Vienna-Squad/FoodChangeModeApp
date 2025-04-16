@@ -1,27 +1,26 @@
 package org.example.presentation
 
 import org.example.logic.model.Meal
-import org.example.logic.usecase.SuggestKetoMealUseCase
-import org.example.logic.usecase.NoMealFoundByNameException
-import org.example.logic.usecase.SearchForMealByName
-import org.example.logic.usecase.SearchFoodsByDateUseCase
+import org.example.logic.usecase.*
+import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
-import org.example.logic.usecase.EasyFoodSuggestionUseCase
+import org.example.logic.usecase.exceptions.NoMealFoundByNameException
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
-import org.example.logic.usecase.GetIraqiMealsUseCase
-import org.example.logic.usecase.GuessPrepareTimeGameException
-import org.example.logic.usecase.GuessPrepareTimeGameUseCase
-import org.example.logic.usecase.GetRandomPotatoMealsUseCase
-class App (
-    private val searchByNameUseCase:SearchForMealByName,
-    private val searchMealsByDateUseCase:SearchFoodsByDateUseCase,
-    private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
+
+class App(
+    private val getMealByName: GetMealByName,
+    private val getMealsByDateUseCase: GetMealsByDateUseCase,
+    private val getEasyFoodSuggestionUseCase: GetEasyFoodSuggestionUseCase,
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
     private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
-    private val suggestKetoMealUseCase: SuggestKetoMealUseCase
+    private val getKetoMealUseCase: GetKetoMealUseCase,
+    private val getItalianGroupMealsUseCase: GetItalianGroupMealsUseCase,
+    private val getMealsByProteinAndCaloriesUseCase: GetMealsByProteinAndCaloriesUseCase,
+    private val getMealsOfCountryUseCase: GetMealsOfCountryUseCase,
+    private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
 ) {
     fun start() {
         do {
@@ -34,22 +33,20 @@ class App (
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
                 MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
-                MenuItem.IRAQI_MEALS -> TODO()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
-                MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
-                MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
+                MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
-                MenuItem.KETO_DIET_MEAL -> TODO()
+                MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
-                MenuItem.POTATO_MEALS -> TODO()
+                MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.FOR_THIN_MEAL -> TODO()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
-                MenuItem.EXIT -> TODO()
+                MenuItem.EXIT -> {}
             }
 
         } while (selectedAction != MenuItem.EXIT)
@@ -59,18 +56,15 @@ class App (
     private fun suggestKetoMeals() {
         val seenMeals = mutableSetOf<Meal>()
         while (true) {
-            val meal = suggestKetoMealUseCase.getMeal(seenMeals)
-
+            val meal = getKetoMealUseCase(seenMeals)
             if (meal == null) {
                 println(" You've seen all keto meals")
                 break
             }
-
             println("Meal: ${meal.name}")
             println(meal.description ?: "No description available.")
             println("1 - Like    |   2 - Dislike ")
             print("Your choice: ")
-
             when (readlnOrNull()) {
                 "1" -> {
                     println("\n Full Details of ${meal.name}")
@@ -79,7 +73,7 @@ class App (
                     println("Steps: ${meal.steps}")
                     println("Nutrition Info:")
                     println("  Calories: ${meal.nutrition?.calories}")
-                    println("  Fat: ${meal.nutrition?.totalFatL}")
+                    println("  Fat: ${meal.nutrition?.totalFat}")
                     println("  Carbs: ${meal.nutrition?.carbohydrates}")
                     println("  Protein: ${meal.nutrition?.protein}")
                     break
@@ -99,44 +93,34 @@ class App (
     }
 
     private fun handleTheMealSearchByName() {
-
         print("Enter Name to search for a meal: ")
         val inputName = readln()
-
         try {
-            val meal = searchByNameUseCase(inputName)
-
+            val meal = getMealByName(inputName)
             println("\n Meal found:")
             println(meal)
         } catch (e: NoMealFoundByNameException) {
             println(e.message)
         }
-
     }
 
     private fun handleSearchByDate() {
-
         print("Enter date (dd/MM/yyyy): ")
         val inputDate = readln()
-
         try {
-            val meals = searchMealsByDateUseCase(inputDate)
+            val meals = getMealsByDateUseCase(inputDate)
             println("Meals on $inputDate:")
             meals.forEach { meal ->
                 println("ID : ${meal.id}, Name : ${meal.name}")
-
             }
-
             print("Enter meal ID to view details: ")
-            val id = readln().toLongOrNull()
-            val meal = id?.let { id ->
+            val meal = readln().toLongOrNull()?.let { id ->
                 meals.find { meal ->
                     meal.id == id
                 }
             }
             println()
             println(meal ?: "No meal found with this ID.")
-
         } catch (e: IncorrectDateFormatException) {
             println("${e.message} Please use dd/MM/yyyy format.")
         } catch (e: MealsNotFoundForThisDateException) {
@@ -145,7 +129,7 @@ class App (
     }
 
     private fun showEasyMeal() {
-        val meals = easyFoodSuggestionUseCase.getMeals()
+        val meals = getEasyFoodSuggestionUseCase()
         if (meals.isEmpty()) {
             println("No meals found")
         } else {
@@ -155,7 +139,6 @@ class App (
             }
         }
     }
-
 
     private fun showIraqiMeals() {
         getIraqiMealsUseCase().let { meals ->
@@ -187,7 +170,7 @@ class App (
     }
 
     private fun showPotatoesMeals() {
-        getRandomPotatoMealsUseCase.getMeals().forEach { meal ->
+        getRandomPotatoMealsUseCase().forEach { meal ->
             println(" Name: ${meal.name}")
             println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
             println("------------------------------------------------------------")
