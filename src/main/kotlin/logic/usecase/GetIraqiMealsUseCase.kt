@@ -3,10 +3,10 @@ package org.example.logic.usecase
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
 
-class IdentifyIraqiMealsUseCase(
+class GetIraqiMealsUseCase(
     private val mealsRepository: MealsRepository
 ) {
-    fun getMeals(): List<Meal> {
+    operator fun invoke(): List<Meal> {
         return mealsRepository.getAllMeals()
             .filter(::isIraqiMeal)
     }

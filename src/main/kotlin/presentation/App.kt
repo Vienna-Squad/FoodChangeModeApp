@@ -1,11 +1,11 @@
 package org.example.presentation
 
-import org.example.logic.usecase.IdentifyIraqiMealsUseCase
+import org.example.logic.usecase.GetIraqiMealsUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
 class App(
-    private val identifyIraqiMealsUseCase: IdentifyIraqiMealsUseCase
+    private val getIraqiMealsUseCase: GetIraqiMealsUseCase
 ) {
 
     fun start() {
@@ -40,7 +40,7 @@ class App(
     }
 
     private fun showIraqiMeals() {
-        identifyIraqiMealsUseCase.getMeals().let { meals ->
+        getIraqiMealsUseCase().let { meals ->
             if (meals.isEmpty()) {
                 println("IraqiMealsNotFound")
             } else {
