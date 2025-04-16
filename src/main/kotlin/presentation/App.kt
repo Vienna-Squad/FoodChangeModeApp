@@ -1,6 +1,4 @@
 package org.example.presentation
-import org.example.logic.repository.MealsRepository
-import org.example.logic.usecase.FakeMealsRepository
 import org.example.logic.usecase.SearchFoodsByDateUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
@@ -9,7 +7,7 @@ import org.example.utils.toMenuItem
 
 class App (
 
-    private val useCase:SearchFoodsByDateUseCase
+    private val searchMealsByDateUseCase:SearchFoodsByDateUseCase
     ){
 
     fun start() {
@@ -43,13 +41,13 @@ class App (
 
     }
 
-    fun handleSearchByDate() {
+    private fun handleSearchByDate() {
 
         print("Enter date (dd/MM/yyyy): ")
         val inputDate = readln()
 
         try {
-            val meals = useCase.searchMealsByDate(inputDate)
+            val meals = searchMealsByDateUseCase.searchMealsByDate(inputDate)
             println("Meals on $inputDate:")
             meals.forEach {meal->
                 println("ID : ${meal.id}, Name : ${meal.name}")
