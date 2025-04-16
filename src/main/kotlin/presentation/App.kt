@@ -1,27 +1,27 @@
 package org.example.presentation
 
-import org.example.logic.usecase.SuggestItalianGroupMealsUseCase
-import org.example.logic.usecase.NoItalianGroupMealsException
-import org.example.logic.usecase.ExploreCountryMealsUseCase
+import org.example.logic.model.Meal
+import org.example.logic.usecase.SuggestKetoMealUseCase
+import org.example.logic.usecase.NoMealFoundByNameException
+import org.example.logic.usecase.SearchForMealByName
+import org.example.logic.usecase.SearchFoodsByDateUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
-import org.example.logic.usecase.*
+import org.example.logic.usecase.EasyFoodSuggestionUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
-import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
-import org.example.logic.usecase.exceptions.NoMealFoundByNameException
-
-class App(
-  private  val suggestItalianGroupMealsUseCase: SuggestItalianGroupMealsUseCase,
-  private val exploreCountryMealsUseCase: ExploreCountryMealsUseCase,
-    private val searchByNameUseCase: SearchForMealByName,
-    private val searchMealsByDateUseCase: SearchFoodsByDateUseCase,
-    private val getEasyFoodSuggestionUseCase: GetEasyFoodSuggestionUseCase,
+import org.example.logic.usecase.GetIraqiMealsUseCase
+import org.example.logic.usecase.GuessPrepareTimeGameException
+import org.example.logic.usecase.GuessPrepareTimeGameUseCase
+import org.example.logic.usecase.GetRandomPotatoMealsUseCase
+class App (
+    private val searchByNameUseCase:SearchForMealByName,
+    private val searchMealsByDateUseCase:SearchFoodsByDateUseCase,
+    private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
     private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
-    private val findMealsByProteinAndCaloriesUseCase: FindMealsByProteinAndCaloriesUseCase,
-    private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
+    private val suggestKetoMealUseCase: SuggestKetoMealUseCase
 ) {
     fun start() {
         do {
@@ -34,56 +34,75 @@ class App(
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
                 MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
+                MenuItem.IRAQI_MEALS -> TODO()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
-                MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
+                MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> TODO()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
-                MenuItem.POTATO_MEALS -> showPotatoesMeals()
+                MenuItem.POTATO_MEALS -> TODO()
                 MenuItem.FOR_THIN_MEAL -> TODO()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
-                MenuItem.EXIT -> {}
+                MenuItem.EXIT -> TODO()
             }
 
         } while (selectedAction != MenuItem.EXIT)
 
     }
-    private fun handleItalianMealForGroups() {
-        try {
-            val meals = suggestItalianGroupMealsUseCase.suggestItalianMealsForGroups()
-            println("Italian meals suitable for groups:")
-            meals.forEachIndexed { index, meal ->
-                println("${index + 1}. ${meal.name}")
+
+    private fun suggestKetoMeals() {
+        val seenMeals = mutableSetOf<Meal>()
+        while (true) {
+            val meal = suggestKetoMealUseCase.getMeal(seenMeals)
+
+            if (meal == null) {
+                println(" You've seen all keto meals")
+                break
             }
-        } catch (e: NoItalianGroupMealsException) {
-            println("No Italian meals for groups found.")
-        }
-    }
-    private fun handleMealByCountry() {
-        print("Enter the country name to explore its meals: ")
-        val countryInput = readln()
-        try {
-            val meals = exploreCountryMealsUseCase.exploreMealsByCountry(countryInput)
-            if (meals.isEmpty()) {
-                println("No meals found for '$countryInput'.")
-            } else {
-                println("Meals from '$countryInput':")
-                meals.forEachIndexed { index, meal ->
-                    println("${index + 1}. ${meal.name}")
+
+            println("Meal: ${meal.name}")
+            println(meal.description ?: "No description available.")
+            println("1 - Like    |   2 - Dislike ")
+            print("Your choice: ")
+
+            when (readlnOrNull()) {
+                "1" -> {
+                    println("\n Full Details of ${meal.name}")
+                    println("Time: ${meal.minutes} ")
+                    println("Ingredients: ${meal.ingredients}")
+                    println("Steps: ${meal.steps}")
+                    println("Nutrition Info:")
+                    println("  Calories: ${meal.nutrition?.calories}")
+                    println("  Fat: ${meal.nutrition?.totalFatL}")
+                    println("  Carbs: ${meal.nutrition?.carbohydrates}")
+                    println("  Protein: ${meal.nutrition?.protein}")
+                    break
+                }
+
+                "2" -> {
+                    seenMeals.add(meal)
+                    println("\n try another one\n")
+                }
+
+                else -> {
+                    println("Exiting Keto Meal Suggestions")
+                    break
                 }
             }
-        } catch (e: Exception) {
-            println("Error: ${e.message}")
         }
     }
+
     private fun handleTheMealSearchByName() {
+
         print("Enter Name to search for a meal: ")
         val inputName = readln()
+
         try {
             val meal = searchByNameUseCase(inputName)
 
@@ -92,11 +111,14 @@ class App(
         } catch (e: NoMealFoundByNameException) {
             println(e.message)
         }
+
     }
 
     private fun handleSearchByDate() {
+
         print("Enter date (dd/MM/yyyy): ")
         val inputDate = readln()
+
         try {
             val meals = searchMealsByDateUseCase(inputDate)
             println("Meals on $inputDate:")
@@ -106,7 +128,8 @@ class App(
             }
 
             print("Enter meal ID to view details: ")
-            val meal = readln().toLongOrNull()?.let { id ->
+            val id = readln().toLongOrNull()
+            val meal = id?.let { id ->
                 meals.find { meal ->
                     meal.id == id
                 }
@@ -122,7 +145,7 @@ class App(
     }
 
     private fun showEasyMeal() {
-        val meals = getEasyFoodSuggestionUseCase()
+        val meals = easyFoodSuggestionUseCase.getMeals()
         if (meals.isEmpty()) {
             println("No meals found")
         } else {
@@ -132,6 +155,7 @@ class App(
             }
         }
     }
+
 
     private fun showIraqiMeals() {
         getIraqiMealsUseCase().let { meals ->
@@ -163,7 +187,7 @@ class App(
     }
 
     private fun showPotatoesMeals() {
-        getRandomPotatoMealsUseCase().forEach { meal ->
+        getRandomPotatoMealsUseCase.getMeals().forEach { meal ->
             println(" Name: ${meal.name}")
             println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
             println("------------------------------------------------------------")
