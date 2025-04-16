@@ -1,9 +1,14 @@
 package org.example.presentation
 
+import org.example.logic.model.Meal
+import org.example.logic.usecase.KetoDietMealHelperUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App(
+    private val  ketoDietMealHelperUseCase: KetoDietMealHelperUseCase
+
+) {
 
     fun start() {
         do {
@@ -35,4 +40,47 @@ class App {
         } while (selectedAction != MenuItem.EXIT)
 
     }
+
+    private fun suggestKetoMeals() {
+    val seenMeals = mutableSetOf<Meal>()
+    while (true) {
+        val meal = ketoDietMealHelperUseCase.getMeal(seenMeals)
+
+        if (meal == null) {
+            println(" You've seen all keto meals")
+            break
+        }
+
+        println("Meal: ${meal.name}")
+        println(meal.description ?: "No description available.")
+        println("1 - Like    |   2 - Dislike ")
+        print("Your choice: ")
+
+        when (readlnOrNull()) {
+            "1" -> {
+                println("\n Full Details of ${meal.name}")
+                println("Time: ${meal.minutes} ")
+                println("Ingredients: ${meal.ingredients}")
+                println("Steps: ${meal.steps }")
+                println("Nutrition Info:")
+                println("  Calories: ${meal.nutrition?.calories}")
+                println("  Fat: ${meal.nutrition?.totalFatL}")
+                println("  Carbs: ${meal.nutrition?.carbohydrates}")
+                println("  Protein: ${meal.nutrition?.protein}")
+                break
+            }
+
+            "2" -> {
+                seenMeals.add(meal)
+                println("\n try another one\n")
+            }
+
+            else -> {
+                println("Exiting Keto Meal Suggestions")
+                break
+            }
+        }
+    }
+}
+
 }
