@@ -22,7 +22,7 @@ class App (
                 MenuItem.MEAL_BY_NAME -> TODO()
                 MenuItem.IRAQI_MEALS -> TODO()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> {
-                    println(easyFoodSuggestionUseCase.getMeals())
+                    showEasyMeal()
 
                 }
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
@@ -43,4 +43,16 @@ class App (
 
     }
 
+    private fun showEasyMeal(){
+        val meals = easyFoodSuggestionUseCase.getMeals()
+        if (meals.isEmpty()) {
+            println("No meals found")
+        } else {
+            println("Easy meals:")
+            meals.forEach { meal ->
+                println(meal)
+            }
+        }
+    }
 }
+
