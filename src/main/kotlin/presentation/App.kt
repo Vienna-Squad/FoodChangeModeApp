@@ -46,7 +46,7 @@ class App(
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.FOR_THIN_MEAL -> TODO()
                 MenuItem.SEAFOOD_MEALS -> TODO()
-                MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
+                MenuItem.ITALIAN_MEAL_FOR_GROUPS -> handleItalianMealForGroups()
                 MenuItem.EXIT -> {}
             }
 
