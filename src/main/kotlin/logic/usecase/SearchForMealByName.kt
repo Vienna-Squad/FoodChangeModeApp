@@ -10,9 +10,11 @@ class SearchForMealByName(
 
     fun getMealByName(query:String): Meal{
 
+        val  threshold=80
+
         return mealsRepository.getAllMeals().find {meal->
 
-            FuzzySearch.tokenSortRatio(meal.name?.lowercase(), query.lowercase())> 80
+            FuzzySearch.tokenSortRatio(meal.name?.lowercase(), query.lowercase())> threshold
 
         }?:throw  NoMealFoundByNameException("No meal found matching the name: $query")
 
