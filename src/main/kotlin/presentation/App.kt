@@ -1,5 +1,7 @@
 package org.example.presentation
-
+import org.example.logic.usecase.SearchFoodsByDateUseCase
+import org.example.logic.usecase.exceptions.IncorrectDateFormatException
+import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.EasyFoodSuggestionUseCase
 import org.example.utils.MenuItem
@@ -9,8 +11,8 @@ import org.example.logic.usecase.GuessPrepareTimeGameException
 import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 
-
 class App (
+    private val searchMealsByDateUseCase:SearchFoodsByDateUseCase,
     private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
@@ -34,7 +36,7 @@ class App (
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> TODO()
-                MenuItem.MEAL_BY_DATE -> TODO()
+                MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
@@ -49,6 +51,36 @@ class App (
 
     }
 
+    private fun handleSearchByDate() {
+
+        print("Enter date (dd/MM/yyyy): ")
+        val inputDate = readln()
+
+        try {
+            val meals = searchMealsByDateUseCase(inputDate)
+            println("Meals on $inputDate:")
+            meals.forEach {meal->
+                println("ID : ${meal.id}, Name : ${meal.name}")
+
+            }
+
+            print("Enter meal ID to view details: ")
+            val id = readln().toLongOrNull()
+            val meal = id?.let {id->
+                meals.find {meal->
+                    meal.id==id
+                }
+            }
+            println()
+            println(meal ?: "No meal found with this ID.")
+
+        } catch (e: IncorrectDateFormatException) {
+            println("${e.message} Please use dd/MM/yyyy format.")
+        } catch (e: MealsNotFoundForThisDateException) {
+            println(e.message)
+        }
+    }
+}
     private fun showEasyMeal(){
         val meals = easyFoodSuggestionUseCase.getMeals()
         if (meals.isEmpty()) {
@@ -97,4 +129,3 @@ class App (
                 println("------------------------------------------------------------")
             }
     }
-}
