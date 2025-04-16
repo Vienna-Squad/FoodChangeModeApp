@@ -1,9 +1,12 @@
 package org.example.presentation
 
+import org.example.logic.usecase.IdentifyIraqiMealsUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App(
+    private val identifyIraqiMealsUseCase: IdentifyIraqiMealsUseCase
+) {
 
     fun start() {
         do {
@@ -16,7 +19,7 @@ class App {
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
                 MenuItem.MEAL_BY_NAME -> TODO()
-                MenuItem.IRAQI_MEALS -> TODO()
+                MenuItem.IRAQI_MEALS -> showIraqiMeals()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
@@ -34,5 +37,15 @@ class App {
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+
+    private fun showIraqiMeals() {
+        identifyIraqiMealsUseCase.getMeals().let { meals ->
+            if (meals.isEmpty()) {
+                println("IraqiMealsNotFound")
+            } else {
+                meals.forEach { println(it) }
+            }
+        }
     }
 }
