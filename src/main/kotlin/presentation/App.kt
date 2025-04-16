@@ -39,8 +39,10 @@ class App (
 
     }
         private fun showPotatoesMeals(){
-        getRandomPotatoMealsUseCase.getMeals().forEach {
-            println(it.ingredients)
-        }
+            getRandomPotatoMealsUseCase.getMeals().forEach { meal ->
+                println(" Name: ${meal.name}")
+                println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
+                println("------------------------------------------------------------")
+            }
     }
 }
