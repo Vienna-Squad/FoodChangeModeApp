@@ -17,7 +17,6 @@ enum class MenuItem(val title: String) {
     SEAFOOD_MEALS("Explore Seafood Dishes"),
     ITALIAN_MEAL_FOR_GROUPS("Italian Group Meals"),
     EXIT("Exit");
-
 }
 
 fun Int.toMenuItem() = MenuItem.entries.getOrNull(this - 1) ?: MenuItem.EXIT
