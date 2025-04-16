@@ -4,11 +4,17 @@ import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.EasyFoodSuggestionUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
+import org.example.logic.usecase.GetIraqiMealsUseCase
+import org.example.logic.usecase.GuessPrepareTimeGameException
+import org.example.logic.usecase.GuessPrepareTimeGameUseCase
+import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 
 class App (
-    private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase
-){
-
+    private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
+    private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
+    private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
+  private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
+) {
     fun start() {
         do {
             MenuItem.entries.forEachIndexed { index, action ->
@@ -21,10 +27,9 @@ class App (
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
                 MenuItem.MEAL_BY_NAME -> TODO()
                 MenuItem.IRAQI_MEALS -> TODO()
-                MenuItem.EASY_FOOD_SUGGESTION_GAME -> {
-                    showEasyMeal()
-
-                }
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
+                MenuItem.IRAQI_MEALS -> showIraqiMeals()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> TODO()
@@ -56,3 +61,39 @@ class App (
     }
 }
 
+    private fun showIraqiMeals() {
+        getIraqiMealsUseCase().let { meals ->
+            if (meals.isEmpty()) {
+                println("IraqiMealsNotFound")
+            } else {
+                meals.forEach { println(it) }
+            }
+        }
+    }
+    private fun startPreparationTimeGuessingGame() {
+        with(guessPrepareTimeGameUseCase.getMeal()) {
+            minutes?.let { minutes ->
+                var attempt = 3
+                print("guess its preparation time of $name: ")
+                while (true) {
+                    val guessMinutes = readln().toLongOrNull() ?: -1
+                    try {
+                        println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
+                        break
+                    } catch (exception: GuessPrepareTimeGameException) {
+                        attempt = exception.attempt
+                        print("${exception.message} try again: ")
+                    }
+                }
+            }
+        }
+    }
+
+        private fun showPotatoesMeals(){
+            getRandomPotatoMealsUseCase.getMeals().forEach { meal ->
+                println(" Name: ${meal.name}")
+                println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
+                println("------------------------------------------------------------")
+            }
+    }
+}
