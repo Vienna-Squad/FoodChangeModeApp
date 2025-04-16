@@ -1,5 +1,6 @@
 package org.example.presentation
 import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.FakeMealsRepository
 import org.example.logic.usecase.SearchFoodsByDateUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
@@ -8,8 +9,8 @@ import org.example.utils.toMenuItem
 
 class App (
 
-    private val mealsRepository: MealsRepository
-        ){
+    private val useCase:SearchFoodsByDateUseCase
+    ){
 
     fun start() {
         do {
@@ -27,7 +28,7 @@ class App (
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> TODO()
-                MenuItem.MEAL_BY_DATE -> handleSearchByDate(mealsRepository)
+                MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
@@ -42,22 +43,25 @@ class App (
 
     }
 
-    fun handleSearchByDate(mealsRepository: MealsRepository) {
-
-        val useCase= SearchFoodsByDateUseCase(mealsRepository)
+    fun handleSearchByDate() {
 
         print("Enter date (dd/MM/yyyy): ")
         val inputDate = readln()
 
         try {
-            val meals = useCase.SearchMealsByDate(inputDate)
+            val meals = useCase.searchMealsByDate(inputDate)
             println("Meals on $inputDate:")
-            meals.forEach { println("ID: ${it.first}, Name: ${it.second}") }
+            meals.forEach {meal->
+                println("ID : ${meal.id}, Name : ${meal.name}")
+
+            }
 
             print("Enter meal ID to view details: ")
             val id = readln().toLongOrNull()
             val meal = id?.let {id->
-                useCase.getMealDetailsById(id)
+                meals.find {meal->
+                    meal.id==id
+                }
             }
             println()
             println(meal ?: "No meal found with this ID.")
