@@ -1,9 +1,13 @@
 package org.example.presentation
 
+import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.EasyFoodSuggestionUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App (
+    private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase
+){
 
     fun start() {
         do {
@@ -17,7 +21,10 @@ class App {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
                 MenuItem.MEAL_BY_NAME -> TODO()
                 MenuItem.IRAQI_MEALS -> TODO()
-                MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> {
+                    println(easyFoodSuggestionUseCase.getMeals())
+
+                }
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> TODO()
@@ -35,4 +42,5 @@ class App {
         } while (selectedAction != MenuItem.EXIT)
 
     }
+
 }
