@@ -1,11 +1,11 @@
 package org.example.presentation
 
-import org.example.logic.usecase.ILovePotatoUseCase
+import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
 class App (
-    private val showPotatoesMeals: ILovePotatoUseCase
+    private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase
 ){
 
     fun start() {
@@ -39,8 +39,8 @@ class App (
 
     }
         private fun showPotatoesMeals(){
-        showPotatoesMeals.getMeals().forEach {
-            println(it)
+        getRandomPotatoMealsUseCase.getMeals().forEach {
+            println(it.ingredients)
         }
     }
 }
