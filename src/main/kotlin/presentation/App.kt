@@ -1,12 +1,13 @@
 package org.example.presentation
 
+import org.example.logic.usecase.GetIraqiMealsUseCase
 import org.example.logic.usecase.GuessPrepareTimeGameException
 import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.GetRandomPotatoMealsUseCase
-import org.example.utils.MenuItem
-import org.example.utils.toMenuItem
+
 
 class App(
+    private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
   private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
 ) {
@@ -21,7 +22,7 @@ class App(
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
                 MenuItem.MEAL_BY_NAME -> TODO()
-                MenuItem.IRAQI_MEALS -> TODO()
+                MenuItem.IRAQI_MEALS -> showIraqiMeals()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
@@ -39,6 +40,16 @@ class App(
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+
+    private fun showIraqiMeals() {
+        getIraqiMealsUseCase().let { meals ->
+            if (meals.isEmpty()) {
+                println("IraqiMealsNotFound")
+            } else {
+                meals.forEach { println(it) }
+            }
+        }
     }
     private fun startPreparationTimeGuessingGame() {
         with(guessPrepareTimeGameUseCase.getMeal()) {
