@@ -1,5 +1,7 @@
 package org.example.presentation
 
+import org.example.logic.usecase.SuggestItalianGroupMealsUseCase
+import org.example.logic.usecase.NoItalianGroupMealsException
 import org.example.logic.usecase.ExploreCountryMealsUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
@@ -9,7 +11,8 @@ import org.example.utils.toMenuItem
 import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
 import org.example.logic.usecase.exceptions.NoMealFoundByNameException
 
-class App (
+class App(
+  private  val suggestItalianGroupMealsUseCase: SuggestItalianGroupMealsUseCase,
   private val exploreCountryMealsUseCase: ExploreCountryMealsUseCase,
     private val searchByNameUseCase: SearchForMealByName,
     private val searchMealsByDateUseCase: SearchFoodsByDateUseCase,
@@ -50,6 +53,17 @@ class App (
         } while (selectedAction != MenuItem.EXIT)
 
     }
+    private fun handleItalianMealForGroups() {
+        try {
+            val meals = suggestItalianGroupMealsUseCase.suggestItalianMealsForGroups()
+            println("Italian meals suitable for groups:")
+            meals.forEachIndexed { index, meal ->
+                println("${index + 1}. ${meal.name}")
+            }
+        } catch (e: NoItalianGroupMealsException) {
+            println("No Italian meals for groups found.")
+        }
+    }
     private fun handleMealByCountry() {
         print("Enter the country name to explore its meals: ")
         val countryInput = readln()
@@ -67,7 +81,6 @@ class App (
             println("Error: ${e.message}")
         }
     }
-
     private fun handleTheMealSearchByName() {
         print("Enter Name to search for a meal: ")
         val inputName = readln()
