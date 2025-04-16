@@ -3,7 +3,7 @@ package org.example.logic.usecase
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
 
-class KetoDietMealHelperUseCase(
+class SuggestKetoMealUseCase(
     private val mealsRepository: MealsRepository
 ) {
 

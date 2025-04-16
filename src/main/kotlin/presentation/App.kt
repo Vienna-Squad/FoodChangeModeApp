@@ -1,13 +1,12 @@
 package org.example.presentation
 
 import org.example.logic.model.Meal
-import org.example.logic.usecase.KetoDietMealHelperUseCase
+import org.example.logic.usecase.SuggestKetoMealUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
 class App(
-    private val  ketoDietMealHelperUseCase: KetoDietMealHelperUseCase
-
+private val suggestKetoMealUseCase: SuggestKetoMealUseCase
 ) {
 
     fun start() {
@@ -44,7 +43,7 @@ class App(
     private fun suggestKetoMeals() {
     val seenMeals = mutableSetOf<Meal>()
     while (true) {
-        val meal = ketoDietMealHelperUseCase.getMeal(seenMeals)
+        val meal = suggestKetoMealUseCase.getMeal(seenMeals)
 
         if (meal == null) {
             println(" You've seen all keto meals")
