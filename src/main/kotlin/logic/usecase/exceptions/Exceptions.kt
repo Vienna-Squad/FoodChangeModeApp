@@ -1,5 +1,9 @@
 package org.example.logic.usecase.exceptions
 
-class IncorrectDateFormatException(message:String):Exception(message)
-
-class MealsNotFoundForThisDateException(message:String):Exception(message)
+abstract class FoodChangeMood(message: String) : Exception(message)
+class IncorrectDateFormatException(message: String) : FoodChangeMood(message)
+class MealsNotFoundForThisDateException(message: String) : FoodChangeMood(message)
+class NoMealFoundByNameException(message:String):FoodChangeMood(message)
+open class GuessPrepareTimeGameException(val attempt: Int, message: String) : FoodChangeMood(message)
+class TooHighException(attempt: Int) : GuessPrepareTimeGameException(attempt, "TooHigh")
+class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, "TooLow")

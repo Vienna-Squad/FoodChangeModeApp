@@ -35,7 +35,5 @@ class FindMealsByProteinAndCaloriesUseCase(private val mealsRepository: MealsRep
                 false
             }
         }
-         // this if I want to return the result sorted
-        // .sortedBy { abs((it.nutrition?.calories ?: 0f) - desiredCalories) }
     }
 }

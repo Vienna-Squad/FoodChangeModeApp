@@ -1,6 +1,8 @@
 package org.example.logic.usecase
 
 import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.exceptions.TooHighException
+import org.example.logic.usecase.exceptions.TooLowException
 
 class GuessPrepareTimeGameUseCase(
     private val mealsRepository: MealsRepository
@@ -13,6 +15,4 @@ class GuessPrepareTimeGameUseCase(
     }
 }
 
-open class GuessPrepareTimeGameException(val attempt: Int, message: String) : Exception(message)
-class TooHighException(attempt: Int) : GuessPrepareTimeGameException(attempt, "TooHigh")
-class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, "TooLow")
+
