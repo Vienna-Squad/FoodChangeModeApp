@@ -3,7 +3,9 @@ package org.example.presentation
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App(
+
+) {
 
     fun start() {
         do {
