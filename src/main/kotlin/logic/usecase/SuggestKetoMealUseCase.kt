@@ -9,8 +9,7 @@ class SuggestKetoMealUseCase(
 
     fun getMeal(seenMeals: Set<Meal>): Meal? {
         return mealsRepository.getAllMeals()
-            .filter(::isKetoFriendlyMeal)
-            .filterNot { it in seenMeals }
+            .filter { isKetoFriendlyMeal(it) && it !in seenMeals }
             .randomOrNull()
     }
 
