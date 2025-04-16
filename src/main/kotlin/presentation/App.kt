@@ -6,7 +6,10 @@ import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App (
+
+    private val mealsRepository: MealsRepository
+        ){
 
     fun start() {
         do {
@@ -24,7 +27,7 @@ class App {
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> TODO()
-                MenuItem.MEAL_BY_DATE -> TODO() //handleSearchByDate()
+                MenuItem.MEAL_BY_DATE -> handleSearchByDate(mealsRepository)
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
@@ -39,29 +42,30 @@ class App {
 
     }
 
-//    fun handleSearchByDate() {
-//        val useCase= SearchFoodsByDateUseCase()
-//
-//        print("Enter date (dd/MM/yyyy): ")
-//        val inputDate = readln()
-//
-//        try {
-//            val meals = useCase.SearchMealsByDate(inputDate)
-//            println("Meals on $inputDate:")
-//            meals.forEach { println("ID: ${it.first}, Name: ${it.second}") }
-//
-//            print("Enter meal ID to view details: ")
-//            val id = readln().toLongOrNull()
-//            val meal = id?.let {id->
-//                useCase.getMealDetailsById(id)
-//            }
-//            println()
-//            println(meal ?: "No meal found with this ID.")
-//
-//        } catch (e: IncorrectDateFormatException) {
-//            println("${e.message} Please use dd/MM/yyyy format.")
-//        } catch (e: MealsNotFoundForThisDateException) {
-//            println(e.message)
-//        }
-//    }
+    fun handleSearchByDate(mealsRepository: MealsRepository) {
+
+        val useCase= SearchFoodsByDateUseCase(mealsRepository)
+
+        print("Enter date (dd/MM/yyyy): ")
+        val inputDate = readln()
+
+        try {
+            val meals = useCase.SearchMealsByDate(inputDate)
+            println("Meals on $inputDate:")
+            meals.forEach { println("ID: ${it.first}, Name: ${it.second}") }
+
+            print("Enter meal ID to view details: ")
+            val id = readln().toLongOrNull()
+            val meal = id?.let {id->
+                useCase.getMealDetailsById(id)
+            }
+            println()
+            println(meal ?: "No meal found with this ID.")
+
+        } catch (e: IncorrectDateFormatException) {
+            println("${e.message} Please use dd/MM/yyyy format.")
+        } catch (e: MealsNotFoundForThisDateException) {
+            println(e.message)
+        }
+    }
 }
