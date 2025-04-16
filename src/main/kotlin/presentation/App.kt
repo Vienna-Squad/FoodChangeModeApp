@@ -1,9 +1,13 @@
 package org.example.presentation
-
+import org.example.logic.usecase.NoMealFoundByNameException
+import org.example.logic.usecase.SearchForMealByName
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App (
+
+    private val searchByNameUseCase:SearchForMealByName
+        ){
 
     fun start() {
         do {
@@ -15,7 +19,7 @@ class App {
             println()
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
-                MenuItem.MEAL_BY_NAME -> TODO()
+                MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
                 MenuItem.IRAQI_MEALS -> TODO()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
@@ -33,6 +37,22 @@ class App {
             }
 
         } while (selectedAction != MenuItem.EXIT)
+
+    }
+
+    private fun handleTheMealSearchByName(){
+
+        print("Enter Name to search for a meal: ")
+        val inputName = readln()
+
+        try {
+            val meal = searchByNameUseCase.getMealByName(inputName)
+
+            println("\n Meal found:")
+            println(meal)
+        }catch (e:NoMealFoundByNameException){
+            println(e.message)
+        }
 
     }
 }
