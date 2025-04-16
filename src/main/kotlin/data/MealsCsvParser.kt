@@ -1,5 +1,4 @@
 package org.example.data
-
 import org.example.logic.model.Meal
 import org.example.logic.model.MealEntityIndex
 import org.example.logic.model.Nutrition
@@ -19,12 +18,12 @@ class MealsCsvParser {
             minutes = meal[MealEntityIndex.MINUTES].toLong(),
             contributorId = meal[MealEntityIndex.CONTRIBUTOR_ID].toLong(),
             submitted = constructDate(meal[MealEntityIndex.SUBMITTED]),
-            tags = constructStringList(meal[MealEntityIndex.TAGS]),
+            tags = consTructListFromString(meal[MealEntityIndex.TAGS]),
             nutrition = constructNutritionObject(meal[MealEntityIndex.NUTRITION]),
             numberOfSteps = meal[MealEntityIndex.NUMBER_OF_STEPS].toInt(),
-            steps = constructStringList(meal[MealEntityIndex.STEPS]),
+            steps = consTructListFromString(meal[MealEntityIndex.STEPS]),
             description = meal[MealEntityIndex.DESCRIPTION],
-            ingredients = constructStringList(meal[MealEntityIndex.INGREDIENTS]),
+            ingredients = consTructListFromString(meal[MealEntityIndex.INGREDIENTS]),
             numberOfIngredients = meal[MealEntityIndex.NUMBER_OF_INGREDIENTS].toInt()
         )
     }
@@ -36,12 +35,7 @@ class MealsCsvParser {
     }
 
     private fun constructNutritionObject(nutritionField: String): Nutrition {
-        val nutrition = nutritionField
-            .removePrefix("[")
-            .removeSuffix("]")
-            .splitToSequence(",")
-            .map { it.toFloat() }
-            .toList()
+        val nutrition = consTructListFromString(nutritionField).map { it.toFloat() }
 
         return Nutrition(
             calories = nutrition[NutritionEntityIndex.CALORIES],
@@ -54,14 +48,13 @@ class MealsCsvParser {
         )
     }
 
-    private fun constructStringList(stringList: String): List<String> {
-        return stringList
+    private fun consTructListFromString(string: String): List<String> {
+        return string
             .removePrefix("[")
             .removeSuffix("]")
             .splitToSequence(",")
             .map { it.trim().removeSurrounding(",") }
             .toList()
-
     }
 
     private fun smartCsvParser(line: String): List<String> {
@@ -100,3 +93,4 @@ class MealsCsvParser {
         return mealEntities
     }
 }
+
