@@ -1,9 +1,12 @@
 package org.example.presentation
 
+import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App (
+    private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase
+){
 
     fun start() {
         do {
@@ -34,5 +37,12 @@ class App {
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+        private fun showPotatoesMeals(){
+            getRandomPotatoMealsUseCase.getMeals().forEach { meal ->
+                println(" Name: ${meal.name}")
+                println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
+                println("------------------------------------------------------------")
+            }
     }
 }
