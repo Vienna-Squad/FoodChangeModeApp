@@ -63,6 +63,7 @@ class MealsCsvParser {
             .toList()
 
     }
+
     private fun smartCsvParser(line: String): List<String> {
         val mealEntities = mutableListOf<String>()
         val currentEntity = StringBuilder()
@@ -79,6 +80,8 @@ class MealsCsvParser {
                         insideQuotes = !insideQuotes
                     }
                 }
+
+
                 ',' -> {
                     if (!insideQuotes) {
                         mealEntities.add(currentEntity.toString().trim())
@@ -87,7 +90,6 @@ class MealsCsvParser {
                         currentEntity.append(char)
                     }
                 }
-
                 else -> currentEntity.append(char)
             }
             i++

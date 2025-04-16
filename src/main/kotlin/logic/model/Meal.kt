@@ -12,7 +12,7 @@ data class Meal(
     val nutrition: Nutrition?,
     val numberOfSteps : Int?,
     val steps:List<String>?,
-    val description:String?,
+    var description:String?,
     val ingredients:List<String>?,
     val numberOfIngredients : Int?,
 )

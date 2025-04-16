@@ -11,8 +11,11 @@ import org.example.logic.repository.MealsRepository
 {
     override fun getAllMeals():List<Meal> {
         val mealsList= mutableListOf<Meal>()
-        csvFileReader.readLinesFromFile().drop(1).dropLast(1).forEach {
+        csvFileReader.readLinesFromFile().drop(1).forEach {
            val meal= mealsCsvParser.parseOneLine(it)
+            if (meal.description.isNullOrEmpty()) {
+                meal.description = null
+            }
             mealsList.add(meal)
         }
         return mealsList

@@ -28,6 +28,6 @@ class CsvFileReader (private val mealsFile: File){
             }
             i++
         }
-        return result.toString()
+        return result.toString().trim()
     }
 }
