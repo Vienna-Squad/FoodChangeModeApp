@@ -8,7 +8,7 @@ class SearchForMealByName(
 
 ) {
 
-    fun getMealByName(query:String): Meal{
+    operator fun invoke(query:String): Meal{
 
         val  threshold=80
 

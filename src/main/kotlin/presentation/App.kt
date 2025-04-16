@@ -46,7 +46,7 @@ class App (
         val inputName = readln()
 
         try {
-            val meal = searchByNameUseCase.getMealByName(inputName)
+            val meal = searchByNameUseCase(inputName)
 
             println("\n Meal found:")
             println(meal)
