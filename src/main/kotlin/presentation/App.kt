@@ -1,9 +1,12 @@
 package org.example.presentation
 
+import org.example.logic.usecase.ILovePotatoUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App (
+    private val showPotatoesMeals: ILovePotatoUseCase
+){
 
     fun start() {
         do {
@@ -34,5 +37,10 @@ class App {
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+        private fun showPotatoesMeals(){
+        showPotatoesMeals.getMeals().forEach {
+            println(it)
+        }
     }
 }
