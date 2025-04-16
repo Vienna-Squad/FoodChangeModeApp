@@ -6,17 +6,12 @@ import org.example.logic.repository.MealsRepository
 class KetoDietMealHelperUseCase(
     private val mealsRepository: MealsRepository
 ) {
-    private val seenMeals = mutableSetOf<Meal>()
 
-    fun getMeal(): Meal {
-        val availableMeals = mealsRepository.getAllMeals()
-            .filterNot { it in seenMeals }
+    fun getMeal(seenMeals: Set<Meal>): Meal? {
+        return mealsRepository.getAllMeals()
             .filter(::isKetoFriendlyMeal)
-
-        val meal = availableMeals.randomOrNull() ?: throw Exception("No keto meals left")
-
-        seenMeals.add(meal)
-        return meal
+            .filterNot { it in seenMeals }
+            .randomOrNull()
     }
 
     private fun isKetoFriendlyMeal(meal: Meal): Boolean {
