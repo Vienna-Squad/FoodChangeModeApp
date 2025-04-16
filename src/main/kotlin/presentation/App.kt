@@ -1,12 +1,16 @@
 package org.example.presentation
 
+import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.EasyFoodSuggestionUseCase
+import org.example.utils.MenuItem
+import org.example.utils.toMenuItem
 import org.example.logic.usecase.GetIraqiMealsUseCase
 import org.example.logic.usecase.GuessPrepareTimeGameException
 import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 
-
-class App(
+class App (
+    private val easyFoodSuggestionUseCase: EasyFoodSuggestionUseCase,
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
   private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
@@ -22,6 +26,8 @@ class App(
             when (selectedAction) {
                 MenuItem.HEALTHY_FAST_FOOD -> TODO()
                 MenuItem.MEAL_BY_NAME -> TODO()
+                MenuItem.IRAQI_MEALS -> TODO()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> TODO()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> TODO()
@@ -41,6 +47,19 @@ class App(
         } while (selectedAction != MenuItem.EXIT)
 
     }
+
+    private fun showEasyMeal(){
+        val meals = easyFoodSuggestionUseCase.getMeals()
+        if (meals.isEmpty()) {
+            println("No meals found")
+        } else {
+            println("Easy meals:")
+            meals.forEach { meal ->
+                println(meal)
+            }
+        }
+    }
+}
 
     private fun showIraqiMeals() {
         getIraqiMealsUseCase().let { meals ->
