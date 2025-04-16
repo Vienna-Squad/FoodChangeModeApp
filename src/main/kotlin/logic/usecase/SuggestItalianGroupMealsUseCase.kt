@@ -3,7 +3,7 @@ import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
 
 class NoItalianGroupMealsException(message: String) : Exception(message)
-class ItalianGroupMealUseCase(
+class SuggestItalianGroupMealsUseCase(
     private val mealsRepository: MealsRepository
 ) {
 
@@ -12,7 +12,7 @@ class ItalianGroupMealUseCase(
      * Filters meals by checking if they have both 'italian' and 'for-large-groups' tags.
      * @throws NoItalianGroupMealsException if no suitable meals are found.
      */
-    fun getMeals(): List<Meal> {
+    fun suggestItalianMealsForGroups(): List<Meal> {
 
         val filteredMeals = mealsRepository.getAllMeals()
             .filter(::isItalianGroupMeal)
