@@ -37,7 +37,7 @@ class App(
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
-                MenuItem.EGG_FREE_SWEETS -> println("coming soon...")
+                MenuItem.EGG_FREE_SWEETS -> showEggFreeSweets()
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> executeGetMealsByProteinAndCalories()
@@ -186,7 +186,7 @@ class App(
             val randomMeal = guessIngredientGameUseCase.generateRandomMeal()
             println("The Meal : ${randomMeal}\n")
 
-            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMeal, randomNumber)
+            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMeal.name, randomNumber)
             randomNumber = !randomNumber
             println("$showUserList\n")
             println("\tPress (1) for option 1 \n\tPress (2) for option 2 \n\tPress (3) for option 3\n")
@@ -197,7 +197,7 @@ class App(
             val ingredientUserInput = guessIngredientGameUseCase.getIngredientOptionByNumber(showUserList, input)
 
 
-            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMeal)
+            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMeal.name)
 
 
             if (correctGuess) {

@@ -18,4 +18,5 @@ val useCasesModule = module {
     single { GuessPrepareTimeGameUseCase(get()) }
     single { SuggestHighCalorieMealUseCase(get()) }
     single { GuessIngredientGameUseCase(get()) }
+    single { GetEggFreeSweetsUseCase(get()) }
 }
