@@ -32,28 +32,77 @@ class App(
             val selectedAction = (readln().toIntOrNull() ?: -1).toMenuItem()
             println()
             when (selectedAction) {
-                MenuItem.HEALTHY_FAST_FOOD -> TODO()
+                MenuItem.HEALTHY_FAST_FOOD -> println("coming soon...")
                 MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
-                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
-                MenuItem.EGG_FREE_SWEETS -> showEggFreeSweets()
+                MenuItem.EGG_FREE_SWEETS -> println("coming soon...")
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
-                MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
+                MenuItem.CALCULATED_CALORIES_MEAL -> executeGetMealsByProteinAndCalories()
                 MenuItem.MEAL_BY_COUNTRY -> handleMealByCountry()
                 MenuItem.INGREDIENT_GAME -> showIngredientGuessGame()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
-                MenuItem.SEAFOOD_MEALS -> TODO()
+                MenuItem.SEAFOOD_MEALS -> executeGetRankedSeafoodByProtein()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> handleItalianMealForGroups()
-                MenuItem.EXIT -> {
-                }
+                MenuItem.EXIT -> println("See you later!!")
             }
 
         } while (selectedAction != MenuItem.EXIT)
 
     }
+
+    private fun executeGetMealsByProteinAndCalories() {
+        println("--- Find Meals by Calories & Protein ---")
+        print("Enter desired calories (e.g., 500): ")
+        val caloriesInput = readln().toFloatOrNull()
+        print("Enter desired protein in grams (e.g., 30): ")
+        val proteinInput = readln().toFloatOrNull()
+
+        if (caloriesInput == null || proteinInput == null) {
+            println("\u001B[31mInvalid input. Please enter numbers only for calories and protein.\u001B[0m")
+            return
+        }
+
+        // Call the injected UseCase using invoke operator
+        val results = getMealsByProteinAndCaloriesUseCase(caloriesInput, proteinInput)
+
+        if (results.isEmpty()) {
+            println("\u001B[33mNo meals found matching your criteria within the tolerance.\u001B[0m")
+        } else {
+            println("\u001B[32mFound ${results.size} matching meals:\u001B[0m")
+            results.forEach { meal ->
+                // Display meal name and relevant nutrition
+                val caloriesStr = meal.nutrition?.calories?.toString() ?: "N/A"
+                val proteinStr = meal.nutrition?.protein?.toString() ?: "N/A"
+                println("- ${meal.name ?: "Unnamed Meal"} (Calories: $caloriesStr, Protein: ${proteinStr}g)")
+            }
+        }
+    }
+
+    private fun executeGetRankedSeafoodByProtein() {
+        println("--- Seafood Meals Sorted by Protein (Highest First) ---")
+
+        val results: List<RankedMealResult> = getRankedSeafoodByProteinUseCase()
+
+        if (results.isEmpty()) {
+            println("\u001B[33mNo seafood meals with protein information found.\u001B[0m")
+        } else {
+            // Green table header
+            println("\u001B[32mRank | Meal Name                      | Protein (g)\u001B[0m")
+            println("-----|--------------------------------|------------")
+            results.forEach { rankedMeal ->
+                // Format output for alignment
+                val rankStr = rankedMeal.rank.toString().padEnd(4)
+                val nameStr = (rankedMeal.name ?: "Unnamed Meal").take(30).padEnd(30) // Truncate long names
+                val proteinStr = rankedMeal.protein?.toString() ?: "N/A"
+                println("$rankStr | $nameStr | $proteinStr")
+            }
+        }
+    }
+
 
     private fun handleMealByCountry() {
         print("Enter a  country to explore its meals: ")
@@ -73,7 +122,7 @@ class App(
         }
     }
 
-    private fun showEggFreeSweets(){
+    private fun showEggFreeSweets() {
         val seenMeals = mutableSetOf<Meal>()
         while (true) {
             val meal = getEggFreeSweetsUseCase(seenMeals)
@@ -98,10 +147,12 @@ class App(
                     println("  Protein: ${meal.nutrition?.protein}")
                     break
                 }
+
                 "2" -> {
                     seenMeals.add(meal)
                     println("\n try another one\n")
                 }
+
                 else -> {
                     println("Exiting Egg-Free Sweets Suggestions")
                     break
@@ -132,13 +183,13 @@ class App(
 
         while (correctGuess && counter < 15) {
 
-            val randomMealName = guessIngredientGameUseCase.generateRandomMeal()
-            println("The Meal : $randomMealName")
+            val randomMeal = guessIngredientGameUseCase.generateRandomMeal()
+            println("The Meal : ${randomMeal}\n")
 
-            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMealName, randomNumber)
+            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMeal, randomNumber)
             randomNumber = !randomNumber
-            println(showUserList)
-            println("Press (1) for option 1 \n\t(2) for option 2\n\t(3) for option 3")
+            println("$showUserList\n")
+            println("\tPress (1) for option 1 \n\tPress (2) for option 2 \n\tPress (3) for option 3\n")
 
             print("Enter the Ingredient Input Number : ")
             val input = readln().toIntOrNull() ?: -1
@@ -146,16 +197,16 @@ class App(
             val ingredientUserInput = guessIngredientGameUseCase.getIngredientOptionByNumber(showUserList, input)
 
 
-            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMealName)
+            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMeal)
 
 
             if (correctGuess) {
                 score = guessIngredientGameUseCase.updateScore(score)
                 counter++
             } else {
-                println("Your Score : $score")
                 println("failure try again later ...")
-                println("End Game ")
+                println("Your Score : $score")
+                println("End Game \n\n")
             }
 
 
@@ -179,9 +230,7 @@ class App(
 
                     1 -> {
                         showMealDetails(
-                            suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(
-                                nameAndDescription.first!!
-                            )
+                            suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!)
                         )
                         break
                     }
