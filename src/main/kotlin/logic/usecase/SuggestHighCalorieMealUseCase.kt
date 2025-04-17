@@ -24,7 +24,7 @@ class SuggestHighCalorieMealUseCase(
     }
 
     private fun filterMealByHighCalorie(meal: Meal): Boolean{
-        return  meal.nutrition?.calories!! > 700f
+        return (meal.nutrition?.calories ?: 0f) > 700f
     }
 
 
