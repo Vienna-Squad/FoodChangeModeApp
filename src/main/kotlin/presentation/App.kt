@@ -24,7 +24,7 @@ class App(
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
     private val guessIngredientGameUseCase: GuessIngredientGameUseCase,
     private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase
-    ) {
+) {
     fun start() {
         do {
             MenuItem.entries.forEachIndexed { index, action ->
@@ -43,7 +43,7 @@ class App(
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
-                MenuItem.MEAL_BY_COUNTRY -> TODO()
+                MenuItem.MEAL_BY_COUNTRY -> handleMealByCountry()
                 MenuItem.INGREDIENT_GAME -> showIngredientGuessGame()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
@@ -54,6 +54,24 @@ class App(
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+
+    private fun handleMealByCountry() {
+        print("Enter a  country to explore its meals: ")
+        val input = readln()
+        try {
+            val meals = getMealsOfCountryUseCase(input)
+            if (meals.isEmpty()) {
+                println("No meals found for '$input'.")
+            } else {
+                println("Meals related to '$input':")
+                meals.forEachIndexed { index, meal ->
+                    println("${index + 1}. ${meal.name}")
+                }
+            }
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
     }
     private fun showIngredientGuessGame() {
 
@@ -94,7 +112,7 @@ class App(
 
         }
     }
-    fun showHighCalorieMeal() {
+ private  fun showHighCalorieMeal() {
         do {
             try {
                 println("The Suggestion High Calorie Meal ")

@@ -3,37 +3,37 @@ package org.example.logic.usecase
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.exceptions.NotACountryException
-import org.example.utils.fuzzysearch.FuzzyCountryMatcher
+import org.example.utils.KMPSearcher
+
 
 class GetMealsOfCountryUseCase(
     private val mealsRepository: MealsRepository,
-    private val fuzzyCountryMatcher: FuzzyCountryMatcher = FuzzyCountryMatcher()
+    private val kmpSearcher: KMPSearcher = KMPSearcher()
 ) {
     /**
-     * Retrieves a list of meals associated with the specified country.
-     * The method validates the country input, checks if it matches a valid country name using fuzzy matching,
-     * and then filters meals based on their tags to find those related to the input country.
-     * The resulting list is shuffled and limited to a maximum of 20 meals.
-     *
-     * @param countryInput The name of the country to search for (e.g.,"Egypt" ,"Italy", "Mexican").
-     * @return A list of up to 20 meals associated with the specified country, randomly shuffled.
-     * @throws NotACountryException If the country input is blank or does not match any valid country name.
+     * Explores meals related to a specified country using KMP string matching with partial match.
+     * Searches in both tags and description, shuffles the results, and returns up to 20 meals.
+     * @param countryInput The country name or adjective entered by the user (e.g., "Italy" or "Italian").
+     * @throws NotACountryException if the country input is empty or not close to a real country.
      */
     operator fun invoke(countryInput: String): List<Meal> {
         if (countryInput.isBlank()) {
             throw NotACountryException("Country name cannot be empty.")
         }
-        if (!fuzzyCountryMatcher.isValidCountry(countryInput)) {
-            throw NotACountryException("'$countryInput' is not a valid country name.")
-        }
+
+        val normalizedCountry = countryInput.trim().lowercase()
         return mealsRepository.getAllMeals()
-            .filter { meal -> hasMatchingCountryTag(meal, countryInput) }
+            .filter { meal -> hasMatchingCountry(meal, normalizedCountry) }
             .shuffled()
             .take(20)
     }
 
-    private fun hasMatchingCountryTag(meal: Meal, countryInput: String) = meal.tags?.any { tag ->
-        fuzzyCountryMatcher.doesTagMatchCountry(tag, countryInput)
-    } ?: false
-}
+    private fun hasMatchingCountry(meal: Meal, countryInput: String): Boolean {
+        val matchesInTags = meal.tags?.any { tag ->
+            kmpSearcher.search(tag.lowercase(), countryInput)
+        } ?: false
 
+        val matchesInDescription = kmpSearcher.search(meal.description?.lowercase() ?: "", countryInput)
+        return matchesInTags || matchesInDescription
+    }
+}
