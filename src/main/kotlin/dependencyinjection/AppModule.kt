@@ -25,7 +25,8 @@ val appModule = module {
             getItalianGroupMealsUseCase = get(),
             getMealsByProteinAndCaloriesUseCase = get(),
             getMealsOfCountryUseCase = get(),
-            getRankedSeafoodByProteinUseCase = get()
+            getRankedSeafoodByProteinUseCase = get(),
+            suggestHighCalorieMealUseCase = get()
         )
     }
 }
