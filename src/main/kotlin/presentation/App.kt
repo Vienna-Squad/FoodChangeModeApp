@@ -1,9 +1,12 @@
 package org.example.presentation
 
+import org.example.logic.usecase.GuessIngredientGameUseCase
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App {
+class App(
+    val guessIngredientGameUseCase: GuessIngredientGameUseCase
+) {
 
     fun start() {
         do {
@@ -24,7 +27,7 @@ class App {
                 MenuItem.MEAL_BY_DATE -> TODO()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
-                MenuItem.INGREDIENT_GAME -> TODO()
+                MenuItem.INGREDIENT_GAME -> showIngredientGuessGame(guessIngredientGameUseCase)
                 MenuItem.POTATO_MEALS -> TODO()
                 MenuItem.FOR_THIN_MEAL -> TODO()
                 MenuItem.SEAFOOD_MEALS -> TODO()
@@ -34,5 +37,41 @@ class App {
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+
+    private fun showIngredientGuessGame(guess: GuessIngredientGameUseCase) {
+        var score = 0
+        var counter = 0
+        var randomNumber = true
+        var correctGuess = true
+
+        while (correctGuess && counter < 15) {
+
+            val randomMealName = guess.generateRandomMeal()
+            println("The Meal : $randomMealName")
+
+            val showUserList = guess.generateIngredientListOptions(randomMealName, randomNumber)
+            randomNumber = !randomNumber
+            println(showUserList)
+            println("Press (1) for option 1 \n\t(2) for option 2\n\t(3) for option 3")
+
+            // get User ingredient
+            print("Enter the Ingredient Input Number : ")
+            val input = readln().toIntOrNull()
+
+            val getUserInput = guess.getIngredientOptionByNumber(showUserList, input?:-1)
+
+            if (guess.checkIngredientUserInput(getUserInput, randomMealName)) {
+                println("Correct .....")
+                score += 1000
+                counter++
+            } else {
+                println("Your Score : $score")
+                println("failure try again later ...")
+                println("End Game ")
+                correctGuess = false
+            }
+
+        }
     }
 }
