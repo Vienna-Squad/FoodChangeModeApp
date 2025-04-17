@@ -21,7 +21,8 @@ class App(
     private val getMealsOfCountryUseCase: GetMealsOfCountryUseCase,
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
     private val guessIngredientGameUseCase: GuessIngredientGameUseCase,
-    private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase
+    private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase,
+    private val getHealthyFastFoodUseCase: GetHealthyFastFoodUseCase
 ) {
     fun start() {
         do {
@@ -32,7 +33,7 @@ class App(
             val selectedAction = (readln().toIntOrNull() ?: -1).toMenuItem()
             println()
             when (selectedAction) {
-                MenuItem.HEALTHY_FAST_FOOD -> println("coming soon...")
+                MenuItem.HEALTHY_FAST_FOOD -> findHealthyFastFood()
                 MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
@@ -52,6 +53,20 @@ class App(
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+
+    private fun findHealthyFastFood() {
+        try {
+            val healthyFastFoodMeals = getHealthyFastFoodUseCase()
+            if (healthyFastFoodMeals.isNotEmpty()) {
+                println("================== Healthy Fast Food Suggestions ==================")
+                healthyFastFoodMeals.forEach { println("- ${it.name}") }
+            } else {
+                println("No healthy fast food options found based on the criteria.")
+            }
+        } catch (e: Exception) {
+            println("Error fetching healthy fast food: ${e.message}")
+        }
     }
 
     private fun executeGetMealsByProteinAndCalories() {
