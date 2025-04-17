@@ -31,22 +31,22 @@ class App(
             val selectedAction = (readln().toIntOrNull() ?: -1).toMenuItem()
             println()
             when (selectedAction) {
-                MenuItem.HEALTHY_FAST_FOOD -> TODO()
+                MenuItem.HEALTHY_FAST_FOOD -> println("coming soon...")
                 MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
-                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
-                MenuItem.EGG_FREE_SWEETS -> TODO()
+                MenuItem.EGG_FREE_SWEETS -> println("coming soon...")
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
-                MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
+                MenuItem.CALCULATED_CALORIES_MEAL -> println("coming soon...")
                 MenuItem.MEAL_BY_COUNTRY -> handleMealByCountry()
                 MenuItem.INGREDIENT_GAME -> showIngredientGuessGame()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
-                MenuItem.SEAFOOD_MEALS -> TODO()
+                MenuItem.SEAFOOD_MEALS -> println("coming soon...")
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> handleItalianMealForGroups()
-                MenuItem.EXIT -> {}
+                MenuItem.EXIT -> println("See you later!!")
             }
 
         } while (selectedAction != MenuItem.EXIT)
