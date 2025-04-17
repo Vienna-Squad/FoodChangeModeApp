@@ -11,14 +11,19 @@ class GetItalianGroupMealsUseCase(private val mealsRepository: MealsRepository) 
      * Filters meals by checking if they have both 'italian' and 'for-large-groups' tags.
      * @throws NoItalianGroupMealsException if no suitable meals are found.
      */
-    operator fun invoke() = mealsRepository.getAllMeals()
-        .filter(::isItalianGroupMeal)
-        .let { meals ->
-            if (meals.isEmpty()) throw NoItalianGroupMealsException("No meals found with tags 'italian' and 'for-large-groups' in the Csv file.")
-            meals
+    operator fun invoke(): List<Meal> {
+        val matchingMeals = mealsRepository.getAllMeals()
+            .filter(::hasItalianAndGroupTags)
+        if (matchingMeals.isEmpty()) {
+            throw NoItalianGroupMealsException("No meals found with tags 'italian' and 'for-large-groups' in the Csv file.")
         }
 
-    private fun isItalianGroupMeal(meal: Meal) = meal.tags?.let { tags ->
-        tags.contains("italian") && tags.contains("for-large-groups")
-    } ?: false
+        return matchingMeals
+    }
+
+    private fun hasItalianAndGroupTags(meal: Meal): Boolean {
+        val hasItalianTag = meal.tags?.any { it.lowercase().contains("italian") } ?: false
+        val isForLargeGroups = meal.tags?.any { it.lowercase().contains("for-large-groups") } ?: false
+        return hasItalianTag && isForLargeGroups
+    }
 }

@@ -3,10 +3,7 @@ package org.example.presentation
 import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
 import org.example.logic.usecase.*
-import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
-import org.example.logic.usecase.exceptions.IncorrectDateFormatException
-import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
-import org.example.logic.usecase.exceptions.NoMealFoundByNameException
+import org.example.logic.usecase.exceptions.*
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
@@ -56,6 +53,7 @@ class App(
 
     }
 
+
     private fun handleMealByCountry() {
         print("Enter a  country to explore its meals: ")
         val input = readln()
@@ -73,7 +71,21 @@ class App(
             println("Error: ${e.message}")
         }
     }
-    private fun showIngredientGuessGame() {
+
+
+    private fun handleItalianMealForGroups() {
+        try {
+            val meals = getItalianGroupMealsUseCase()
+            meals.forEach { meal ->
+                println(meal.name)
+            }
+        } catch (e: Exception) {
+            println("No Italian meals for groups found")
+        }
+    }
+
+
+private fun showIngredientGuessGame() {
 
         // init
         var score = 0
