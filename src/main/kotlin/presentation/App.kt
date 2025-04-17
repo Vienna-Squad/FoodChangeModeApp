@@ -10,7 +10,7 @@ import org.example.logic.usecase.exceptions.NoMealFoundByNameException
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
-class App (
+class App(
     private val getMealByName: GetMealByName,
     private val getMealsByDateUseCase: GetMealsByDateUseCase,
     private val getEasyFoodSuggestionUseCase: GetEasyFoodSuggestionUseCase,
@@ -24,7 +24,7 @@ class App (
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
     val guessIngredientGameUseCase: GuessIngredientGameUseCase
 
-    ){
+) {
 
     fun start() {
         do {
@@ -56,7 +56,10 @@ class App (
         } while (selectedAction != MenuItem.EXIT)
 
     }
+
     private fun showIngredientGuessGame(guess: GuessIngredientGameUseCase) {
+
+        // init
         var score = 0
         var counter = 0
         var randomNumber = true
@@ -72,22 +75,24 @@ class App (
             println(showUserList)
             println("Press (1) for option 1 \n\t(2) for option 2\n\t(3) for option 3")
 
-            // get User ingredient
             print("Enter the Ingredient Input Number : ")
-            val input = readln().toIntOrNull()
+            val input = readln().toIntOrNull() ?: -1
 
-            val getUserInput = guess.getIngredientOptionByNumber(showUserList, input?:-1)
+            val ingredientUserInput = guess.getIngredientOptionByNumber(showUserList, input)
 
-            if (guess.checkIngredientUserInput(getUserInput, randomMealName)) {
-                println("Correct .....")
-                score += 1000
+
+            correctGuess = guess.checkIngredientUserInput(ingredientUserInput, randomMealName)
+
+
+            if (correctGuess) {
+                score = guess.updateScore(score)
                 counter++
             } else {
                 println("Your Score : $score")
                 println("failure try again later ...")
                 println("End Game ")
-                correctGuess = false
             }
+
 
         }
     }

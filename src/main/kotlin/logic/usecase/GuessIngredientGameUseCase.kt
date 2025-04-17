@@ -75,6 +75,10 @@ class GuessIngredientGameUseCase(
             ?.any { ingredientItem -> ingredientItem.contains(ingredient, ignoreCase = true) } == true
     }
 
+    fun updateScore(score: Int):Int{
+        return score+1000
+    }
+
     companion object {
         const val FIRST_CORRECT_INDEX = 0
         const val SECOND_CORRECT_INDEX = 2
