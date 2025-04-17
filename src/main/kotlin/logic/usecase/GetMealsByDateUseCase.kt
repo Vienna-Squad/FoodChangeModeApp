@@ -5,7 +5,7 @@ import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
 import java.text.SimpleDateFormat
 
-class SearchFoodsByDateUseCase(private val mealsRepository: MealsRepository) {
+class GetMealsByDateUseCase(private val mealsRepository: MealsRepository) {
     operator fun invoke(date: String) = mealsRepository.getAllMeals().filter { meal ->
         meal.submitted == dateFormat(date)
     }.let { meals ->

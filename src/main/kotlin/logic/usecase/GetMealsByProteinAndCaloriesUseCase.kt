@@ -4,7 +4,7 @@ import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
 import kotlin.math.abs
 
-class FindMealsByProteinAndCaloriesUseCase(private val mealsRepository: MealsRepository) {
+class GetMealsByProteinAndCaloriesUseCase(private val mealsRepository: MealsRepository) {
 
     private val CALORIE_TOLERANCE = 50.0f // +/- 50 calories
     private val PROTEIN_TOLERANCE = 5.0f  // +/- 5 grams of protein

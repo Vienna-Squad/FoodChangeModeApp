@@ -13,7 +13,7 @@ enum class MenuItem(val title: String) {
     MEAL_BY_COUNTRY("Explore Meals by Country"),
     INGREDIENT_GAME("Guess the Ingredient Game"),
     POTATO_MEALS("Find Potato-Based Dishes"),
-    FOR_THIN_MEAL("High-Calorie Meals for Weight Gain"),
+    HIGH_CALORIES_MEAL("High-Calorie Meals for Weight Gain"),
     SEAFOOD_MEALS("Explore Seafood Dishes"),
     ITALIAN_MEAL_FOR_GROUPS("Italian Group Meals"),
     EXIT("Exit");
