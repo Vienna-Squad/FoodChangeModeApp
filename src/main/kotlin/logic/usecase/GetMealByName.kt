@@ -1,12 +1,18 @@
 package org.example.logic.usecase
 
-import me.xdrop.fuzzywuzzy.FuzzySearch
+import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.exceptions.NoMealFoundByNameException
+import org.example.utils.KMPSearcher
 
-class GetMealByName(private val mealsRepository: MealsRepository) {
-    operator fun invoke(query: String) = mealsRepository.getAllMeals().find { meal ->
-        FuzzySearch.tokenSortRatio(meal.name?.lowercase(), query.lowercase()) > 80
-    } ?: throw NoMealFoundByNameException("No meal found matching the name: $query")
+class GetMealByName(private val mealsRepository: MealsRepository,private val kmpSearcher: KMPSearcher = KMPSearcher()) {
+        operator fun invoke(query: String): Meal {
+            val normalizedQuery = query.trim().lowercase()
+
+            return mealsRepository.getAllMeals().find { meal ->
+                val name = meal.name?.lowercase().orEmpty()
+                kmpSearcher.search(name, normalizedQuery)
+            } ?: throw NoMealFoundByNameException("No meal found matching the name: $query")
+        }
 }
 
