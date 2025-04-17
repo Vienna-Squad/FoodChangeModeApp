@@ -22,8 +22,8 @@ class App(
     private val getMealsByProteinAndCaloriesUseCase: GetMealsByProteinAndCaloriesUseCase,
     private val getMealsOfCountryUseCase: GetMealsOfCountryUseCase,
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
-    private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase,
-) {
+    val guessIngredientGameUseCase: GuessIngredientGameUseCase
+    ) {
     fun start() {
         do {
             MenuItem.entries.forEachIndexed { index, action ->
@@ -45,7 +45,7 @@ class App(
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
-                MenuItem.FOR_THIN_MEAL -> showHighCalorieMeal()
+                MenuItem.FOR_THIN_MEAL -> TODO()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
                 MenuItem.EXIT -> {}
@@ -54,7 +54,45 @@ class App(
         } while (selectedAction != MenuItem.EXIT)
 
     }
+    private fun showIngredientGuessGame(guess: GuessIngredientGameUseCase) {
 
+        // init
+        var score = 0
+        var counter = 0
+        var randomNumber = true
+        var correctGuess = true
+
+        while (correctGuess && counter < 15) {
+
+            val randomMealName = guess.generateRandomMeal()
+            println("The Meal : $randomMealName")
+
+            val showUserList = guess.generateIngredientListOptions(randomMealName, randomNumber)
+            randomNumber = !randomNumber
+            println(showUserList)
+            println("Press (1) for option 1 \n\t(2) for option 2\n\t(3) for option 3")
+
+            print("Enter the Ingredient Input Number : ")
+            val input = readln().toIntOrNull() ?: -1
+
+            val ingredientUserInput = guess.getIngredientOptionByNumber(showUserList, input)
+
+
+            correctGuess = guess.checkIngredientUserInput(ingredientUserInput, randomMealName)
+
+
+            if (correctGuess) {
+                score = guess.updateScore(score)
+                counter++
+            } else {
+                println("Your Score : $score")
+                println("failure try again later ...")
+                println("End Game ")
+            }
+
+
+        }
+    }
     fun showHighCalorieMeal() {
         do {
             try {
