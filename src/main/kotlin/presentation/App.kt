@@ -1,5 +1,6 @@
 package org.example.presentation
 
+import org.example.logic.usecase.GuessIngredientGameUseCase
 import org.example.logic.model.Meal
 import org.example.logic.usecase.*
 import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
@@ -21,7 +22,10 @@ class App(
     private val getMealsByProteinAndCaloriesUseCase: GetMealsByProteinAndCaloriesUseCase,
     private val getMealsOfCountryUseCase: GetMealsOfCountryUseCase,
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
+    val guessIngredientGameUseCase: GuessIngredientGameUseCase
+
 ) {
+
     fun start() {
         do {
             MenuItem.entries.forEachIndexed { index, action ->
@@ -38,7 +42,7 @@ class App(
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
                 MenuItem.EGG_FREE_SWEETS -> TODO()
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
-                MenuItem.MEAL_BY_DATE -> handleSearchByDate()
+                MenuItem.MEAL_BY_DATE -> showPotatoesMeals()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
@@ -46,11 +50,51 @@ class App(
                 MenuItem.FOR_THIN_MEAL -> TODO()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
-                MenuItem.EXIT -> {}
+                MenuItem.EXIT -> TODO()
             }
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+
+    private fun showIngredientGuessGame(guess: GuessIngredientGameUseCase) {
+
+        // init
+        var score = 0
+        var counter = 0
+        var randomNumber = true
+        var correctGuess = true
+
+        while (correctGuess && counter < 15) {
+
+            val randomMealName = guess.generateRandomMeal()
+            println("The Meal : $randomMealName")
+
+            val showUserList = guess.generateIngredientListOptions(randomMealName, randomNumber)
+            randomNumber = !randomNumber
+            println(showUserList)
+            println("Press (1) for option 1 \n\t(2) for option 2\n\t(3) for option 3")
+
+            print("Enter the Ingredient Input Number : ")
+            val input = readln().toIntOrNull() ?: -1
+
+            val ingredientUserInput = guess.getIngredientOptionByNumber(showUserList, input)
+
+
+            correctGuess = guess.checkIngredientUserInput(ingredientUserInput, randomMealName)
+
+
+            if (correctGuess) {
+                score = guess.updateScore(score)
+                counter++
+            } else {
+                println("Your Score : $score")
+                println("failure try again later ...")
+                println("End Game ")
+            }
+
+
+        }
     }
 
     private fun suggestKetoMeals() {
@@ -177,3 +221,4 @@ class App(
         }
     }
 }
+
