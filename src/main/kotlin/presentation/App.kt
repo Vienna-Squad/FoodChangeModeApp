@@ -52,7 +52,23 @@ class App(
         } while (selectedAction != MenuItem.EXIT)
 
     }
-
+    private fun handleMealByCountry() {
+        print("Enter a  country to explore its meals: ")
+        val input = readln()
+        try {
+            val meals = getMealsOfCountryUseCase(input)
+            if (meals.isEmpty()) {
+                println("No meals found for '$input'.")
+            } else {
+                println("Meals related to '$input':")
+                meals.forEachIndexed { index, meal ->
+                    println("${index + 1}. ${meal.name}")
+                }
+            }
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
+    }
     private fun suggestKetoMeals() {
         val seenMeals = mutableSetOf<Meal>()
         while (true) {
