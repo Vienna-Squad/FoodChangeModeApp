@@ -13,6 +13,7 @@ class App(
     private val getEasyFoodSuggestionUseCase: GetEasyFoodSuggestionUseCase,
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase,
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase,
+    private val getEggFreeSweetsUseCase: GetEggFreeSweetsUseCase,
     private val getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase,
     private val getKetoMealUseCase: GetKetoMealUseCase,
     private val getItalianGroupMealsUseCase: GetItalianGroupMealsUseCase,
@@ -27,7 +28,7 @@ class App(
             MenuItem.entries.forEachIndexed { index, action ->
                 println("${index + 1}- ${action.title}")
             }
-            print("choose the action \u001B[33m*enter (8) or anything else to exit*\u001B[0m: ")
+            print("choose the action \u001B[33m*enter (16 or anything else to exit*\u001B[0m: ")
             val selectedAction = (readln().toIntOrNull() ?: -1).toMenuItem()
             println()
             when (selectedAction) {
@@ -36,7 +37,7 @@ class App(
                 MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
-                MenuItem.EGG_FREE_SWEETS -> TODO()
+                MenuItem.EGG_FREE_SWEETS -> showEggFreeSweets()
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
@@ -46,13 +47,13 @@ class App(
                 MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> handleItalianMealForGroups()
-                MenuItem.EXIT -> {}
+                MenuItem.EXIT -> {
+                }
             }
 
         } while (selectedAction != MenuItem.EXIT)
 
     }
-
 
     private fun handleMealByCountry() {
         print("Enter a  country to explore its meals: ")
@@ -72,6 +73,42 @@ class App(
         }
     }
 
+    private fun showEggFreeSweets(){
+        val seenMeals = mutableSetOf<Meal>()
+        while (true) {
+            val meal = getEggFreeSweetsUseCase(seenMeals)
+            if (meal == null) {
+                println("There Is no Egg-Free sweets")
+                break
+            }
+            println("Meal: ${meal.name}")
+            println(meal.description ?: "No description available.")
+            println("1 - Like    |   2 - Dislike ")
+            print("Your choice: ")
+            when (readlnOrNull()) {
+                "1" -> {
+                    println("\n Full Details of ${meal.name}")
+                    println("Time: ${meal.minutes} ")
+                    println("Ingredients: ${meal.ingredients}")
+                    println("Steps: ${meal.steps}")
+                    println("Nutrition Info:")
+                    println("  Calories: ${meal.nutrition?.calories}")
+                    println("  Fat: ${meal.nutrition?.totalFat}")
+                    println("  Carbs: ${meal.nutrition?.carbohydrates}")
+                    println("  Protein: ${meal.nutrition?.protein}")
+                    break
+                }
+                "2" -> {
+                    seenMeals.add(meal)
+                    println("\n try another one\n")
+                }
+                else -> {
+                    println("Exiting Egg-Free Sweets Suggestions")
+                    break
+                }
+            }
+        }
+    }
 
     private fun handleItalianMealForGroups() {
         try {
@@ -85,7 +122,7 @@ class App(
     }
 
 
-private fun showIngredientGuessGame() {
+    private fun showIngredientGuessGame() {
 
         // init
         var score = 0
@@ -124,7 +161,8 @@ private fun showIngredientGuessGame() {
 
         }
     }
- private  fun showHighCalorieMeal() {
+
+    private fun showHighCalorieMeal() {
         do {
             try {
                 println("The Suggestion High Calorie Meal ")
@@ -140,7 +178,11 @@ private fun showIngredientGuessGame() {
                 when (inputUser) {
 
                     1 -> {
-                        showMealDetails(suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!))
+                        showMealDetails(
+                            suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(
+                                nameAndDescription.first!!
+                            )
+                        )
                         break
                     }
 
@@ -160,7 +202,8 @@ private fun showIngredientGuessGame() {
 
         } while (true)
     }
-    fun showMealDetails(meal: Meal){
+
+    private fun showMealDetails(meal: Meal) {
         println("name : ${meal.name}")
         println("ingredients : ${meal.description}")
         println("minutes : ${meal.minutes}")
@@ -168,7 +211,8 @@ private fun showIngredientGuessGame() {
         println("steps : ${meal.steps}")
         showNutrition(meal.nutrition!!)
     }
-    fun showNutrition(nutrition: Nutrition){
+
+    private fun showNutrition(nutrition: Nutrition) {
         println("calories : ${nutrition.calories}")
         println("sodium : ${nutrition.sodium}")
         println("sugar  : ${nutrition.sugar}")
@@ -254,8 +298,10 @@ private fun showIngredientGuessGame() {
     }
 
     private fun showEasyMeal() {
-        println("Here is a 10 meals That are Easy to make  A meal is considered easy if it \n" +
-                "requires 30 minutes or less, has 5 ingredients or fewer, and can be prepared in 6 steps or fewer.\n ")
+        println(
+            "Here is a 10 meals That are Easy to make  A meal is considered easy if it \n" +
+                    "requires 30 minutes or less, has 5 ingredients or fewer, and can be prepared in 6 steps or fewer.\n "
+        )
         val meals = getEasyFoodSuggestionUseCase()
         if (meals.isEmpty()) {
             println("No meals found")
