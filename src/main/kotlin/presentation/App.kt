@@ -39,12 +39,12 @@ class App(
                 MenuItem.EGG_FREE_SWEETS -> println("coming soon...")
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
-                MenuItem.CALCULATED_CALORIES_MEAL -> println("coming soon...")
+                MenuItem.CALCULATED_CALORIES_MEAL -> executeGetMealsByProteinAndCalories()
                 MenuItem.MEAL_BY_COUNTRY -> handleMealByCountry()
                 MenuItem.INGREDIENT_GAME -> showIngredientGuessGame()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
-                MenuItem.SEAFOOD_MEALS -> println("coming soon...")
+                MenuItem.SEAFOOD_MEALS -> executeGetRankedSeafoodByProtein()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> handleItalianMealForGroups()
                 MenuItem.EXIT -> println("See you later!!")
             }
@@ -52,6 +52,56 @@ class App(
         } while (selectedAction != MenuItem.EXIT)
 
     }
+
+    private fun executeGetMealsByProteinAndCalories() {
+        println("--- Find Meals by Calories & Protein ---")
+        print("Enter desired calories (e.g., 500): ")
+        val caloriesInput = readln().toFloatOrNull()
+        print("Enter desired protein in grams (e.g., 30): ")
+        val proteinInput = readln().toFloatOrNull()
+
+        if (caloriesInput == null || proteinInput == null) {
+            println("\u001B[31mInvalid input. Please enter numbers only for calories and protein.\u001B[0m")
+            return
+        }
+
+        // Call the injected UseCase using invoke operator
+        val results = getMealsByProteinAndCaloriesUseCase(caloriesInput, proteinInput)
+
+        if (results.isEmpty()) {
+            println("\u001B[33mNo meals found matching your criteria within the tolerance.\u001B[0m")
+        } else {
+            println("\u001B[32mFound ${results.size} matching meals:\u001B[0m")
+            results.forEach { meal ->
+                // Display meal name and relevant nutrition
+                val caloriesStr = meal.nutrition?.calories?.toString() ?: "N/A"
+                val proteinStr = meal.nutrition?.protein?.toString() ?: "N/A"
+                println("- ${meal.name ?: "Unnamed Meal"} (Calories: $caloriesStr, Protein: ${proteinStr}g)")
+            }
+        }
+    }
+
+    private fun executeGetRankedSeafoodByProtein() {
+        println("--- Seafood Meals Sorted by Protein (Highest First) ---")
+
+        val results: List<RankedMealResult> = getRankedSeafoodByProteinUseCase()
+
+        if (results.isEmpty()) {
+            println("\u001B[33mNo seafood meals with protein information found.\u001B[0m")
+        } else {
+            // Green table header
+            println("\u001B[32mRank | Meal Name                      | Protein (g)\u001B[0m")
+            println("-----|--------------------------------|------------")
+            results.forEach { rankedMeal ->
+                // Format output for alignment
+                val rankStr = rankedMeal.rank.toString().padEnd(4)
+                val nameStr = (rankedMeal.name ?: "Unnamed Meal").take(30).padEnd(30) // Truncate long names
+                val proteinStr = rankedMeal.protein?.toString() ?: "N/A"
+                println("$rankStr | $nameStr | $proteinStr")
+            }
+        }
+    }
+
 
 
     private fun handleMealByCountry() {
