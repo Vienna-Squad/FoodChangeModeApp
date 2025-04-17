@@ -1,10 +1,11 @@
 package org.example.logic.usecase
+
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.exceptions.NotACountryException
 import org.example.utils.fuzzysearch.FuzzyCountryMatcher
 
-class NotACountryException(message: String) : Exception(message)
-class ExploreCountryMealsUseCase(
+class GetMealsOfCountryUseCase(
     private val mealsRepository: MealsRepository,
     private val fuzzyCountryMatcher: FuzzyCountryMatcher = FuzzyCountryMatcher()
 ) {
@@ -18,7 +19,7 @@ class ExploreCountryMealsUseCase(
      * @return A list of up to 20 meals associated with the specified country, randomly shuffled.
      * @throws NotACountryException If the country input is blank or does not match any valid country name.
      */
-    fun exploreMealsByCountry(countryInput: String): List<Meal> {
+    operator fun invoke(countryInput: String): List<Meal> {
         if (countryInput.isBlank()) {
             throw NotACountryException("Country name cannot be empty.")
         }
@@ -31,10 +32,8 @@ class ExploreCountryMealsUseCase(
             .take(20)
     }
 
-    private fun hasMatchingCountryTag(meal: Meal, countryInput: String): Boolean {
-        return meal.tags?.any { tag ->
-            fuzzyCountryMatcher.doesTagMatchCountry(tag, countryInput)
-        } ?: false
-    }
+    private fun hasMatchingCountryTag(meal: Meal, countryInput: String) = meal.tags?.any { tag ->
+        fuzzyCountryMatcher.doesTagMatchCountry(tag, countryInput)
+    } ?: false
 }
 
