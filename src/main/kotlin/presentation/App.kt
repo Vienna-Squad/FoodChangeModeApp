@@ -44,9 +44,9 @@ class App(
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> TODO()
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
-                MenuItem.INGREDIENT_GAME -> TODO()
+                MenuItem.INGREDIENT_GAME -> showIngredientGuessGame()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
-                MenuItem.FOR_THIN_MEAL -> showHighCalorieMeal()
+                MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
                 MenuItem.EXIT -> {}
@@ -55,7 +55,7 @@ class App(
         } while (selectedAction != MenuItem.EXIT)
 
     }
-    private fun showIngredientGuessGame(guess: GuessIngredientGameUseCase) {
+    private fun showIngredientGuessGame() {
 
         // init
         var score = 0
@@ -65,10 +65,10 @@ class App(
 
         while (correctGuess && counter < 15) {
 
-            val randomMealName = guess.generateRandomMeal()
+            val randomMealName = guessIngredientGameUseCase.generateRandomMeal()
             println("The Meal : $randomMealName")
 
-            val showUserList = guess.generateIngredientListOptions(randomMealName, randomNumber)
+            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMealName, randomNumber)
             randomNumber = !randomNumber
             println(showUserList)
             println("Press (1) for option 1 \n\t(2) for option 2\n\t(3) for option 3")
@@ -76,14 +76,14 @@ class App(
             print("Enter the Ingredient Input Number : ")
             val input = readln().toIntOrNull() ?: -1
 
-            val ingredientUserInput = guess.getIngredientOptionByNumber(showUserList, input)
+            val ingredientUserInput = guessIngredientGameUseCase.getIngredientOptionByNumber(showUserList, input)
 
 
-            correctGuess = guess.checkIngredientUserInput(ingredientUserInput, randomMealName)
+            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMealName)
 
 
             if (correctGuess) {
-                score = guess.updateScore(score)
+                score = guessIngredientGameUseCase.updateScore(score)
                 counter++
             } else {
                 println("Your Score : $score")
