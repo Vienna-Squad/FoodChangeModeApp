@@ -17,7 +17,7 @@ val appModule = module {
     single<MealsRepository> { CsvMealsRepository(csvFileReader = get(), mealsCsvParser = get()) }
     single {
         App(
-            getMealByName = get(),
+            //getMealByName = get(),
             getMealsByDateUseCase = get(),
             getEasyFoodSuggestionUseCase = get(),
             getIraqiMealsUseCase = get(),
@@ -30,6 +30,7 @@ val appModule = module {
             getRankedSeafoodByProteinUseCase = get(),
             suggestHighCalorieMealUseCase = get(),
             guessIngredientGameUseCase = get(),
+            getMealByName = get(),
         )
     }
 }

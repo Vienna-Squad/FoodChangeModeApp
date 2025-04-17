@@ -2,7 +2,7 @@ package org.example.dependencyinjection
 
 import org.example.logic.usecase.*
 import org.koin.dsl.module
-import kotlin.math.sin
+
 
 val useCasesModule = module {
     single { GetEasyFoodSuggestionUseCase(get()) }

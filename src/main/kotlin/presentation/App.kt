@@ -242,13 +242,15 @@ class App(
     }
 
     private fun showEasyMeal() {
+        println("Here is a 10 meals That are Easy to make  A meal is considered easy if it \n" +
+                "requires 30 minutes or less, has 5 ingredients or fewer, and can be prepared in 6 steps or fewer.\n ")
         val meals = getEasyFoodSuggestionUseCase()
         if (meals.isEmpty()) {
             println("No meals found")
         } else {
             println("Easy meals:")
             meals.forEach { meal ->
-                println(meal)
+                showMealDetails(meal)
             }
         }
     }
