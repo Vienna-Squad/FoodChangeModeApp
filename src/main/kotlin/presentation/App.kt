@@ -31,12 +31,12 @@ class App(
             val selectedAction = (readln().toIntOrNull() ?: -1).toMenuItem()
             println()
             when (selectedAction) {
-                MenuItem.HEALTHY_FAST_FOOD -> TODO()
+                MenuItem.HEALTHY_FAST_FOOD -> println("coming soon...")
                 MenuItem.MEAL_BY_NAME -> handleTheMealSearchByName()
-                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.IRAQI_MEALS -> showIraqiMeals()
+                MenuItem.EASY_FOOD_SUGGESTION_GAME -> showEasyMeal()
                 MenuItem.PREPARATION_TIME_GUESSING_GAME -> startPreparationTimeGuessingGame()
-                MenuItem.EGG_FREE_SWEETS -> TODO()
+                MenuItem.EGG_FREE_SWEETS -> println("coming soon...")
                 MenuItem.KETO_DIET_MEAL -> suggestKetoMeals()
                 MenuItem.MEAL_BY_DATE -> handleSearchByDate()
                 MenuItem.CALCULATED_CALORIES_MEAL -> executeGetMealsByProteinAndCalories()
@@ -46,7 +46,7 @@ class App(
                 MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
                 MenuItem.SEAFOOD_MEALS -> executeGetRankedSeafoodByProtein()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> handleItalianMealForGroups()
-                MenuItem.EXIT -> {}
+                MenuItem.EXIT -> println("See you later!!")
             }
 
         } while (selectedAction != MenuItem.EXIT)
@@ -145,13 +145,13 @@ private fun showIngredientGuessGame() {
 
         while (correctGuess && counter < 15) {
 
-            val randomMealName = guessIngredientGameUseCase.generateRandomMeal()
-            println("The Meal : $randomMealName")
+            val randomMeal = guessIngredientGameUseCase.generateRandomMeal()
+            println("The Meal : ${randomMeal.name}\n")
 
-            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMealName, randomNumber)
+            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMeal.name, randomNumber)
             randomNumber = !randomNumber
-            println(showUserList)
-            println("Press (1) for option 1 \n\t(2) for option 2\n\t(3) for option 3")
+            println("$showUserList\n")
+            println("\tPress (1) for option 1 \n\tPress (2) for option 2 \n\tPress (3) for option 3\n")
 
             print("Enter the Ingredient Input Number : ")
             val input = readln().toIntOrNull() ?: -1
@@ -159,16 +159,16 @@ private fun showIngredientGuessGame() {
             val ingredientUserInput = guessIngredientGameUseCase.getIngredientOptionByNumber(showUserList, input)
 
 
-            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMealName)
+            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMeal.name)
 
 
             if (correctGuess) {
                 score = guessIngredientGameUseCase.updateScore(score)
                 counter++
             } else {
-                println("Your Score : $score")
                 println("failure try again later ...")
-                println("End Game ")
+                println("Your Score : $score")
+                println("End Game \n\n")
             }
 
 
