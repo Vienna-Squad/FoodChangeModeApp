@@ -3,10 +3,7 @@ package org.example.presentation
 import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
 import org.example.logic.usecase.*
-import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
-import org.example.logic.usecase.exceptions.IncorrectDateFormatException
-import org.example.logic.usecase.exceptions.MealsNotFoundForThisDateException
-import org.example.logic.usecase.exceptions.NoMealFoundByNameException
+import org.example.logic.usecase.exceptions.*
 import org.example.utils.MenuItem
 import org.example.utils.toMenuItem
 
@@ -48,13 +45,14 @@ class App(
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
                 MenuItem.HIGH_CALORIES_MEAL -> showHighCalorieMeal()
                 MenuItem.SEAFOOD_MEALS -> TODO()
-                MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
+                MenuItem.ITALIAN_MEAL_FOR_GROUPS -> handleItalianMealForGroups()
                 MenuItem.EXIT -> {}
             }
 
         } while (selectedAction != MenuItem.EXIT)
 
     }
+
 
     private fun handleMealByCountry() {
         print("Enter a  country to explore its meals: ")
@@ -73,7 +71,21 @@ class App(
             println("Error: ${e.message}")
         }
     }
-    private fun showIngredientGuessGame() {
+
+
+    private fun handleItalianMealForGroups() {
+        try {
+            val meals = getItalianGroupMealsUseCase()
+            meals.forEach { meal ->
+                println(meal.name)
+            }
+        } catch (e: Exception) {
+            println("No Italian meals for groups found")
+        }
+    }
+
+
+private fun showIngredientGuessGame() {
 
         // init
         var score = 0
