@@ -3,6 +3,7 @@ package org.example.logic.usecase
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
 import org.koin.core.logger.MESSAGE
+import kotlin.random.Random
 
 
 class GuessIngredientGameUseCase(
@@ -10,11 +11,15 @@ class GuessIngredientGameUseCase(
 ) {
 
 
-    fun generateRandomMeal(): String {
+    fun generateRandomMealsList(): List<Meal>{
         return mealsRepository.getAllMeals()
-            .filter { it.numberOfIngredients != 0 }
-            .map(Meal::name).random()
-            ?: throw IngredientRandomMealGenerationException("The Meal Not Contain Any Ingredients")
+            .chunked(15)[Random.nextInt(0,40)]
+            .filter { it.numberOfIngredients!=0 }
+    }
+
+    fun generateRandomMeal(): Meal {
+        return generateRandomMealsList().random()
+
     }
 
     fun generateIngredientListOptions(randomMealName: String?, randomChoose: Boolean): List<String?> {
