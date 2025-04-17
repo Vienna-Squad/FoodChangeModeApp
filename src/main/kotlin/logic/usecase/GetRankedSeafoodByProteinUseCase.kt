@@ -16,9 +16,10 @@ class GetRankedSeafoodByProteinUseCase(private val mealsRepository: MealsReposit
 
         return allMeals
             .filter { meal ->
-                val isSeafood = meal.tags?.any { it.equals("seafood", ignoreCase = true) } == true
+                val isSeafood = meal.tags?.any { tag ->
+                    tag.trim().equals("seafood", ignoreCase = true)
+                } ?: false
                 val hasProtein = meal.nutrition?.protein != null
-
                 isSeafood && hasProtein
             }
             .sortedByDescending { meal ->
