@@ -1,6 +1,7 @@
 package org.example.presentation
 
 import org.example.logic.model.Meal
+import org.example.logic.model.Nutrition
 import org.example.logic.usecase.*
 import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
@@ -21,6 +22,7 @@ class App(
     private val getMealsByProteinAndCaloriesUseCase: GetMealsByProteinAndCaloriesUseCase,
     private val getMealsOfCountryUseCase: GetMealsOfCountryUseCase,
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
+    private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase,
 ) {
     fun start() {
         do {
@@ -43,7 +45,7 @@ class App(
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
-                MenuItem.FOR_THIN_MEAL -> TODO()
+                MenuItem.FOR_THIN_MEAL -> showHighCalorieMeal()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
                 MenuItem.EXIT -> {}
@@ -51,6 +53,60 @@ class App(
 
         } while (selectedAction != MenuItem.EXIT)
 
+    }
+
+    fun showHighCalorieMeal() {
+        do {
+            try {
+                println("The Suggestion High Calorie Meal ")
+                val nameAndDescription = suggestHighCalorieMealUseCase.suggestNameAndDescriptionOfHighCalorieMeal()
+                suggestHighCalorieMealUseCase.checkMealIsFound(nameAndDescription)
+                println("name : ${nameAndDescription.first} , Description : ${nameAndDescription.second}")
+                println("\nIf you want more details about meal press (1) ")
+                println("if you want another meal press (2) ")
+                println("if you want To Exit (3) ")
+                print("Input Your Choose Number : ")
+                val inputUser = readln().toIntOrNull()
+
+                when (inputUser) {
+
+                    1 -> {
+                        showMealDetails(suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!))
+                        break
+                    }
+
+                    2 -> println("Another Suggestion Meal \n")
+
+                    3 -> break
+
+                    else -> throw InvalidInputNumberOfHighCalorieMeal("$inputUser is not in valid range (0..3) , please try again\n\n")
+                }
+            } catch (emptyException: EmptyRandomMealException) {
+                print("Error : ${emptyException.message}")
+            } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
+                print("Error : ${invalidInputException.message}")
+            } catch (error: Exception) {
+                println("Error : ${error.message}")
+            }
+
+        } while (true)
+    }
+    fun showMealDetails(meal: Meal){
+        println("name : ${meal.name}")
+        println("ingredients : ${meal.description}")
+        println("minutes : ${meal.minutes}")
+        println("ingredients : ${meal.ingredients}")
+        println("steps : ${meal.steps}")
+        showNutrition(meal.nutrition!!)
+    }
+    fun showNutrition(nutrition: Nutrition){
+        println("calories : ${nutrition.calories}")
+        println("sodium : ${nutrition.sodium}")
+        println("sugar  : ${nutrition.sugar}")
+        println("protein : ${nutrition.protein}")
+        println("totalFat : ${nutrition.totalFat}")
+        println("carbohydrates : ${nutrition.carbohydrates}")
+        println("saturatedFat : ${nutrition.saturatedFat}")
     }
 
     private fun suggestKetoMeals() {
