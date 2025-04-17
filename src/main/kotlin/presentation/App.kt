@@ -22,7 +22,8 @@ class App(
     private val getMealsByProteinAndCaloriesUseCase: GetMealsByProteinAndCaloriesUseCase,
     private val getMealsOfCountryUseCase: GetMealsOfCountryUseCase,
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
-    val guessIngredientGameUseCase: GuessIngredientGameUseCase
+    private val guessIngredientGameUseCase: GuessIngredientGameUseCase,
+    private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase
     ) {
     fun start() {
         do {
@@ -45,7 +46,7 @@ class App(
                 MenuItem.MEAL_BY_COUNTRY -> TODO()
                 MenuItem.INGREDIENT_GAME -> TODO()
                 MenuItem.POTATO_MEALS -> showPotatoesMeals()
-                MenuItem.FOR_THIN_MEAL -> TODO()
+                MenuItem.FOR_THIN_MEAL -> showHighCalorieMeal()
                 MenuItem.SEAFOOD_MEALS -> TODO()
                 MenuItem.ITALIAN_MEAL_FOR_GROUPS -> TODO()
                 MenuItem.EXIT -> {}
