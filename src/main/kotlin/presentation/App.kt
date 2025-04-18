@@ -25,11 +25,14 @@ class App(
     private val getHealthyFastFoodUseCase: GetHealthyFastFoodUseCase
 ) {
     fun start() {
+
+        print("\u001B[H\u001B[2J")
+        println("\u001B[1;36m" + "=".repeat(30))
+        println(" FOOD CHANGE MOOD! ".padStart(23))
+        println("=".repeat(30) + "\u001B[0m\n")
+
         do {
-            MenuItem.entries.forEachIndexed { index, action ->
-                println("${index + 1}- ${action.title}")
-            }
-            print("choose the action \u001B[33m*enter (16 or anything else to exit*\u001B[0m: ")
+             displayMenu()
             val selectedAction = (readln().toIntOrNull() ?: -1).toMenuItem()
             println()
             when (selectedAction) {
@@ -52,365 +55,385 @@ class App(
             }
 
         } while (selectedAction != MenuItem.EXIT)
-
     }
 
-    private fun findHealthyFastFood() {
-        try {
-            val healthyFastFoodMeals = getHealthyFastFoodUseCase()
-            if (healthyFastFoodMeals.isNotEmpty()) {
-                println("================== Healthy Fast Food Suggestions ==================")
-                healthyFastFoodMeals.forEach { println("- ${it.name}") }
-            } else {
-                println("No healthy fast food options found based on the criteria.")
-            }
-        } catch (e: Exception) {
-            println("Error fetching healthy fast food: ${e.message}")
-        }
-    }
-
-    private fun executeGetMealsByProteinAndCalories() {
-        println("--- Find Meals by Calories & Protein ---")
-        print("Enter desired calories (e.g., 500): ")
-        val caloriesInput = readln().toFloatOrNull()
-        print("Enter desired protein in grams (e.g., 30): ")
-        val proteinInput = readln().toFloatOrNull()
-
-        if (caloriesInput == null || proteinInput == null) {
-            println("\u001B[31mInvalid input. Please enter numbers only for calories and protein.\u001B[0m")
-            return
-        }
-
-        // Call the injected UseCase using invoke operator
-        val results = getMealsByProteinAndCaloriesUseCase(caloriesInput, proteinInput)
-
-        if (results.isEmpty()) {
-            println("\u001B[33mNo meals found matching your criteria within the tolerance.\u001B[0m")
-        } else {
-            println("\u001B[32mFound ${results.size} matching meals:\u001B[0m")
-            results.forEach { meal ->
-                // Display meal name and relevant nutrition
-                val caloriesStr = meal.nutrition?.calories?.toString() ?: "N/A"
-                val proteinStr = meal.nutrition?.protein?.toString() ?: "N/A"
-                println("- ${meal.name ?: "Unnamed Meal"} (Calories: $caloriesStr, Protein: ${proteinStr}g)")
-            }
-        }
-    }
-
-    private fun executeGetRankedSeafoodByProtein() {
-        println("--- Seafood Meals Sorted by Protein (Highest First) ---")
-
-        val results: List<RankedMealResult> = getRankedSeafoodByProteinUseCase()
-
-        if (results.isEmpty()) {
-            println("\u001B[33mNo seafood meals with protein information found.\u001B[0m")
-        } else {
-            // Green table header
-            println("\u001B[32mRank | Meal Name                      | Protein (g)\u001B[0m")
-            println("-----|--------------------------------|------------")
-            results.forEach { rankedMeal ->
-                // Format output for alignment
-                val rankStr = rankedMeal.rank.toString().padEnd(4)
-                val nameStr = (rankedMeal.name ?: "Unnamed Meal").take(30).padEnd(30) // Truncate long names
-                val proteinStr = rankedMeal.protein?.toString() ?: "N/A"
-                println("$rankStr | $nameStr | $proteinStr")
-            }
-        }
-    }
-
-
-    private fun handleMealByCountry() {
-        print("Enter a  country to explore its meals: ")
-        val input = readln()
-        try {
-            val meals = getMealsOfCountryUseCase(input)
-            if (meals.isEmpty()) {
-                println("No meals found for '$input'.")
-            } else {
-                println("Meals related to '$input':")
-                meals.forEachIndexed { index, meal ->
-                    println("${index + 1}. ${meal.name}")
-                }
-            }
-        } catch (e: Exception) {
-            println("Error: ${e.message}")
-        }
-    }
-
-    private fun showEggFreeSweets() {
-        val seenMeals = mutableSetOf<Meal>()
-        while (true) {
-            val meal = getEggFreeSweetsUseCase(seenMeals)
-            if (meal == null) {
-                println("There Is no Egg-Free sweets")
-                break
-            }
-            println("Meal: ${meal.name}")
-            println(meal.description ?: "No description available.")
-            println("1 - Like    |   2 - Dislike ")
-            print("Your choice: ")
-            when (readlnOrNull()) {
-                "1" -> {
-                    println("\n Full Details of ${meal.name}")
-                    println("Time: ${meal.minutes} ")
-                    println("Ingredients: ${meal.ingredients}")
-                    println("Steps: ${meal.steps}")
-                    println("Nutrition Info:")
-                    println("  Calories: ${meal.nutrition?.calories}")
-                    println("  Fat: ${meal.nutrition?.totalFat}")
-                    println("  Carbs: ${meal.nutrition?.carbohydrates}")
-                    println("  Protein: ${meal.nutrition?.protein}")
-                    break
-                }
-
-                "2" -> {
-                    seenMeals.add(meal)
-                    println("\n try another one\n")
-                }
-
-                else -> {
-                    println("Exiting Egg-Free Sweets Suggestions")
-                    break
-                }
-            }
-        }
-    }
-
-    private fun handleItalianMealForGroups() {
-        try {
-            val meals = getItalianGroupMealsUseCase()
-            meals.forEach { meal ->
-                println(meal.name)
-            }
-        } catch (e: Exception) {
-            println("No Italian meals for groups found")
-        }
-    }
-
-
-    private fun showIngredientGuessGame() {
-
-        // init
-        var score = 0
-        var counter = 0
-        var randomNumber = true
-        var correctGuess = true
-
-        while (correctGuess && counter < 15) {
-
-            val randomMeal = guessIngredientGameUseCase.generateRandomMeal()
-            println("The Meal : ${randomMeal}\n")
-
-            val showUserList = guessIngredientGameUseCase.generateIngredientListOptions(randomMeal.name, randomNumber)
-            randomNumber = !randomNumber
-            println("$showUserList\n")
-            println("\tPress (1) for option 1 \n\tPress (2) for option 2 \n\tPress (3) for option 3\n")
-
-            print("Enter the Ingredient Input Number : ")
-            val input = readln().toIntOrNull() ?: -1
-
-            val ingredientUserInput = guessIngredientGameUseCase.getIngredientOptionByNumber(showUserList, input)
-
-
-            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMeal.name)
-
-
-            if (correctGuess) {
-                score = guessIngredientGameUseCase.updateScore(score)
-                counter++
-            } else {
-                println("failure try again later ...")
-                println("Your Score : $score")
-                println("End Game \n\n")
-            }
-
-
-        }
-    }
-
-    private fun showHighCalorieMeal() {
-        do {
+        private fun findHealthyFastFood() {
             try {
-                println("The Suggestion High Calorie Meal ")
-                val nameAndDescription = suggestHighCalorieMealUseCase.suggestNameAndDescriptionOfHighCalorieMeal()
-                suggestHighCalorieMealUseCase.checkMealIsFound(nameAndDescription)
-                println("name : ${nameAndDescription.first} , Description : ${nameAndDescription.second}")
-                println("\nIf you want more details about meal press (1) ")
-                println("if you want another meal press (2) ")
-                println("if you want To Exit (3) ")
-                print("Input Your Choose Number : ")
-                val inputUser = readln().toIntOrNull()
-
-                when (inputUser) {
-
-                    1 -> {
-                        showMealDetails(
-                            suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!)
-                        )
-                        break
-                    }
-
-                    2 -> println("Another Suggestion Meal \n")
-
-                    3 -> break
-
-                    else -> throw InvalidInputNumberOfHighCalorieMeal("$inputUser is not in valid range (0..3) , please try again\n\n")
+                val healthyFastFoodMeals = getHealthyFastFoodUseCase()
+                if (healthyFastFoodMeals.isNotEmpty()) {
+                    println("================== Healthy Fast Food Suggestions ==================")
+                    healthyFastFoodMeals.forEach { println("- ${it.name}") }
+                } else {
+                    println("No healthy fast food options found based on the criteria.")
                 }
-            } catch (emptyException: EmptyRandomMealException) {
-                print("Error : ${emptyException.message}")
-            } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
-                print("Error : ${invalidInputException.message}")
-            } catch (error: Exception) {
-                println("Error : ${error.message}")
-            }
-
-        } while (true)
-    }
-
-    private fun showMealDetails(meal: Meal) {
-        println("name : ${meal.name}")
-        println("ingredients : ${meal.description}")
-        println("minutes : ${meal.minutes}")
-        println("ingredients : ${meal.ingredients}")
-        println("steps : ${meal.steps}")
-        showNutrition(meal.nutrition!!)
-    }
-
-    private fun showNutrition(nutrition: Nutrition) {
-        println("calories : ${nutrition.calories}")
-        println("sodium : ${nutrition.sodium}")
-        println("sugar  : ${nutrition.sugar}")
-        println("protein : ${nutrition.protein}")
-        println("totalFat : ${nutrition.totalFat}")
-        println("carbohydrates : ${nutrition.carbohydrates}")
-        println("saturatedFat : ${nutrition.saturatedFat}")
-    }
-
-    private fun suggestKetoMeals() {
-        val seenMeals = mutableSetOf<Meal>()
-        while (true) {
-            val meal = getKetoMealUseCase(seenMeals)
-            if (meal == null) {
-                println(" You've seen all keto meals")
-                break
-            }
-            println("Meal: ${meal.name}")
-            println(meal.description ?: "No description available.")
-            println("1 - Like    |   2 - Dislike ")
-            print("Your choice: ")
-            when (readlnOrNull()) {
-                "1" -> {
-                    println("\n Full Details of ${meal.name}")
-                    println("Time: ${meal.minutes} ")
-                    println("Ingredients: ${meal.ingredients}")
-                    println("Steps: ${meal.steps}")
-                    println("Nutrition Info:")
-                    println("  Calories: ${meal.nutrition?.calories}")
-                    println("  Fat: ${meal.nutrition?.totalFat}")
-                    println("  Carbs: ${meal.nutrition?.carbohydrates}")
-                    println("  Protein: ${meal.nutrition?.protein}")
-                    break
-                }
-
-                "2" -> {
-                    seenMeals.add(meal)
-                    println("\n try another one\n")
-                }
-
-                else -> {
-                    println("Exiting Keto Meal Suggestions")
-                    break
-                }
+            } catch (e: Exception) {
+                println("Error fetching healthy fast food: ${e.message}")
             }
         }
-    }
 
-    private fun handleTheMealSearchByName() {
-        print("Enter Name to search for a meal: ")
-        val inputName = readln()
-        try {
-            val meal = getMealByName(inputName)
-            println("\n Meal found:")
-            println(meal)
-        } catch (e: NoMealFoundByNameException) {
-            println(e.message)
-        }
-    }
+        private fun executeGetMealsByProteinAndCalories() {
+            println("--- Find Meals by Calories & Protein ---")
+            print("Enter desired calories (e.g., 500): ")
+            val caloriesInput = readln().toFloatOrNull()
+            print("Enter desired protein in grams (e.g., 30): ")
+            val proteinInput = readln().toFloatOrNull()
 
-    private fun handleSearchByDate() {
-        print("Enter date (dd/MM/yyyy): ")
-        val inputDate = readln()
-        try {
-            val meals = getMealsByDateUseCase(inputDate)
-            println("Meals on $inputDate:")
-            meals.forEach { meal ->
-                println("ID : ${meal.id}, Name : ${meal.name}")
+            if (caloriesInput == null || proteinInput == null) {
+                println("\u001B[31mInvalid input. Please enter numbers only for calories and protein.\u001B[0m")
+                return
             }
-            print("Enter meal ID to view details: ")
-            val meal = readln().toLongOrNull()?.let { id ->
-                meals.find { meal ->
-                    meal.id == id
-                }
-            }
-            println()
-            println(meal ?: "No meal found with this ID.")
-        } catch (e: IncorrectDateFormatException) {
-            println("${e.message} Please use dd/MM/yyyy format.")
-        } catch (e: MealsNotFoundForThisDateException) {
-            println(e.message)
-        }
-    }
 
-    private fun showEasyMeal() {
-        println(
-            "Here is a 10 meals That are Easy to make  A meal is considered easy if it \n" +
-                    "requires 30 minutes or less, has 5 ingredients or fewer, and can be prepared in 6 steps or fewer.\n "
-        )
-        val meals = getEasyFoodSuggestionUseCase()
-        if (meals.isEmpty()) {
-            println("No meals found")
-        } else {
-            println("Easy meals:")
-            meals.forEach { meal ->
-                showMealDetails(meal)
-            }
-        }
-    }
+            val results = getMealsByProteinAndCaloriesUseCase(caloriesInput, proteinInput)
 
-    private fun showIraqiMeals() {
-        getIraqiMealsUseCase().let { meals ->
-            if (meals.isEmpty()) {
-                println("IraqiMealsNotFound")
+            if (results.isEmpty()) {
+                println("\u001B[33mNo meals found matching your criteria within the tolerance.\u001B[0m")
             } else {
-                meals.forEach { println(it) }
+                println("\u001B[32mFound ${results.size} matching meals:\u001B[0m")
+                results.forEach { meal ->
+                    // Display meal name and relevant nutrition
+                    val caloriesStr = meal.nutrition?.calories?.toString() ?: "N/A"
+                    val proteinStr = meal.nutrition?.protein?.toString() ?: "N/A"
+                    println("- ${meal.name ?: "Unnamed Meal"} (Calories: $caloriesStr, Protein: ${proteinStr}g)")
+                }
             }
         }
-    }
 
-    private fun startPreparationTimeGuessingGame() {
-        with(guessPrepareTimeGameUseCase.getMeal()) {
-            minutes?.let { minutes ->
-                var attempt = 3
-                print("guess its preparation time of $name: ")
-                while (true) {
-                    val guessMinutes = readln().toLongOrNull() ?: -1
-                    try {
-                        println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
+        private fun executeGetRankedSeafoodByProtein() {
+            println("--- Seafood Meals Sorted by Protein (Highest First) ---")
+
+            val results: List<RankedMealResult> = getRankedSeafoodByProteinUseCase()
+
+            if (results.isEmpty()) {
+                println("\u001B[33mNo seafood meals with protein information found.\u001B[0m")
+            } else {
+                // Green table header
+                println("\u001B[32mRank | Meal Name                      | Protein (g)\u001B[0m")
+                println("-----|--------------------------------|------------")
+                results.forEach { rankedMeal ->
+                    // Format output for alignment
+                    val rankStr = rankedMeal.rank.toString().padEnd(4)
+                    val nameStr = (rankedMeal.name ?: "Unnamed Meal").take(30).padEnd(30) // Truncate long names
+                    val proteinStr = rankedMeal.protein?.toString() ?: "N/A"
+                    println("$rankStr | $nameStr | $proteinStr")
+                }
+            }
+        }
+
+
+        private fun handleMealByCountry() {
+            print("Enter a  country to explore its meals: ")
+            val input = readln()
+            try {
+                val meals = getMealsOfCountryUseCase(input)
+                if (meals.isEmpty()) {
+                    println("No meals found for '$input'.")
+                } else {
+                    println("Meals related to '$input':")
+                    meals.forEachIndexed { index, meal ->
+                        println("${index + 1}. ${meal.name}")
+                    }
+                }
+            } catch (e: Exception) {
+                println("Error: ${e.message}")
+            }
+        }
+
+        private fun showEggFreeSweets() {
+            val seenMeals = mutableSetOf<Meal>()
+            while (true) {
+                val meal = getEggFreeSweetsUseCase(seenMeals)
+                if (meal == null) {
+                    println("There Is no Egg-Free sweets")
+                    break
+                }
+                println("Meal: ${meal.name}")
+                println(meal.description ?: "No description available.")
+                println("1 - Like    |   2 - Dislike ")
+                print("Your choice: ")
+                when (readlnOrNull()) {
+                    "1" -> {
+                        println("\n Full Details of ${meal.name}")
+                        println("Time: ${meal.minutes} ")
+                        println("Ingredients: ${meal.ingredients}")
+                        println("Steps: ${meal.steps}")
+                        println("Nutrition Info:")
+                        println("  Calories: ${meal.nutrition?.calories}")
+                        println("  Fat: ${meal.nutrition?.totalFat}")
+                        println("  Carbs: ${meal.nutrition?.carbohydrates}")
+                        println("  Protein: ${meal.nutrition?.protein}")
                         break
-                    } catch (exception: GuessPrepareTimeGameException) {
-                        attempt = exception.attempt
-                        print("${exception.message} try again: ")
+                    }
+
+                    "2" -> {
+                        seenMeals.add(meal)
+                        println("\n try another one\n")
+                    }
+
+                    else -> {
+                        println("Exiting Egg-Free Sweets Suggestions")
+                        break
                     }
                 }
             }
         }
+
+        private fun handleItalianMealForGroups() {
+            try {
+                val meals = getItalianGroupMealsUseCase()
+                meals.forEach { meal ->
+                    println(meal.name)
+                }
+            } catch (e: Exception) {
+                println("No Italian meals for groups found")
+            }
+        }
+
+
+        private fun showIngredientGuessGame() {
+
+            // init
+            var score = 0
+            var counter = 0
+            var randomNumber = true
+            var correctGuess = true
+
+            while (correctGuess && counter < 15) {
+
+                val randomMeal = guessIngredientGameUseCase.generateRandomMeal()
+                println("The Meal : ${randomMeal}\n")
+
+                val showUserList =
+                    guessIngredientGameUseCase.generateIngredientListOptions(randomMeal.name, randomNumber)
+                randomNumber = !randomNumber
+                println("$showUserList\n")
+                println("\tPress (1) for option 1 \n\tPress (2) for option 2 \n\tPress (3) for option 3\n")
+
+                print("Enter the Ingredient Input Number : ")
+                val input = readln().toIntOrNull() ?: -1
+
+                val ingredientUserInput = guessIngredientGameUseCase.getIngredientOptionByNumber(showUserList, input)
+
+
+                correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMeal.name)
+
+
+                if (correctGuess) {
+                    score = guessIngredientGameUseCase.updateScore(score)
+                    counter++
+                } else {
+                    println("failure try again later ...")
+                    println("Your Score : $score")
+                    println("End Game \n\n")
+                }
+
+
+            }
+        }
+
+        private fun showHighCalorieMeal() {
+            do {
+                try {
+                    println("The Suggestion High Calorie Meal ")
+                    val nameAndDescription = suggestHighCalorieMealUseCase.suggestNameAndDescriptionOfHighCalorieMeal()
+                    suggestHighCalorieMealUseCase.checkMealIsFound(nameAndDescription)
+                    println("name : ${nameAndDescription.first} , Description : ${nameAndDescription.second}")
+                    println("\nIf you want more details about meal press (1) ")
+                    println("if you want another meal press (2) ")
+                    println("if you want To Exit (3) ")
+                    print("Input Your Choose Number : ")
+                    val inputUser = readln().toIntOrNull()
+
+                    when (inputUser) {
+
+                        1 -> {
+                            showMealDetails(
+                                suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!)
+                            )
+                            break
+                        }
+
+                        2 -> println("Another Suggestion Meal \n")
+
+                        3 -> break
+
+                        else -> throw InvalidInputNumberOfHighCalorieMeal("$inputUser is not in valid range (0..3) , please try again\n\n")
+                    }
+                } catch (emptyException: EmptyRandomMealException) {
+                    print("Error : ${emptyException.message}")
+                } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
+                    print("Error : ${invalidInputException.message}")
+                } catch (error: Exception) {
+                    println("Error : ${error.message}")
+                }
+
+            } while (true)
+        }
+
+        private fun showMealDetails(meal: Meal) {
+            println("name : ${meal.name}")
+            println("ingredients : ${meal.description}")
+            println("minutes : ${meal.minutes}")
+            println("ingredients : ${meal.ingredients}")
+            println("steps : ${meal.steps}")
+            showNutrition(meal.nutrition!!)
+        }
+
+        private fun showNutrition(nutrition: Nutrition) {
+            println("calories : ${nutrition.calories}")
+            println("sodium : ${nutrition.sodium}")
+            println("sugar  : ${nutrition.sugar}")
+            println("protein : ${nutrition.protein}")
+            println("totalFat : ${nutrition.totalFat}")
+            println("carbohydrates : ${nutrition.carbohydrates}")
+            println("saturatedFat : ${nutrition.saturatedFat}")
+        }
+
+        private fun suggestKetoMeals() {
+            val seenMeals = mutableSetOf<Meal>()
+            while (true) {
+                val meal = getKetoMealUseCase(seenMeals)
+                if (meal == null) {
+                    println(" You've seen all keto meals")
+                    break
+                }
+                println("Meal: ${meal.name}")
+                println(meal.description ?: "No description available.")
+                println("1 - Like    |   2 - Dislike ")
+                print("Your choice: ")
+                when (readlnOrNull()) {
+                    "1" -> {
+                        println("\n Full Details of ${meal.name}")
+                        println("Time: ${meal.minutes} ")
+                        println("Ingredients: ${meal.ingredients}")
+                        println("Steps: ${meal.steps}")
+                        println("Nutrition Info:")
+                        println("  Calories: ${meal.nutrition?.calories}")
+                        println("  Fat: ${meal.nutrition?.totalFat}")
+                        println("  Carbs: ${meal.nutrition?.carbohydrates}")
+                        println("  Protein: ${meal.nutrition?.protein}")
+                        break
+                    }
+
+                    "2" -> {
+                        seenMeals.add(meal)
+                        println("\n try another one\n")
+                    }
+
+                    else -> {
+                        println("Exiting Keto Meal Suggestions")
+                        break
+                    }
+                }
+            }
+        }
+
+        private fun handleTheMealSearchByName() {
+            print("Enter Name to search for a meal: ")
+            val inputName = readln()
+            try {
+                val meal = getMealByName(inputName)
+                println("\n Meal found:")
+                println(meal)
+            } catch (e: NoMealFoundByNameException) {
+                println(e.message)
+            }
+        }
+
+        private fun handleSearchByDate() {
+            print("Enter date (dd/MM/yyyy): ")
+            val inputDate = readln()
+            try {
+                val meals = getMealsByDateUseCase(inputDate)
+                println("Meals on $inputDate:")
+                meals.forEach { meal ->
+                    println("ID : ${meal.id}, Name : ${meal.name}")
+                }
+                print("Enter meal ID to view details: ")
+                val meal = readln().toLongOrNull()?.let { id ->
+                    meals.find { meal ->
+                        meal.id == id
+                    }
+                }
+                println()
+                println(meal ?: "No meal found with this ID.")
+            } catch (e: IncorrectDateFormatException) {
+                println("${e.message} Please use dd/MM/yyyy format.")
+            } catch (e: MealsNotFoundForThisDateException) {
+                println(e.message)
+            }
+        }
+
+        private fun showEasyMeal() {
+
+            val meals = getEasyFoodSuggestionUseCase()
+            if (meals.isEmpty()) {
+                println("No meals found")
+            } else {
+                println("Easy meals:")
+                meals.forEach { meal ->
+                    showMealDetails(meal)
+                }
+            }
+        }
+
+        private fun showIraqiMeals() {
+            getIraqiMealsUseCase().let { meals ->
+                if (meals.isEmpty()) {
+                    println("IraqiMealsNotFound")
+                } else {
+                    meals.forEach { println(it) }
+                }
+            }
+        }
+
+        private fun startPreparationTimeGuessingGame() {
+            with(guessPrepareTimeGameUseCase.getMeal()) {
+                minutes?.let { minutes ->
+                    var attempt = 3
+                    print("guess its preparation time of $name: ")
+                    while (true) {
+                        val guessMinutes = readln().toLongOrNull() ?: -1
+                        try {
+                            println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
+                            break
+                        } catch (exception: GuessPrepareTimeGameException) {
+                            attempt = exception.attempt
+                            print("${exception.message} try again: ")
+                        }
+                    }
+                }
+            }
+        }
+
+        private fun showPotatoesMeals() {
+            getRandomPotatoMealsUseCase().forEach { meal ->
+                println(" Name: ${meal.name}")
+                println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
+                println("------------------------------------------------------------")
+            }
+        }
+
+    private fun displayMenu() {
+
+        MenuItem.entries.forEachIndexed { index, option ->
+            when (index) {
+                0 -> printCategoryHeader(" General Meal Discovery")
+                6 -> printCategoryHeader(" Dietary & Nutrition")
+                11 -> printCategoryHeader(" Ingredient Specials")
+                13 -> printCategoryHeader(" Fun Activities")
+                16 -> printCategoryHeader(" System")
+            }
+            val number = (index + 1).toString().padEnd(2)
+            println("  \u001B[32m$number.\u001B[0m ${option.title}")
+        }
+        println("\n\u001B[33mEnter your choice (1-${MenuItem.entries.size}): \u001B[0m")
+        print("\u001B[33m*Enter 16 or Anything Else to Exit*\u001B[0m:")
+
     }
 
-    private fun showPotatoesMeals() {
-        getRandomPotatoMealsUseCase().forEach { meal ->
-            println(" Name: ${meal.name}")
-            println(" Ingredients: ${meal.ingredients ?: "No ingredients listed"}")
-            println("------------------------------------------------------------")
-        }
+    private fun printCategoryHeader(title: String) {
+        println("\n\u001B[1;33m$title\u001B[0m")
+        println("\u001B[37m${"-".repeat(title.length)}\u001B[0m")
     }
+
 }
