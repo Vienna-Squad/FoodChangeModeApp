@@ -12,11 +12,16 @@ class GetEggFreeSweetsUseCase(
 
     private fun isEggFreeSweet(meal: Meal): Boolean {
 
-        return (meal.ingredients?.any {
-            !it.contains("Egg", ignoreCase = true)
-        } == true) && (meal.tags?.any {
-                 it.contains("dessert")
+        return (meal.ingredients?.none {
+            it.contains("Egg", ignoreCase = true)
         } == true)
+                && meal.ingredients.any {
+            it.contains("Sugar", ignoreCase = true)
+        }
+                && (meal.tags?.any {
+            it.contains("Dessert", ignoreCase = true)
+        } == true)
+
     }
 }
 
