@@ -43,6 +43,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-###app data###
-food.csv
+
 .idea/
