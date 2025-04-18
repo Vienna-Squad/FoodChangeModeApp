@@ -26,11 +26,6 @@ class App(
 ) {
     fun start() {
 
-        print("\u001B[H\u001B[2J")
-        println("\u001B[1;36m" + "=".repeat(30))
-        println(" FOOD CHANGE MOOD! ".padStart(23))
-        println("=".repeat(30) + "\u001B[0m\n")
-
         do {
              displayMenu()
             val selectedAction = (readln().toIntOrNull() ?: -1).toMenuItem()
@@ -153,7 +148,7 @@ class App(
                 when (readlnOrNull()) {
                     "1" -> {
                         println("\n Full Details of ${meal.name}")
-                        println("Time: ${meal.minutes} ")
+                        println("Preparation Time: ${meal.minutes} ")
                         println("Ingredients: ${meal.ingredients}")
                         println("Steps: ${meal.steps}")
                         println("Nutrition Info:")
