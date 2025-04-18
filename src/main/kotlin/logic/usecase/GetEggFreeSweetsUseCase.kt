@@ -7,12 +7,16 @@ class GetEggFreeSweetsUseCase(
     private val mealsRepository: MealsRepository
 ) {
     operator fun invoke(seenMeals: MutableSet<Meal>) = mealsRepository.getAllMeals()
-        .filter { isEggFreeSweet(it) == true && it !in seenMeals }
+        .filter { isEggFreeSweet(it) && it !in seenMeals }
         .randomOrNull()
 
-     private fun isEggFreeSweet(meal: Meal): Boolean? {
-         return meal.ingredients?.any{ it.contains("Egg", ignoreCase = true) }
-     }
-     }
+    private fun isEggFreeSweet(meal: Meal): Boolean {
 
+        return (meal.ingredients?.any {
+            !it.contains("Egg", ignoreCase = true)
+        } == true) && (meal.tags?.any {
+                 it.contains("dessert")
+        } == true)
+    }
+}
 
