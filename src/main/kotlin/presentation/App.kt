@@ -372,12 +372,10 @@ class App(
         }
 
         private fun showIraqiMeals() {
-            getIraqiMealsUseCase().let { meals ->
-                if (meals.isEmpty()) {
-                    println("IraqiMealsNotFound")
-                } else {
-                    meals.forEach { println(it) }
-                }
+            try {
+                getIraqiMealsUseCase().forEach { println(it) }
+            } catch (exception: NoMealsFoundException) {
+                println(exception.message)
             }
         }
 

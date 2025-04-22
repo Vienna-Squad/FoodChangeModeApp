@@ -2,6 +2,7 @@ package org.example.logic.usecase.exceptions
 
 abstract class FoodChangeMoodException(message: String) : Exception(message)
 class IncorrectDateFormatException(message: String) : FoodChangeMoodException(message)
+class NoMealsFoundException(typeOfMeals: String = "meals") : FoodChangeMoodException("No $typeOfMeals found")
 class MealsNotFoundForThisDateException(message: String) : FoodChangeMoodException(message)
 class NoMealFoundByNameException(message: String) : FoodChangeMoodException(message)
 class NotACountryException(message: String) : FoodChangeMoodException(message)
