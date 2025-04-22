@@ -1,5 +1,4 @@
-package org.example.logic.usecase.exceptions
-
+package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
