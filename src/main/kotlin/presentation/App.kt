@@ -5,6 +5,7 @@ import org.example.logic.model.Nutrition
 import org.example.logic.usecase.*
 import org.example.logic.usecase.exceptions.*
 import org.example.utils.MenuItem
+import org.example.utils.show
 import org.example.utils.toMenuItem
 
 class App(
@@ -21,7 +22,7 @@ class App(
     private val getMealsOfCountryUseCase: GetMealsOfCountryUseCase,
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase,
     private val guessIngredientGameUseCase: GuessIngredientGameUseCase,
-    private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase,
+    private val getHighCalorieMealUseCase: GetHighCalorieMealUseCase,
     private val getHealthyFastFoodUseCase: GetHealthyFastFoodUseCase
 ) {
     fun start() {
@@ -229,12 +230,10 @@ class App(
             do {
                 try {
                     println("The Suggestion High Calorie Meal ")
-                    val nameAndDescription = suggestHighCalorieMealUseCase.suggestNameAndDescriptionOfHighCalorieMeal()
-                    suggestHighCalorieMealUseCase.checkMealIsFound(nameAndDescription)
-                    println("name : ${nameAndDescription.first} , Description : ${nameAndDescription.second}")
-                    println("\nIf you want more details about meal press (1) ")
-                    println("if you want another meal press (2) ")
-                    println("if you want To Exit (3) ")
+                    getHighCalorieMealUseCase.getNameAndDescription().show()
+                    println("\t(1) Like (show more details about meal)")
+                    println("\t(2) Dislike (show another meal )")
+                    println("\t(3) Exit ")
                     print("Input Your Choose Number : ")
                     val inputUser = readln().toIntOrNull()
 
@@ -242,18 +241,18 @@ class App(
 
                         1 -> {
                             showMealDetails(
-                                suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!)
+                                getHighCalorieMealUseCase.getMealDetailsByName()
                             )
                             break
                         }
 
-                        2 -> println("Another Suggestion Meal \n")
+                        2 -> println("Get Another Suggestion Meal \n")
 
                         3 -> break
 
                         else -> throw InvalidInputNumberOfHighCalorieMeal("$inputUser is not in valid range (0..3) , please try again\n\n")
                     }
-                } catch (emptyException: EmptyRandomMealException) {
+                } catch (emptyException: NullRandomMealException) {
                     print("Error : ${emptyException.message}")
                 } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
                     print("Error : ${invalidInputException.message}")

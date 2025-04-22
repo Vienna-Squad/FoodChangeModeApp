@@ -2,7 +2,8 @@ package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
-import org.koin.core.logger.MESSAGE
+import org.example.logic.usecase.exceptions.IngredientUserInputException
+import org.example.logic.usecase.exceptions.IngredientsOptionsException
 import kotlin.random.Random
 
 
@@ -99,8 +100,3 @@ class GuessIngredientGameUseCase(
 
 }
 
-// instead Exception put App Exception
-open class IngredientGameException(message: MESSAGE) : Exception(message)
-class IngredientRandomMealGenerationException(message: String) : IngredientGameException(message)
-class IngredientUserInputException(message: String) : IngredientGameException(message)
-class IngredientsOptionsException(message: String) : IngredientGameException(message)
