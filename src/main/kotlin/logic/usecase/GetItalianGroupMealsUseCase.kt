@@ -22,8 +22,7 @@ class GetItalianGroupMealsUseCase(private val mealsRepository: MealsRepository) 
     }
 
     private fun hasItalianAndGroupTags(meal: Meal): Boolean {
-        val hasItalianTag = meal.tags?.any { it.lowercase().contains("italian") } ?: false
-        val isForLargeGroups = meal.tags?.any { it.lowercase().contains("for-large-groups") } ?: false
-        return hasItalianTag && isForLargeGroups
+        val tags = meal.tags?.map { it.lowercase() } ?: return false
+        return tags.any { it.contains("italian") } && tags.any { it.contains("for-large-groups") }
     }
 }
