@@ -15,25 +15,25 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.Date
 
+
 class GetHighCalorieMealUseCaseTest {
 
     private lateinit var getHighCalorieMealUseCase: GetHighCalorieMealUseCase
-    private lateinit var mealsRepository: MealsRepository
+    private val mealsRepository: MealsRepository = mockk(relaxed = true)
 
     @BeforeEach
     fun setUp() {
-        mealsRepository = mockk(relaxed = true)
-        getHighCalorieMealUseCase = mockk(relaxed = true)
+        getHighCalorieMealUseCase = GetHighCalorieMealUseCase(mealsRepository)
     }
 
     @Test
     fun `getNameAndDescription should throw NullRandomMealException if name of meal is null or empty`() {
         // stubs
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeal(null,"desc")
-        )
+        every { mealsRepository.getAllMeals() } returns emptyList()
         // when & then
-        assertThrows<NullRandomMealException>{getHighCalorieMealUseCase.getNameAndDescription()}
+        val exception = assertThrows<NullRandomMealException>{getHighCalorieMealUseCase.getNameAndDescription() }.apply {
+            assertThat(message).isEqualTo("The meal with more than 700 calorie in meal list")
+        }
     }
     @Test
     fun `getNameAndDescription should throw NullRandomMealException if description of meal is null or empty`() {

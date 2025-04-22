@@ -11,7 +11,8 @@ class GetHighCalorieMealUseCase(
 ) {
 
     fun getNameAndDescription(): Pair<String?, String?>{
-        return mealsRepository.getAllMeals()
+//        return mealsRepository.getAllMeals()
+           return emptyList<Meal>()
             .filter(::filterNameAndDescriptionAndCalories)
             .filter(::filterMealOnlyContainMoreThan700Calories)
             .take(30)
@@ -19,7 +20,7 @@ class GetHighCalorieMealUseCase(
             .randomOrNull()?:throw NullRandomMealException("The meal with more than 700 calorie in meal list")
     }
 
-    private val mealName = getNameAndDescription().first
+    private val mealName = getNameAndDescription()?.first
 
     fun getMealDetailsByName(name: String = mealName?:""): Meal {
         return mealsRepository.getAllMeals()
