@@ -1,6 +1,5 @@
 package org.example.logic.usecase.exceptions
 
-import org.koin.core.logger.MESSAGE
 
 abstract class FoodChangeMoodException(message: String) : Exception(message)
 class IncorrectDateFormatException(message: String) : FoodChangeMoodException(message)
@@ -14,6 +13,5 @@ class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, "To
 class NullRandomMealException(message: String): FoodChangeMoodException(message)
 class NullHighCalorieRandomMealException(message: String): FoodChangeMoodException(message)
 class InvalidInputNumberOfHighCalorieMeal(message: String): FoodChangeMoodException(message)
-class IngredientRandomMealGenerationException(message: String) : FoodChangeMoodException(message)
 class IngredientUserInputException(message: String) : FoodChangeMoodException(message)
 class IngredientsOptionsException(message: String) : FoodChangeMoodException(message)
