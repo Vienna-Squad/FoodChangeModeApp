@@ -5,21 +5,23 @@ import org.example.logic.model.Nutrition
 
 abstract class MealDetailsViewer {
     fun showMealDetails(meal: Meal) {
-        println("name : ${meal.name}")
-        println("ingredients : ${meal.description}")
-        println("minutes : ${meal.minutes}")
-        println("ingredients : ${meal.ingredients}")
-        println("steps : ${meal.steps}")
+        println("Name : ${meal.name}")
+        println("Description : ${meal.description ?: "no description"}")
+        println("Prepare Minutes : ${meal.minutes}")
+        println("Ingredients : ${meal.ingredients}")
+        println("Steps : ${meal.steps}")
         showNutrition(meal.nutrition!!)
     }
 
     private fun showNutrition(nutrition: Nutrition) {
-        println("calories : ${nutrition.calories}")
-        println("sodium : ${nutrition.sodium}")
-        println("sugar  : ${nutrition.sugar}")
-        println("protein : ${nutrition.protein}")
-        println("totalFat : ${nutrition.totalFat}")
-        println("carbohydrates : ${nutrition.carbohydrates}")
-        println("saturatedFat : ${nutrition.saturatedFat}")
+        val map = mutableMapOf<String, Float?>()
+        map.put("calories", nutrition.calories)
+        map.put("sodium", nutrition.sodium)
+        map.put("sugar", nutrition.sugar)
+        map.put("protein", nutrition.protein)
+        map.put("totalFat", nutrition.totalFat)
+        map.put("carbohydrates", nutrition.carbohydrates)
+        map.put("saturatedFat", nutrition.saturatedFat)
+        println("Nutrition : $map")
     }
 }
