@@ -227,8 +227,8 @@ class App(
         }
 
         private fun showHighCalorieMeal() {
-            do {
-                try {
+            try {
+                do {
                     println("The Suggestion High Calorie Meal ")
                     getHighCalorieMealUseCase.getNameAndDescription().show()
                     println("\t(1) Like (show more details about meal)")
@@ -252,15 +252,18 @@ class App(
 
                         else -> throw InvalidInputNumberOfHighCalorieMeal("$inputUser is not in valid range (0..3) , please try again\n\n")
                     }
-                } catch (emptyException: NullRandomMealException) {
-                    print("Error : ${emptyException.message}")
-                } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
-                    print("Error : ${invalidInputException.message}")
-                } catch (error: Exception) {
-                    println("Error : ${error.message}")
-                }
 
             } while (true)
+            } catch (emptyException: NullRandomMealException) {
+                print("Error : ${emptyException.message}")
+            } catch (exception:NullHighCalorieRandomMealException){
+                print("Error : ${exception.message}")
+            } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
+                print("Error : ${invalidInputException.message}")
+            } catch (error: Exception) {
+                println("Error : ${error.message}")
+            }
+
         }
 
         private fun showMealDetails(meal: Meal) {

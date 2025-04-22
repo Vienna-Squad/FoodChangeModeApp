@@ -12,6 +12,7 @@ open class GuessPrepareTimeGameException(val attempt: Int, message: String) : Fo
 class TooHighException(attempt: Int) : GuessPrepareTimeGameException(attempt, "TooHigh")
 class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, "TooLow")
 class NullRandomMealException(message: String): FoodChangeMoodException(message)
+class NullHighCalorieRandomMealException(message: String): FoodChangeMoodException(message)
 class InvalidInputNumberOfHighCalorieMeal(message: String): FoodChangeMoodException(message)
 class IngredientRandomMealGenerationException(message: String) : FoodChangeMoodException(message)
 class IngredientUserInputException(message: String) : FoodChangeMoodException(message)
