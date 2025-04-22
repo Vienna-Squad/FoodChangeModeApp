@@ -6,6 +6,7 @@ import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.MealDetailsViewer
 import org.example.presentation.UiController
 import org.koin.mp.KoinPlatform.getKoin
+import java.util.Date
 
 class MealsByDateUiController(
     private val getMealsByDateUseCase: GetMealsByDateUseCase = getKoin().get()
@@ -14,7 +15,7 @@ class MealsByDateUiController(
         print("Enter date (dd/MM/yyyy): ")
         val inputDate = readln()
         try {
-            val meals = getMealsByDateUseCase(inputDate)
+            val meals = getMealsByDateUseCase(Date())
             println("Meals on $inputDate:")
             showMeals(meals)
             print("Enter meal ID to view details: ")
