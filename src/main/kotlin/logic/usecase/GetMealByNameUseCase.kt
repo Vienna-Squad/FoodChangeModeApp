@@ -2,7 +2,7 @@ package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
-import org.example.logic.usecase.exceptions.NoMealFoundByNameException
+import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.utils.KMPSearcher
 
 class GetMealByNameUseCase(
@@ -14,7 +14,7 @@ class GetMealByNameUseCase(
         return mealsRepository.getAllMeals().find { meal ->
             val name = meal.name?.lowercase().orEmpty()
             kmpSearcher.search(name, normalizedQuery)
-        } ?: throw NoMealFoundByNameException("No meal found matching the name: $query")
+        } ?: throw NoMealFoundException("No meal found matching the name: $query")
     }
 }
 

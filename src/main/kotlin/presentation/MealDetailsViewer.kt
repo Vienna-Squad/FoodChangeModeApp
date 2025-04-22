@@ -14,14 +14,22 @@ abstract class MealDetailsViewer {
     }
 
     private fun showNutrition(nutrition: Nutrition) {
-        val map = mutableMapOf<String, Float?>()
-        map.put("calories", nutrition.calories)
-        map.put("sodium", nutrition.sodium)
-        map.put("sugar", nutrition.sugar)
-        map.put("protein", nutrition.protein)
-        map.put("totalFat", nutrition.totalFat)
-        map.put("carbohydrates", nutrition.carbohydrates)
-        map.put("saturatedFat", nutrition.saturatedFat)
+        val map = mutableMapOf(
+            "calories" to nutrition.calories,
+            "sodium" to nutrition.sodium,
+            "sugar" to nutrition.sugar,
+            "protein" to nutrition.protein,
+            "totalFat" to nutrition.totalFat,
+            "carbohydrates" to nutrition.carbohydrates,
+            "saturatedFat" to nutrition.saturatedFat,
+        )
         println("Nutrition : $map")
+    }
+
+    fun showMeals(meals: List<Meal>) {
+        meals.forEach { meal ->
+            showMealDetails(meal)
+            println("------------------------------------------------------------")
+        }
     }
 }

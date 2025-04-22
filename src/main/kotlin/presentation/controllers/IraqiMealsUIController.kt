@@ -13,7 +13,7 @@ class IraqiMealsUIController(
             if (meals.isEmpty()) {
                 println("IraqiMealsNotFound")
             } else {
-                meals.forEach { showMealDetails(it) }
+                showMeals(meals)
             }
         }
     }

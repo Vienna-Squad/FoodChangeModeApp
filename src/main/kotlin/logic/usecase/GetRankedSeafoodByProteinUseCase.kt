@@ -1,8 +1,7 @@
 package org.example.logic.usecase
 
+import org.example.logic.model.RankedMealResult
 import org.example.logic.repository.MealsRepository
-
-data class RankedMealResult(val rank: Int, val name: String?, val protein: Float?)
 
 class GetRankedSeafoodByProteinUseCase(private val mealsRepository: MealsRepository) {
 

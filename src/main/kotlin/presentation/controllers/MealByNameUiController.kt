@@ -1,7 +1,7 @@
 package org.example.presentation.controllers
 
 import org.example.logic.usecase.GetMealByNameUseCase
-import org.example.logic.usecase.exceptions.NoMealFoundByNameException
+import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.MealDetailsViewer
 import org.example.presentation.UiController
 import org.koin.mp.KoinPlatform.getKoin
@@ -15,7 +15,7 @@ class MealByNameUiController(
         try {
             val meal = getMealByNameUseCase(inputName)
             showMealDetails(meal)
-        } catch (e: NoMealFoundByNameException) {
+        } catch (e: NoMealFoundException) {
             println(e.message)
         }
     }

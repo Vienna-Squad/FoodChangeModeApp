@@ -13,6 +13,5 @@ class App {
             start()
         }
     }
-
     private fun getMenuItemByIndex(input: Int) = entries.getOrNull(input - 1) ?: EXIT
 }

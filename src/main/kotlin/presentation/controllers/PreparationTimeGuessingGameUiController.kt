@@ -9,10 +9,11 @@ class PreparationTimeGuessingGameUiController(
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase = getKoin().get()
 ) : UiController {
     override fun execute() {
-        with(guessPrepareTimeGameUseCase.getMeal()) {
+        with(guessPrepareTimeGameUseCase.getRandomMeal()) {
             minutes?.let { minutes ->
                 var attempt = 3
                 print("guess its preparation time of $name: ")
+
                 while (true) {
                     val guessMinutes = readln().toLongOrNull() ?: -1
                     try {

@@ -1,7 +1,7 @@
 package org.example.presentation.controllers
 
+import org.example.logic.model.RankedMealResult
 import org.example.logic.usecase.GetRankedSeafoodByProteinUseCase
-import org.example.logic.usecase.RankedMealResult
 import org.example.presentation.UiController
 import org.koin.mp.KoinPlatform.getKoin
 

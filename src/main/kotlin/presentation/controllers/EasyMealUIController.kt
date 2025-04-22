@@ -14,9 +14,7 @@ class EasyMealUIController(
             println("No meals found")
         } else {
             println("Easy meals:")
-            meals.forEach { meal ->
-                showMealDetails(meal)
-            }
+            showMeals(meals)
         }
     }
 }

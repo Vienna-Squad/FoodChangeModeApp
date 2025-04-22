@@ -9,7 +9,6 @@ class GetIraqiMealsUseCase(
     operator fun invoke() = mealsRepository.getAllMeals()
         .filter { meal -> hasIraqiTag(meal) || isDescriptionContainsIraqWord(meal) }
 
-
     private fun hasIraqiTag(meal: Meal) = meal.tags?.any { it.equals("iraqi", ignoreCase = true) } ?: false
 
     private fun isDescriptionContainsIraqWord(meal: Meal) =
