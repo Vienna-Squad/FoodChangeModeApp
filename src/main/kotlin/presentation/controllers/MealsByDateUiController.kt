@@ -6,6 +6,9 @@ import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.MealDetailsViewer
 import org.example.presentation.UiController
 import org.koin.mp.KoinPlatform.getKoin
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatterBuilder
 import java.util.Date
 
 class MealsByDateUiController(
@@ -14,23 +17,43 @@ class MealsByDateUiController(
     override fun execute() {
         print("Enter date (dd/MM/yyyy): ")
         val inputDate = readln()
+
         try {
-            val meals = getMealsByDateUseCase(Date())
+
+            val date: Date = dateFormat(inputDate)
+            val mealsByDate = getMealsByDateUseCase(date)
+
+
             println("Meals on $inputDate:")
-            showMeals(meals)
+            mealsByDate.forEach { meal ->
+                println("ID : ${meal.id}, Name : ${meal.name}")
+            }
             print("Enter meal ID to view details: ")
-            val meal = readln().toLongOrNull()?.let { id ->
-                meals.find { meal ->
+            val mealId = readln().toLongOrNull()?.let { id ->
+                mealsByDate.find { meal ->
                     meal.id == id
                 }
             }
             println()
-            println(meal ?: "No meal found with this ID.")
+            println(mealId ?: "No meal found with this ID.")
         } catch (e: IncorrectDateFormatException) {
             println("${e.message} Please use dd/MM/yyyy format.")
         } catch (e: NoMealFoundException) {
             println(e.message)
         }
+    }
+    private fun dateFormat(date:String): Date {
+
+        return try {
+            val formatter= DateTimeFormatterBuilder().appendPattern("d/M/yyyy").toFormatter()
+            val localDate= LocalDate.parse(date,formatter)
+            Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+        }catch (e:Exception){
+            throw IncorrectDateFormatException("Incorrect date format")
+        }
+
+
     }
 
 }

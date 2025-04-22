@@ -7,9 +7,10 @@ import java.util.*
 fun createMeals(
     name:String,
     id:Long,
+    date: Date
 
 )=Meal(
-    name, id, null, null, Date(20/7/2003), null,
+    name, id, null, null, date, null,
     Nutrition(
         null,
         null,

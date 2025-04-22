@@ -14,10 +14,5 @@ class GetMealsByDateUseCase(private val mealsRepository: MealsRepository) {
         meals
     }
 
-    private fun dateFormat(date: String) = try {
-        val formatter = SimpleDateFormat("dd/MM/yyyy")
-        formatter.parse(date)
-    } catch (e: Exception) {
-        throw IncorrectDateFormatException("Incorrect Date Format")
-    }
+    
 }
