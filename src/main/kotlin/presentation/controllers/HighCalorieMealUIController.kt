@@ -1,40 +1,35 @@
 package org.example.presentation.controllers
 
+import org.example.logic.usecase.GetHighCalorieMealUseCase
 import org.example.logic.usecase.SuggestHighCalorieMealUseCase
 import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
 import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.FoodViewer
 import org.example.presentation.UiController
 import org.example.presentation.Viewer
+import org.example.utils.showNameAndDescription
 import org.koin.mp.KoinPlatform.getKoin
 
 class HighCalorieMealUIController(
-    private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase = getKoin().get(),
+    private val getHighCalorieMeal: GetHighCalorieMealUseCase = getKoin().get(),
     private val viewer: Viewer = FoodViewer()
 ) : UiController {
     override fun execute() {
         do {
             try {
                 println("The Suggestion High Calorie Meal ")
-                val nameAndDescription = suggestHighCalorieMealUseCase.suggestNameAndDescriptionOfHighCalorieMeal()
-                suggestHighCalorieMealUseCase.checkMealIsFound(nameAndDescription)
-                println("name : ${nameAndDescription.first} , Description : ${nameAndDescription.second}")
-                println("\nIf you want more details about meal press (1) ")
-                println("if you want another meal press (2) ")
-                println("if you want To Exit (3) ")
+                getHighCalorieMeal.getRandomHighCalorieMeal().showNameAndDescription()
+                println("\t(1) Like (show more details about meal)")
+                println("\t(2) Dislike (show another meal)")
+                println("\t(3) Exit ")
                 print("Input Your Choose Number : ")
                 val inputUser = readln().toIntOrNull()
 
                 when (inputUser) {
 
-                    1 -> {
-                        viewer.showMealDetails(
-                            suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!)
-                        )
-                        break
-                    }
+                    1 -> { viewer.showMealDetails(getHighCalorieMeal.getRandomHighCalorieMeal()); break }
 
-                    2 -> println("Another Suggestion Meal \n")
+                    2 -> println("Get Another Suggestion Meal \n")
 
                     3 -> break
 

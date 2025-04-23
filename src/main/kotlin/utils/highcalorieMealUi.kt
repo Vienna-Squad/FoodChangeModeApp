@@ -1,6 +1,8 @@
 package org.example.utils
 
-fun <T,E>Pair<T,E>.show(){
-    println("Name : [ ${this.first} ]\nDescription : ${this.second}")
+import org.example.logic.model.Meal
+
+fun Meal.showNameAndDescription(){
+    println("Name : [ ${this.name} ]\nDescription : ${this.description}")
 }
 
