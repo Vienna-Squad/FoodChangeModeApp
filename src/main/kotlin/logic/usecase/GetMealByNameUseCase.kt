@@ -14,7 +14,7 @@ class GetMealByNameUseCase(
         return mealsRepository.getAllMeals().find { meal ->
             val name = meal.name?.lowercase().orEmpty()
             kmpSearcher.search(name, normalizedQuery)
-        } ?: throw NoMealFoundException("No meal found matching the name: $query")
+        } ?: throw NoMealFoundException(query)
     }
 }
 

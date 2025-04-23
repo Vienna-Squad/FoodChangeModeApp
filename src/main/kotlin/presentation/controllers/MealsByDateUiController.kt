@@ -3,18 +3,17 @@ package org.example.presentation.controllers
 import org.example.logic.usecase.GetMealsByDateUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.presentation.FoodViewer
-import org.example.presentation.UiController
-import org.example.presentation.Viewer
+import org.example.presentation.*
 import org.koin.mp.KoinPlatform.getKoin
 
 class MealsByDateUiController(
     private val getMealsByDateUseCase: GetMealsByDateUseCase = getKoin().get(),
-    private val viewer: Viewer = FoodViewer()
+    private val viewer: Viewer = FoodViewer(),
+    private val interactor: Interactor=UserInteractor()
 ) : UiController {
     override fun execute() {
         print("Enter date (dd/MM/yyyy): ")
-        val inputDate = readln()
+        val inputDate = interactor.getInput()
         try {
             val meals = getMealsByDateUseCase(inputDate)
             println("Meals on $inputDate:")
@@ -28,9 +27,9 @@ class MealsByDateUiController(
             println()
             println(meal ?: "No meal found with this ID.")
         } catch (e: IncorrectDateFormatException) {
-            println("${e.message} Please use dd/MM/yyyy format.")
+            viewer.showExceptionMessage(IncorrectDateFormatException(""))
         } catch (e: NoMealFoundException) {
-            println(e.message)
+            viewer.showExceptionMessage(NoMealFoundException())
         }
     }
 

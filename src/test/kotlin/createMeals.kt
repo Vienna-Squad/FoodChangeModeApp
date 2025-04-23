@@ -3,10 +3,9 @@ import org.example.logic.model.Nutrition
 import java.util.*
 
 fun createMeals(
-    name:String,
-    date: Date
+    name:String
 )=Meal(
-    name, null, null, null,date , null,
+    name, null, null, null,Date() , null,
     Nutrition(
         null,
         null,

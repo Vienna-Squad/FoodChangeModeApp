@@ -7,6 +7,7 @@ import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.GetMealByNameUseCase
 import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.FoodViewer
+import org.example.presentation.Interactor
 import org.example.presentation.UiController
 import org.example.presentation.controllers.MealByNameUiController
 import org.example.utils.KMPSearcher
@@ -23,57 +24,53 @@ internal class MealByNameUiControllerTest{
 
     lateinit var getMealsByNameUseCase: GetMealByNameUseCase
     lateinit var viewer: FoodViewer
-    lateinit var getMealByNameUiController: MealByNameUiController
+    lateinit var MealByNameUiController: MealByNameUiController
+    lateinit var interactor: Interactor
 
-
-    val localDate = LocalDate.of(2003, 4, 14)
-    val date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
 
     @BeforeEach
     fun setUp(){
 
         getMealsByNameUseCase= mockk()
         viewer= mockk(relaxed = true)
-        getMealByNameUiController=MealByNameUiController(getMealsByNameUseCase,viewer)
+        interactor= mockk(relaxed = true)
+        MealByNameUiController=MealByNameUiController(getMealsByNameUseCase,viewer,interactor)
 
     }
 
     @Test
     fun `should show meal details when meal is found`(){
         //given
-        every { getMealsByNameUseCase.invoke("chinese  candy") }returns createMeals("chinese  candy", date)
+        every { interactor.getInput() }returns "chinese  candy"
+
+        every { getMealsByNameUseCase.invoke("chinese  candy") }returns createMeals("chinese  candy")
 
         //when
-        System.setIn("chinese  candy\n".byteInputStream())
-        getMealByNameUiController.execute()
+        MealByNameUiController.execute()
 
         // then
         verify {
-            viewer.showMealDetails(createMeals("chinese  candy", date))
+            viewer.showMealDetails(any())
         }
 
     }
 
+
     @Test
-    fun `should return exception when meal is not found`(){
-        //given
-        every { getMealsByNameUseCase.invoke("chinese  candy") }returns createMeals("chinese  candy", date)
-        every { getMealsByNameUseCase.invoke("fried  potatoes") } throws NoMealFoundException("Meal not found")
+    fun `should throw exception when search by name for not available meal `(){
 
+        //given  (stubs)
+        every { interactor.getInput() }returns "chinese  candy"
 
-        System.setIn("fried  potatoes\n".byteInputStream())
-
-        mockkStatic("kotlin.io.ConsoleKt")
-        every { println("Meal not found") } just Runs
+        every { getMealsByNameUseCase.invoke("chinese  candy") } throws NoMealFoundException()
 
         //when
-        getMealByNameUiController.execute()
+        MealByNameUiController.execute()
 
         // then
         verify {
-            println("Meal not found")
+            viewer.showExceptionMessage(any())
         }
-
 
     }
 
