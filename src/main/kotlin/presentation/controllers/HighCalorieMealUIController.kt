@@ -1,7 +1,6 @@
 package org.example.presentation.controllers
 
 import org.example.logic.usecase.GetHighCalorieMealUseCase
-import org.example.logic.usecase.SuggestHighCalorieMealUseCase
 import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
 import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.FoodViewer
