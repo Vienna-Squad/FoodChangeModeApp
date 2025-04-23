@@ -2,11 +2,14 @@ package org.example.presentation.controllers
 
 import org.example.logic.model.RankedMealResult
 import org.example.logic.usecase.GetRankedSeafoodByProteinUseCase
+import org.example.presentation.FoodViewer
 import org.example.presentation.UiController
+import org.example.presentation.Viewer
 import org.koin.mp.KoinPlatform.getKoin
 
 class RankedSeafoodByProteinUiController(
-    private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase = getKoin().get()
+    private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase = getKoin().get(),
+    private val viewer: Viewer = FoodViewer()
 ) : UiController {
     override fun execute() {
         println("--- Seafood Meals Sorted by Protein (Highest First) ---")
