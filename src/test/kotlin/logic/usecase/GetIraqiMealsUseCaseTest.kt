@@ -15,7 +15,13 @@ import java.util.*
 
 class GetIraqiMealsUseCaseTest {
     lateinit var getIraqiMealsUseCase: GetIraqiMealsUseCase
-    val mealsRepository: MealsRepository = mockk(relaxed = true)
+    private val mealsRepository: MealsRepository = mockk(relaxed = true)
+    private val nonIraqiMeals = listOf(
+        createMeal(),
+        createMeal(),
+        createMeal(),
+        createMeal(),
+    )
 
     @BeforeEach
     fun setup() {
@@ -25,18 +31,16 @@ class GetIraqiMealsUseCaseTest {
     @Test
     fun `when call getAllMeals() from mealsRepository and it returns list of meals should that getIraqiMealsUseCase return just iraqi meals`() {
         //given
-        every { mealsRepository.getAllMeals() } returns listOf(
+        val iraqiMeals = listOf(
             createMeal(hasIraqiTag = true, hasIraqInDescription = true),
             createMeal(hasIraqiTag = true, hasIraqInDescription = true),
-            createMeal(),
             createMeal(hasIraqiTag = true, hasIraqInDescription = true),
-            createMeal(),
             createMeal(hasIraqiTag = true, hasIraqInDescription = true),
-            createMeal(),
-            createMeal(),
         )
+        val mixedMeals = (nonIraqiMeals + iraqiMeals).shuffled()
+        every { mealsRepository.getAllMeals() } returns mixedMeals
         //when && then
-        assertThat(getIraqiMealsUseCase().size).isEqualTo(4)
+        assertThat(getIraqiMealsUseCase()).isEqualTo(iraqiMeals)
     }
 
     @Test
@@ -52,11 +56,7 @@ class GetIraqiMealsUseCaseTest {
     @Test
     fun `when call getAllMeals() from mealsRepository and it returns a list of non-iraqi meals should getIraqiMealsUseCase throw NoMealsFoundException`() {
         //given
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeal(),
-            createMeal(),
-            createMeal(),
-        )
+        every { mealsRepository.getAllMeals() } returns nonIraqiMeals
         //when && then
         assertThrows<NoMealFoundException> {
             getIraqiMealsUseCase()
@@ -65,29 +65,29 @@ class GetIraqiMealsUseCaseTest {
 
     @Test
     fun `when call getAllMeals() from mealsRepository and it returns a list includes meal without iraqi tag but has iraq in description should still be considered iraqi`() {
-        //given
-        every { mealsRepository.getAllMeals() } returns listOf(
+        //given iraqiDescribedMeals
+        val iraqiDescribedMeals = listOf(
             createMeal(hasIraqInDescription = true),
-            createMeal(),
             createMeal(hasIraqInDescription = true),
-            createMeal(),
-            createMeal(),
         )
+        val mixedMeals = (nonIraqiMeals + iraqiDescribedMeals).shuffled()
+        every { mealsRepository.getAllMeals() } returns mixedMeals
         //when && then
-        assertThat(getIraqiMealsUseCase().size).isEqualTo(2)
+        assertThat(getIraqiMealsUseCase()).isEqualTo(iraqiDescribedMeals)
     }
 
     @Test
     fun `when call getAllMeals() from mealsRepository and it returns a list includes meal with iraqi tag but has no iraq in description should still be considered iraqi`() {
         //given
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeal(),
+        val iraqiTaggedMeals = listOf(
             createMeal(hasIraqiTag = true),
-            createMeal(),
-            createMeal(),
+            createMeal(hasIraqiTag = true),
+            createMeal(hasIraqiTag = true),
         )
+        val mixedMeals = (nonIraqiMeals + iraqiTaggedMeals).shuffled()
+        every { mealsRepository.getAllMeals() } returns mixedMeals
         //when && then
-        assertThat(getIraqiMealsUseCase().size).isEqualTo(1)
+        assertThat(getIraqiMealsUseCase()).isEqualTo(iraqiTaggedMeals)
     }
 
     private fun createMeal(hasIraqiTag: Boolean = false, hasIraqInDescription: Boolean = false) =
