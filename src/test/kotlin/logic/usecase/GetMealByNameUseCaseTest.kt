@@ -25,6 +25,7 @@ internal class GetMealByNameUseCaseTest{
 
     val localDate = LocalDate.of(2003, 4, 14)
     val date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+    val expectedMeal=createMeals("chinese  candy", date)
 
 
 
@@ -52,7 +53,6 @@ internal class GetMealByNameUseCaseTest{
         )
         every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
         every { kmpSearcher.search("fried  potatoes", "chinese  candy") } returns false
-        every { kmpSearcher.search("chinese  candy", "ChInese  CAndy") } returns true
 
 
         val mealName="chinese  candy"
@@ -62,9 +62,83 @@ internal class GetMealByNameUseCaseTest{
 
         //then
         assertThat(result).isEqualTo(
-            createMeals(mealName, date),
+            expectedMeal
         )
 
+    }
+
+    @Test
+    fun `should return the meal regardless of name case`(){
+
+        //given  (stubs)
+
+
+        every { mealsRepository.getAllMeals() } returns listOf(
+            createMeals("chinese  candy", date),
+            )
+        every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
+        every { kmpSearcher.search("chinese  candy", "ChInesE  CAndy") } returns true
+
+
+        val mealName="ChInesE  CAndy"
+
+        //when
+        val result= getMealsByNameUseCase.invoke(mealName)
+
+        //then
+        assertThat(result).isEqualTo(
+            expectedMeal
+        )
+
+    }
+    @Test
+    fun `should return meal when only part of the name is typed`(){
+
+        //given  (stubs)
+
+
+        every { mealsRepository.getAllMeals() } returns listOf(
+            createMeals("chinese  candy", date),
+            createMeals("fried  potatoes", date),
+
+            )
+        every { kmpSearcher.search("chinese  candy", "chinese") } returns true
+        every { kmpSearcher.search("fried  potatoes", "fried") } returns false
+
+
+        val mealName="chinese"
+
+        //when
+        val result= getMealsByNameUseCase.invoke(mealName)
+
+        //then
+        assertThat(result).isEqualTo(
+            expectedMeal
+        )
+
+    }
+    @Test
+    fun `should return meal even when query has leading or trailing spaces`(){
+
+        //given  (stubs)
+        every { mealsRepository.getAllMeals() } returns listOf(
+            createMeals("chinese  candy", date),
+            createMeals("fried  potatoes", date),
+
+            )
+        every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
+        every { kmpSearcher.search("fried  potatoes", "fried  potatoes") } returns false
+
+
+        val mealName=" chinese  candy "
+
+        //when
+        val result= getMealsByNameUseCase.invoke(mealName)
+
+        //then
+        assertThat(result).isEqualTo(
+            expectedMeal
+        )
     }
 
     @Test
