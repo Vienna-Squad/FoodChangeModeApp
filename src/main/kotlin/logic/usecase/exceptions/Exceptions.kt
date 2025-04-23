@@ -15,3 +15,4 @@ open class GuessPrepareTimeGameException(val attempt: Int, message: String) : Fo
 class GameOverException : GuessPrepareTimeGameException(0, "game over")
 class TooHighException(attempt: Int) : GuessPrepareTimeGameException(attempt, "too high")
 class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, "too low")
+class NoSeafoodFoundException(message: String = "No seafood meals found") : FoodChangeMoodException(message)

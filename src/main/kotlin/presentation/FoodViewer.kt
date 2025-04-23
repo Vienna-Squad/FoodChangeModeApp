@@ -2,6 +2,7 @@ package org.example.presentation
 
 import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
+import org.example.logic.model.RankedMealResult
 import kotlin.collections.forEach
 
 class FoodViewer : Viewer {
@@ -35,5 +36,16 @@ class FoodViewer : Viewer {
 
     override fun showExceptionMessage(exception: Exception) {
         println("\"\\u001B[31m${exception.message}\\u001B[0m\"")
+    }
+
+    override fun showRankedMealsByProtein(meals: List<RankedMealResult>) {
+        println("\u001B[32mRank | Meal Name                      | Protein (g)\u001B[0m")
+        println("-----|--------------------------------|------------")
+        meals.forEach { meal ->
+            val rankStr = meal.rank.toString().padEnd(4)
+            val nameStr = (meal.name ?: "Unnamed Meal").take(30).padEnd(30)
+            val proteinStr = meal.protein?.toString() ?: "N/A"
+            println("$rankStr | $nameStr | $proteinStr")
+        }
     }
 }
