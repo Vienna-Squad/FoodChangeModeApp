@@ -3,18 +3,19 @@ package logic.usecase
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
-import org.example.logic.model.Meal
-import org.example.logic.model.Nutrition
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.GetKetoMealUseCase
+import buildKetoMeal
+import buildMealWithMissingNutrition
+import buildMealWithPartialNutrition
+import buildNonKetoMeal
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.Date
 
 class GetKetoMealUseCaseTest {
 
     private lateinit var getKetoMealUseCase: GetKetoMealUseCase
-    private val mealsRepository: MealsRepository = mockk(relaxed = true)
+    private val mealsRepository: MealsRepository = mockk()
 
     @BeforeEach
     fun setUp() {
@@ -25,8 +26,8 @@ class GetKetoMealUseCaseTest {
     fun `invoke should return null when no keto meals available`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
-            createNonKetoMeal("Pasta"),
-            createNonKetoMeal("Rice")
+            buildNonKetoMeal("Pasta"),
+            buildNonKetoMeal("Rice")
         )
 
         // When
@@ -39,11 +40,11 @@ class GetKetoMealUseCaseTest {
     @Test
     fun `invoke should return keto meal when available`() {
         // Given
-        val ketoMeal = createKetoMeal("Keto Steak")
+        val ketoMeal = buildKetoMeal("Keto Steak")
         every { mealsRepository.getAllMeals() } returns listOf(
-            createNonKetoMeal("Pasta"),
+            buildNonKetoMeal("Pasta"),
             ketoMeal,
-            createNonKetoMeal("Rice")
+            buildNonKetoMeal("Rice")
         )
 
         // When
@@ -56,12 +57,12 @@ class GetKetoMealUseCaseTest {
     @Test
     fun `invoke should exclude seen meals`() {
         // Given
-        val seenKetoMeal = createKetoMeal("Seen Keto Meal")
-        val newKetoMeal = createKetoMeal("New Keto Meal")
+        val seenKetoMeal = buildKetoMeal("Seen Keto Meal")
+        val newKetoMeal = buildKetoMeal("New Keto Meal")
         every { mealsRepository.getAllMeals() } returns listOf(
             seenKetoMeal,
             newKetoMeal,
-            createNonKetoMeal("Pasta")
+            buildNonKetoMeal("Pasta")
         )
 
         // When
@@ -74,12 +75,12 @@ class GetKetoMealUseCaseTest {
     @Test
     fun `invoke should return null when all keto meals have been seen`() {
         // Given
-        val ketoMeal1 = createKetoMeal("Keto Meal 1")
-        val ketoMeal2 = createKetoMeal("Keto Meal 2")
+        val ketoMeal1 = buildKetoMeal("Keto Meal 1")
+        val ketoMeal2 = buildKetoMeal("Keto Meal 2")
         every { mealsRepository.getAllMeals() } returns listOf(
             ketoMeal1,
             ketoMeal2,
-            createNonKetoMeal("Pasta")
+            buildNonKetoMeal("Pasta")
         )
 
         // When
@@ -93,8 +94,8 @@ class GetKetoMealUseCaseTest {
     fun `invoke should return null when nutrition data is missing`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
-            createMealWithMissingNutrition("Meal 1"),
-            createMealWithMissingNutrition("Meal 2")
+            buildMealWithMissingNutrition("Meal 1"),
+            buildMealWithMissingNutrition("Meal 2")
         )
 
         // When
@@ -108,8 +109,8 @@ class GetKetoMealUseCaseTest {
     fun `invoke should return null when carbs or fat data is missing`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
-            createMealWithPartialNutrition("Meal 1"),
-            createMealWithPartialNutrition("Meal 2")
+            buildMealWithPartialNutrition("Meal 1", hasFat = false, hasCarbs = true),
+            buildMealWithPartialNutrition("Meal 2", hasFat = true, hasCarbs = false)
         )
 
         // When
@@ -117,97 +118,5 @@ class GetKetoMealUseCaseTest {
 
         // Then
         assertThat(result).isNull()
-    }
-
-    private fun createKetoMeal(name: String): Meal {
-        return Meal(
-            name = name,
-            id = null,
-            minutes = null,
-            contributorId = null,
-            submitted = Date(),
-            tags = null,
-            nutrition = Nutrition(
-                calories = null,
-                totalFat = 25.0F,
-                sugar = null,
-                sodium = null,
-                protein = null,
-                saturatedFat = null,
-                carbohydrates = 10.0F
-            ),
-            numberOfSteps = null,
-            steps = null,
-            description = null,
-            ingredients = null,
-            numberOfIngredients = null
-        )
-    }
-
-    private fun createNonKetoMeal(name: String): Meal {
-        return Meal(
-            name = name,
-            id = null,
-            minutes = null,
-            contributorId = null,
-            submitted = Date(),
-            tags = null,
-            nutrition = Nutrition(
-                calories = null,
-                totalFat = 10.0F,
-                sugar = null,
-                sodium = null,
-                protein = null,
-                saturatedFat = null,
-                carbohydrates = 50.0F
-            ),
-            numberOfSteps = null,
-            steps = null,
-            description = null,
-            ingredients = null,
-            numberOfIngredients = null
-        )
-    }
-
-    private fun createMealWithMissingNutrition(name: String): Meal {
-        return Meal(
-            name = name,
-            id = null,
-            minutes = null,
-            contributorId = null,
-            submitted = Date(),
-            tags = null,
-            nutrition = null,
-            numberOfSteps = null,
-            steps = null,
-            description = null,
-            ingredients = null,
-            numberOfIngredients = null
-        )
-    }
-
-    private fun createMealWithPartialNutrition(name: String): Meal {
-        return Meal(
-            name = name,
-            id = null,
-            minutes = null,
-            contributorId = null,
-            submitted = Date(),
-            tags = null,
-            nutrition = Nutrition(
-                calories = null,
-                totalFat = null,
-                sugar = null,
-                sodium = null,
-                protein = null,
-                saturatedFat = null,
-                carbohydrates = 10.0F
-            ),
-            numberOfSteps = null,
-            steps = null,
-            description = null,
-            ingredients = null,
-            numberOfIngredients = null
-        )
     }
 }
