@@ -15,3 +15,5 @@ open class GuessPrepareTimeGameException(val attempt: Int, message: String) : Fo
 class GameOverException : GuessPrepareTimeGameException(0, "game over")
 class TooHighException(attempt: Int) : GuessPrepareTimeGameException(attempt, "too high")
 class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, "too low")
+
+class NoHealthyFastFoodFoundException(message: String = "No healthy fast food meals found") : FoodChangeMoodException(message)

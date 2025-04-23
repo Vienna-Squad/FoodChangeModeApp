@@ -1,6 +1,7 @@
 package org.example.presentation.controllers
 
 import org.example.logic.usecase.GetHealthyFastFoodUseCase
+import org.example.logic.usecase.exceptions.NoHealthyFastFoodFoundException
 import org.example.presentation.FoodViewer
 import org.example.presentation.UiController
 import org.example.presentation.Viewer
@@ -12,15 +13,13 @@ class HealthyFastFoodUIController(
 ) : UiController {
     override fun execute() {
         try {
+            println("================== Healthy Fast Food Suggestions ==================")
             val healthyFastFoodMeals = getHealthyFastFoodUseCase()
-            if (healthyFastFoodMeals.isNotEmpty()) {
-                println("================== Healthy Fast Food Suggestions ==================")
-                viewer.showMealsDetails(healthyFastFoodMeals)
-            } else {
-                println("No healthy fast food options found based on the criteria.")
-            }
+            viewer.showMealsDetails(healthyFastFoodMeals)
+        } catch (e: NoHealthyFastFoodFoundException) {
+            println("\u001B[33m${e.message}\u001B[0m")
         } catch (e: Exception) {
-            println("Error fetching healthy fast food: ${e.message}")
+            println("\u001B[31mError fetching healthy fast food: ${e.message}\u001B[0m")
         }
     }
 }
