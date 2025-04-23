@@ -16,22 +16,6 @@ val appModule = module {
     single { KMPSearcher() }
     single<MealsRepository> { CsvMealsRepository(csvFileReader = get(), mealsCsvParser = get()) }
     single {
-        App(
-            getMealByName = get(),
-            getMealsByDateUseCase = get(),
-            getEasyFoodSuggestionUseCase = get(),
-            getIraqiMealsUseCase = get(),
-            guessPrepareTimeGameUseCase = get(),
-            getRandomPotatoMealsUseCase = get(),
-            getKetoMealUseCase = get(),
-            getItalianGroupMealsUseCase = get(),
-            getMealsByProteinAndCaloriesUseCase = get(),
-            getMealsOfCountryUseCase = get(),
-            getRankedSeafoodByProteinUseCase = get(),
-            getHighCalorieMealUseCase = get(),
-            guessIngredientGameUseCase = get(),
-            getEggFreeSweetsUseCase = get(),
-            getHealthyFastFoodUseCase = get()
-        )
+        App()
     }
 }

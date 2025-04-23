@@ -1,7 +1,7 @@
 package org.example.dependencyinjection
 
 import org.example.logic.usecase.*
-import org.example.logic.usecase.exceptions.GetHealthyFastFoodUseCase
+import org.example.logic.usecase.GetHealthyFastFoodUseCase
 import org.koin.dsl.module
 
 
@@ -10,7 +10,7 @@ val useCasesModule = module {
     single { GetIraqiMealsUseCase(get()) }
     single { GetItalianGroupMealsUseCase(get()) }
     single { GetKetoMealUseCase(get()) }
-    single { GetMealByName(get()) }
+    single { GetMealByNameUseCase(get()) }
     single { GetMealsByDateUseCase(get()) }
     single { GetMealsByProteinAndCaloriesUseCase(get()) }
     single { GetMealsOfCountryUseCase(get(),get()) }

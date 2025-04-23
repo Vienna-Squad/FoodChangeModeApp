@@ -2,8 +2,8 @@ package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
-import org.example.logic.usecase.exceptions.IngredientUserInputException
-import org.example.logic.usecase.exceptions.IngredientsOptionsException
+import org.example.logic.usecase.exceptions.NoMealFoundException
+import org.koin.core.logger.MESSAGE
 import kotlin.random.Random
 
 
@@ -69,9 +69,9 @@ class GuessIngredientGameUseCase(
             }
 
             else -> {
-                throw IngredientUserInputException("InValid Input Number")
+                throw NoMealFoundException("InValid Input Number")
             }
-        } ?: throw IngredientsOptionsException("Ingredients List is Null Or Empty")
+        } ?: throw NoMealFoundException("Ingredients List is Null Or Empty")
     }
 
     fun checkIngredientUserInput(ingredient: String, randomMealName: String?): Boolean {
@@ -99,4 +99,3 @@ class GuessIngredientGameUseCase(
     }
 
 }
-
