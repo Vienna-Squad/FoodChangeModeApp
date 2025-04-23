@@ -2,19 +2,20 @@ package org.example.presentation
 
 import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
+import kotlin.collections.forEach
 
-abstract class MealDetailsViewer {
-    fun showMealDetails(meal: Meal) {
+class FoodViewer : Viewer {
+    override fun showMealDetails(meal: Meal) {
         println("Name : ${meal.name}")
         println("Description : ${meal.description ?: "no description"}")
         println("Prepare Minutes : ${meal.minutes}")
         println("Ingredients : ${meal.ingredients}")
         println("Steps : ${meal.steps}")
-        showNutrition(meal.nutrition!!)
+        println("Nutrition : ${nutritionToString(meal.nutrition!!)}")
     }
 
-    private fun showNutrition(nutrition: Nutrition) {
-        val map = mutableMapOf(
+    private fun nutritionToString(nutrition: Nutrition): String {
+        return mutableMapOf(
             "calories" to nutrition.calories,
             "sodium" to nutrition.sodium,
             "sugar" to nutrition.sugar,
@@ -22,14 +23,17 @@ abstract class MealDetailsViewer {
             "totalFat" to nutrition.totalFat,
             "carbohydrates" to nutrition.carbohydrates,
             "saturatedFat" to nutrition.saturatedFat,
-        )
-        println("Nutrition : $map")
+        ).toString()
     }
 
-    fun showMeals(meals: List<Meal>) {
+    override fun showMealsDetails(meals: List<Meal>) {
         meals.forEach { meal ->
             showMealDetails(meal)
             println("------------------------------------------------------------")
         }
+    }
+
+    override fun showExceptionMessage(exception: Exception) {
+        println("\"\\u001B[31m${exception.message}\\u001B[0m\"")
     }
 }

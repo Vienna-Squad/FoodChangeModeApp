@@ -2,13 +2,15 @@ package org.example.presentation.controllers
 
 import org.example.logic.model.Meal
 import org.example.logic.usecase.GetEggFreeSweetsUseCase
-import org.example.presentation.MealDetailsViewer
+import org.example.presentation.FoodViewer
 import org.example.presentation.UiController
+import org.example.presentation.Viewer
 import org.koin.mp.KoinPlatform
 
 class EggFreeSweetsUIController(
-    private val getEggFreeSweetsUseCase: GetEggFreeSweetsUseCase = KoinPlatform.getKoin().get()
-) : MealDetailsViewer(), UiController {
+    private val getEggFreeSweetsUseCase: GetEggFreeSweetsUseCase = KoinPlatform.getKoin().get(),
+    private val viewer: Viewer = FoodViewer()
+) : UiController {
     override fun execute() {
         val seenMeals = mutableSetOf<Meal>()
         while (true) {
@@ -24,7 +26,7 @@ class EggFreeSweetsUIController(
             when (readlnOrNull()) {
                 "1" -> {
                     println("\n Full Details of ${meal.name}")
-                    showMealDetails(meal)
+                    viewer.showMealDetails(meal)
                     break
                 }
 

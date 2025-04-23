@@ -2,12 +2,14 @@ package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.exceptions.NoMealFoundException
 
 class GetIraqiMealsUseCase(
     private val mealsRepository: MealsRepository
 ) {
     operator fun invoke() = mealsRepository.getAllMeals()
         .filter { meal -> hasIraqiTag(meal) || isDescriptionContainsIraqWord(meal) }
+        .ifEmpty { throw NoMealFoundException("iraqi meals") }
 
     private fun hasIraqiTag(meal: Meal) = meal.tags?.any { it.equals("iraqi", ignoreCase = true) } ?: false
 
