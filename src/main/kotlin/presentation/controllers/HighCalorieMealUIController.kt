@@ -2,9 +2,11 @@ package org.example.presentation.controllers
 
 import org.example.logic.model.Meal
 import org.example.logic.usecase.GetHighCalorieMealUseCase
-import org.example.logic.usecase.exceptions.FoodChangeMoodException
+import org.example.logic.usecase.exceptions.EmptyRandomMealException
 import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
 import org.example.logic.usecase.exceptions.NoMealFoundException
+import org.example.utils.interactor.HighCalorieMealInteractor
+import org.example.utils.interactor.UserHighCalorieMealInteractor
 import org.example.utils.viewer.AnotherSuggestionMealViewer
 import org.example.utils.viewer.ExceptionViewer
 import org.example.utils.viewer.FoodExceptionViewer
@@ -18,20 +20,20 @@ class HighCalorieMealUIController(
     private val showMealDetailsViewer: ItemDetailsViewer<Meal> = MealDetailsViewer(),
     private val highCalorieMealViewer: ItemDetailsViewer<Meal> = HighCalorieMealViewer(),
     private val anotherSuggestionMealViewer: ItemDetailsViewer<String> = AnotherSuggestionMealViewer(),
-    private val exceptionViewer: ExceptionViewer = FoodExceptionViewer()
+    private val exceptionViewer: ExceptionViewer = FoodExceptionViewer(),
+    private val highCalorieMealInteractor: HighCalorieMealInteractor = UserHighCalorieMealInteractor()
 ) : UiController {
     override fun execute() {
-        do {
-            try {
-
+        try {
+            var counter = 0
+            do {
                 val meal = suggestHighCalorieMealUseCase.getRandomHighCalorieMeal()
                 highCalorieMealViewer.viewDetails(meal)
 
                 print(INPUT_USER_MESSAGE)
-                val inputUser = readln().toIntOrNull()
+                val inputUser = highCalorieMealInteractor.getInput()
 
                 when (inputUser) {
-
                     1 -> {
                         showMealDetailsViewer.viewDetails(suggestHighCalorieMealUseCase.getRandomHighCalorieMeal())
                         break
@@ -43,20 +45,20 @@ class HighCalorieMealUIController(
 
                     else -> throw InvalidInputNumberOfHighCalorieMeal(INVALID_INPUT_NUMBER_EXCEPTION)
                 }
-            } catch (emptyException: NoMealFoundException) {
-                exceptionViewer.viewExceptionMessage(emptyException)
-            } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
-                exceptionViewer.viewExceptionMessage(invalidInputException)
-            } catch (generalException: Exception) {
-                exceptionViewer.viewExceptionMessage(generalException)
-            }
-
-        } while (true)
+                counter++
+            }while (counter <3)
+        } catch (emptyException: EmptyRandomMealException) {
+            exceptionViewer.viewExceptionMessage(emptyException)
+        } catch (invalidInputException: InvalidInputNumberOfHighCalorieMeal) {
+            exceptionViewer.viewExceptionMessage(invalidInputException)
+        } catch (generalException: Exception) {
+            exceptionViewer.viewExceptionMessage(generalException)
+        }
     }
 
     companion object {
         const val ANOTHER_SUGGESTION_MEAL_MESSAGE = "Show Another Suggestion Meal"
         const val INPUT_USER_MESSAGE = "Input Your Choose Number : "
-        const val INVALID_INPUT_NUMBER_EXCEPTION = " Input User Number is not in valid range (0..3) , please try again\n\n"
+        const val INVALID_INPUT_NUMBER_EXCEPTION = "Input User Number is not in valid range (0..3) , please try again\n\n"
     }
 }

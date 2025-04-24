@@ -1,41 +1,104 @@
 package presentation.controllers
 
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.example.logic.model.Meal
 import org.example.logic.usecase.GetHighCalorieMealUseCase
-import org.example.presentation.Viewer
+import org.example.logic.usecase.exceptions.EmptyRandomMealException
+import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
+import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.controllers.HighCalorieMealUIController
+import org.example.utils.interactor.HighCalorieMealInteractor
+import org.example.utils.viewer.ExceptionViewer
+import org.example.utils.viewer.ItemDetailsViewer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class HighCalorieMealUIControllerTest {
-    private val getHighCalorieMealUseCase: GetHighCalorieMealUseCase = mockk(relaxed = true)
-    private val viewer: Viewer = mockk()
+    private val suggestHighCalorieMealUseCase: GetHighCalorieMealUseCase = mockk(relaxed = true)
+    private val showMealDetailsViewer: ItemDetailsViewer<Meal> = mockk(relaxUnitFun = true)
+    private val highCalorieMealViewer: ItemDetailsViewer<Meal> = mockk(relaxUnitFun = true)
+    private val anotherSuggestionMealViewer: ItemDetailsViewer<String> = mockk(relaxUnitFun = true)
+    private val exceptionViewer: ExceptionViewer = mockk(relaxUnitFun = true)
+    private val highCalorieMealInteractor: HighCalorieMealInteractor = mockk()
+
     lateinit var highCalorieMealUIController: HighCalorieMealUIController
+
     @BeforeEach
     fun setUp() {
-        highCalorieMealUIController = HighCalorieMealUIController(getHighCalorieMealUseCase,viewer)
+        highCalorieMealUIController = HighCalorieMealUIController(
+            suggestHighCalorieMealUseCase = suggestHighCalorieMealUseCase,
+            showMealDetailsViewer = showMealDetailsViewer,
+            highCalorieMealViewer = highCalorieMealViewer,
+            anotherSuggestionMealViewer = anotherSuggestionMealViewer,
+            exceptionViewer = exceptionViewer,
+            highCalorieMealInteractor = highCalorieMealInteractor
+        )
     }
 
 
     @Test
-    fun `execute should call getRandomHighCalorieMeal from getHighCalorieMealUseCase`(){
-//        highCalorieMealUIController.execute()
-//
-//        verify (exactly = 1){ getHighCalorieMealUseCase.getRandomHighCalorieMeal() }
+    fun `execute should call getRandomHighCalorieMeal`() {
+
+        highCalorieMealUIController.execute()
+
+        verify { suggestHighCalorieMealUseCase.getRandomHighCalorieMeal() }
+
     }
 
     @Test
-    fun `execute should throw InvalidInputNumberOfHighCalorieMeal when the input number is not in range from 1 to 3`() {
+    fun `execute should call getInput of highCalorieMealInteractor`() {
 
-        // given
-        val inputNumber = 4
+        highCalorieMealUIController.execute()
 
-        // when&then
-//        assertThrows<InvalidInputNumberOfHighCalorieMeal> {
-//            highCalorieMealUIController.execute()
-//        }
+        verify { highCalorieMealInteractor.getInput()}
 
     }
+
+    @Test
+    fun `execute should call getRandomHighCalorieMeal viewDetails of highCalorieMealUIController`() {
+
+        highCalorieMealUIController.execute()
+
+        verify { highCalorieMealViewer.viewDetails(any()) }
+    }
+
+    @Test
+    fun `execute should call viewDetails of showMealDetailsViewer when input number is 1`() {
+
+        every { highCalorieMealInteractor.getInput() } returns 1
+
+        highCalorieMealUIController.execute()
+
+        verify { showMealDetailsViewer.viewDetails(any()) }
+
+    }
+
+
+    @Test
+    fun `execute should call getRandomHighCalorieMeal viewDetails of anotherSuggestionMealViewer`() {
+
+        every { highCalorieMealInteractor.getInput() } returns 2
+
+        highCalorieMealUIController.execute()
+
+        verify { anotherSuggestionMealViewer.viewDetails(any()) }
+
+    }
+
+
+
+    @Test
+    fun `execute should throw  InvalidInputNumberOfHighCalorieMeal when the input number is not in range from 1 to 3`() {
+
+        every { highCalorieMealInteractor.getInput() } returns 4
+
+        highCalorieMealUIController.execute()
+
+        verify { exceptionViewer.viewExceptionMessage(any()) }
+
+    }
+
 
 }
