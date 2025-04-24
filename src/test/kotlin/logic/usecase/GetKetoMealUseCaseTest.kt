@@ -1,16 +1,16 @@
 package logic.usecase
-
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
+import org.example.logic.model.Meal
+import org.example.logic.model.Nutrition
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.GetKetoMealUseCase
-import buildKetoMeal
-import buildMealWithMissingNutrition
-import buildMealWithPartialNutrition
-import buildNonKetoMeal
+import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.util.Date
 
 class GetKetoMealUseCaseTest {
 
@@ -23,100 +23,110 @@ class GetKetoMealUseCaseTest {
     }
 
     @Test
-    fun `invoke should return null when no keto meals available`() {
+    fun `should throw exception when no keto meals available`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
-            buildNonKetoMeal("Pasta"),
-            buildNonKetoMeal("Rice")
+            createMeal(totalFat = 10f, carbs = 50f),
+            createMeal(totalFat = 15f, carbs = 30f)
         )
 
-        // When
-        val result = getKetoMealUseCase.invoke(emptySet())
-
-        // Then
-        assertThat(result).isNull()
+        // When & Then
+        assertThrows<NoMealFoundException> {
+            getKetoMealUseCase(emptySet())
+        }
     }
 
     @Test
-    fun `invoke should return keto meal when available`() {
+    fun `should return keto meal when available`() {
         // Given
-        val ketoMeal = buildKetoMeal("Keto Steak")
+        val ketoMeal = createMeal(totalFat = 25f, carbs = 10f)
         every { mealsRepository.getAllMeals() } returns listOf(
-            buildNonKetoMeal("Pasta"),
+            createMeal(totalFat = 10f, carbs = 50f),
             ketoMeal,
-            buildNonKetoMeal("Rice")
+            createMeal(totalFat = 12f, carbs = 45f)
         )
 
         // When
-        val result = getKetoMealUseCase.invoke(emptySet())
+        val result = getKetoMealUseCase(emptySet())
 
         // Then
         assertThat(result).isEqualTo(ketoMeal)
     }
 
     @Test
-    fun `invoke should exclude seen meals`() {
+    fun `should exclude seen meals`() {
         // Given
-        val seenKetoMeal = buildKetoMeal("Seen Keto Meal")
-        val newKetoMeal = buildKetoMeal("New Keto Meal")
+        val seenKetoMeal = createMeal(totalFat = 25f, carbs = 10f)
+        val newKetoMeal = createMeal(totalFat = 22f, carbs = 12f)
         every { mealsRepository.getAllMeals() } returns listOf(
             seenKetoMeal,
             newKetoMeal,
-            buildNonKetoMeal("Pasta")
+            createMeal(totalFat = 10f, carbs = 50f)
         )
 
         // When
-        val result = getKetoMealUseCase.invoke(setOf(seenKetoMeal))
+        val result = getKetoMealUseCase(setOf(seenKetoMeal))
 
         // Then
         assertThat(result).isEqualTo(newKetoMeal)
     }
 
     @Test
-    fun `invoke should return null when all keto meals have been seen`() {
+    fun `should throw exception when nutrition data is missing`() {
         // Given
-        val ketoMeal1 = buildKetoMeal("Keto Meal 1")
-        val ketoMeal2 = buildKetoMeal("Keto Meal 2")
         every { mealsRepository.getAllMeals() } returns listOf(
-            ketoMeal1,
-            ketoMeal2,
-            buildNonKetoMeal("Pasta")
+            createMeal(nutrition = null),
+            createMeal(nutrition = null)
         )
 
-        // When
-        val result = getKetoMealUseCase.invoke(setOf(ketoMeal1, ketoMeal2))
-
-        // Then
-        assertThat(result).isNull()
+        // When & Then
+        assertThrows<NoMealFoundException> {
+            getKetoMealUseCase(emptySet())
+        }
     }
 
     @Test
-    fun `invoke should return null when nutrition data is missing`() {
+    fun `should throw exception when partial nutrition data`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
-            buildMealWithMissingNutrition("Meal 1"),
-            buildMealWithMissingNutrition("Meal 2")
+            createMeal(totalFat = 25f, carbs = null),
+            createMeal(totalFat = null, carbs = 10f)
         )
 
-        // When
-        val result = getKetoMealUseCase.invoke(emptySet())
-
-        // Then
-        assertThat(result).isNull()
+        // When & Then
+        assertThrows<NoMealFoundException> {
+            getKetoMealUseCase(emptySet())
+        }
     }
 
-    @Test
-    fun `invoke should return null when carbs or fat data is missing`() {
-        // Given
-        every { mealsRepository.getAllMeals() } returns listOf(
-            buildMealWithPartialNutrition("Meal 1", hasFat = false, hasCarbs = true),
-            buildMealWithPartialNutrition("Meal 2", hasFat = true, hasCarbs = false)
+    private fun createMeal(
+        name: String? = null,
+        totalFat: Float? = null,
+        carbs: Float? = null,
+        nutrition: Nutrition? = Nutrition(
+            calories = null,
+            totalFat = totalFat,
+            sugar = null,
+            sodium = null,
+            protein = null,
+            saturatedFat = null,
+            carbohydrates = carbs
+        ),
+        ingredients: List<String>? = null
+    ): Meal {
+        return Meal(
+            name = name,
+            id = null,
+            minutes = null,
+            contributorId = null,
+            submitted = Date(),
+            tags = null,
+            nutrition = nutrition,
+            numberOfSteps = null,
+            steps = null,
+            description = null,
+            ingredients = ingredients,
+            numberOfIngredients = ingredients?.size
         )
-
-        // When
-        val result = getKetoMealUseCase.invoke(emptySet())
-
-        // Then
-        assertThat(result).isNull()
     }
 }
