@@ -1,56 +1,56 @@
 package presentation.controllers
 
-import com.google.common.truth.Truth.assertThat
 import createMeals
 import io.mockk.*
-import org.example.logic.repository.MealsRepository
+import org.example.logic.model.Meal
 import org.example.logic.usecase.GetMealByNameUseCase
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.presentation.FoodViewer
-import org.example.presentation.Interactor
-import org.example.presentation.UiController
 import org.example.presentation.controllers.MealByNameUiController
-import org.example.utils.KMPSearcher
-import org.junit.jupiter.api.Assertions.*
+import org.example.utils.interactor.Interactor
+import org.example.utils.viewer.ExceptionViewer
+import org.example.utils.viewer.ItemDetailsViewer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.*
 
 internal class MealByNameUiControllerTest{
 
 
     lateinit var getMealsByNameUseCase: GetMealByNameUseCase
-    lateinit var viewer: FoodViewer
+    lateinit var viewer:ItemDetailsViewer<Meal>
     lateinit var MealByNameUiController: MealByNameUiController
     lateinit var interactor: Interactor
+    lateinit var exceptionViewer: ExceptionViewer
 
 
     @BeforeEach
     fun setUp(){
 
-        getMealsByNameUseCase= mockk()
+        getMealsByNameUseCase= mockk(relaxed = true)
         viewer= mockk(relaxed = true)
-        interactor= mockk(relaxed = true)
-        MealByNameUiController=MealByNameUiController(getMealsByNameUseCase,viewer,interactor)
+        exceptionViewer= mockk(relaxed = true)
+        interactor= mockk()
+        MealByNameUiController=MealByNameUiController(getMealsByNameUseCase,viewer,exceptionViewer,interactor)
 
     }
 
     @Test
     fun `should show meal details when meal is found`(){
+
+        val meal= listOf(
+            createMeals("chinese  candy"),
+            createMeals("fried potato")
+        )
         //given
         every { interactor.getInput() }returns "chinese  candy"
 
-        every { getMealsByNameUseCase.invoke("chinese  candy") }returns createMeals("chinese  candy")
+        every { getMealsByNameUseCase("chinese  candy") }returns meal[0]
 
         //when
         MealByNameUiController.execute()
 
         // then
         verify {
-            viewer.showMealDetails(any())
+            viewer.viewDetails(meal[0])
         }
 
     }
@@ -59,17 +59,24 @@ internal class MealByNameUiControllerTest{
     @Test
     fun `should throw exception when search by name for not available meal `(){
 
+        val meal= listOf(
+            createMeals("chinese  candy"),
+            createMeals("fried potato")
+        )
         //given  (stubs)
-        every { interactor.getInput() }returns "chinese  candy"
+        every { interactor.getInput() }returns "not-exist"
 
-        every { getMealsByNameUseCase.invoke("chinese  candy") } throws NoMealFoundException()
+        every { getMealsByNameUseCase("not-exist") } throws NoMealFoundException()
 
         //when
         MealByNameUiController.execute()
 
         // then
         verify {
-            viewer.showExceptionMessage(any())
+            exceptionViewer.viewExceptionMessage(
+                match {
+                it is NoMealFoundException
+            })
         }
 
     }

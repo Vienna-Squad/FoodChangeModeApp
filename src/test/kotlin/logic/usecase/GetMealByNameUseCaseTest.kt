@@ -34,15 +34,17 @@ internal class GetMealByNameUseCaseTest{
 
     }
 
+    val meals=listOf(
+        createMeals("chinese  candy"),
+        createMeals("fried  potatoes"),
+
+        )
+
     @Test
     fun `should return meals that match the given name`(){
 
         //given  (stubs)
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeals("chinese  candy"),
-            createMeals("fried  potatoes"),
-
-        )
+        every { mealsRepository.getAllMeals() } returns meals
         every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
         every { kmpSearcher.search("fried  potatoes", "chinese  candy") } returns false
 
@@ -50,10 +52,11 @@ internal class GetMealByNameUseCaseTest{
         val mealName="chinese  candy"
 
         //when
-        val result= getMealsByNameUseCase.invoke(mealName)
+        val result= getMealsByNameUseCase(mealName)
 
         //then
-        assertThat(result).isNotNull()
+        assertThat(result).isEqualTo(meals[0])
+
 
     }
 
@@ -61,11 +64,7 @@ internal class GetMealByNameUseCaseTest{
     fun `should return the meal regardless of name case`(){
 
         //given  (stubs)
-
-
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeals("chinese  candy"),
-            )
+        every { mealsRepository.getAllMeals() } returns meals
         every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
         every { kmpSearcher.search("chinese  candy", "ChInesE  CAndy") } returns true
 
@@ -73,10 +72,10 @@ internal class GetMealByNameUseCaseTest{
         val mealName="ChInesE  CAndy"
 
         //when
-        val result= getMealsByNameUseCase.invoke(mealName)
+        val result= getMealsByNameUseCase(mealName)
 
         //then
-        assertThat(result).isNotNull()
+        assertThat(result).isEqualTo(meals[0])
 
     }
     @Test
@@ -85,11 +84,7 @@ internal class GetMealByNameUseCaseTest{
         //given  (stubs)
 
 
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeals("chinese  candy"),
-            createMeals("fried  potatoes"),
-
-            )
+        every { mealsRepository.getAllMeals() } returns meals
         every { kmpSearcher.search("chinese  candy", "chinese") } returns true
         every { kmpSearcher.search("fried  potatoes", "fried") } returns false
 
@@ -97,10 +92,10 @@ internal class GetMealByNameUseCaseTest{
         val mealName="chinese"
 
         //when
-        val result= getMealsByNameUseCase.invoke(mealName)
+        val result= getMealsByNameUseCase(mealName)
 
         //then
-        assertThat(result).isNotNull()
+        assertThat(result).isEqualTo(meals[0])
 
 
     }
@@ -108,11 +103,7 @@ internal class GetMealByNameUseCaseTest{
     fun `should return meal even when query has leading or trailing spaces`(){
 
         //given  (stubs)
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeals("chinese  candy"),
-            createMeals("fried  potatoes"),
-
-            )
+        every { mealsRepository.getAllMeals() } returns meals
         every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
         every { kmpSearcher.search("fried  potatoes", "fried  potatoes") } returns false
 
@@ -120,10 +111,10 @@ internal class GetMealByNameUseCaseTest{
         val mealName=" chinese  candy "
 
         //when
-        val result= getMealsByNameUseCase.invoke(mealName)
+        val result= getMealsByNameUseCase(mealName)
 
         //then
-        assertThat(result).isNotNull()
+        assertThat(result).isEqualTo(meals[0])
 
     }
 
@@ -131,19 +122,14 @@ internal class GetMealByNameUseCaseTest{
     fun `should throw exception when search by name for not available meal `(){
 
         //given  (stubs)
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeals("chinese  candy"),
-            createMeals("fried  potatoes"),
-            createMeals("apple a day  milk shake")
-        )
+        every { mealsRepository.getAllMeals() } returns meals
         every { kmpSearcher.search("chinese  candy", "alouette  potatoes") } returns false
         every { kmpSearcher.search("fried  potatoes", "alouette  potatoes") } returns false
-        every { kmpSearcher.search("apple a day  milk shake", "alouette  potatoes") } returns false
 
 
         //when && then
         assertThrows<NoMealFoundException> {
-            getMealsByNameUseCase.invoke("alouette  potatoes")
+            getMealsByNameUseCase("alouette  potatoes")
         }
 
     }
