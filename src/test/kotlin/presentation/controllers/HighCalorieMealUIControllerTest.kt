@@ -5,9 +5,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.example.logic.model.Meal
 import org.example.logic.usecase.GetHighCalorieMealUseCase
-import org.example.logic.usecase.exceptions.EmptyRandomMealException
-import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
-import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.controllers.HighCalorieMealUIController
 import org.example.utils.interactor.HighCalorieMealInteractor
 import org.example.utils.viewer.ExceptionViewer
@@ -39,7 +36,7 @@ class HighCalorieMealUIControllerTest {
 
 
     @Test
-    fun `execute should call getRandomHighCalorieMeal`() {
+    fun `execute should call getRandomHighCalorieMeal once i call execute to get random high calorie meal`() {
 
         highCalorieMealUIController.execute()
 
@@ -48,7 +45,7 @@ class HighCalorieMealUIControllerTest {
     }
 
     @Test
-    fun `execute should call getInput of highCalorieMealInteractor`() {
+    fun `execute should call getInput of highCalorieMealInteractor whan handling user input`() {
 
         highCalorieMealUIController.execute()
 
@@ -77,7 +74,7 @@ class HighCalorieMealUIControllerTest {
 
 
     @Test
-    fun `execute should call getRandomHighCalorieMeal viewDetails of anotherSuggestionMealViewer`() {
+    fun `execute should call getRandomHighCalorieMeal viewDetails of anotherSuggestionMealViewer when input number is 2`() {
 
         every { highCalorieMealInteractor.getInput() } returns 2
 
