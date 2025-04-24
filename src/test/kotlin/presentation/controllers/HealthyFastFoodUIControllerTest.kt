@@ -24,7 +24,7 @@ class HealthyFastFoodUIControllerTest {
     @BeforeEach
     fun setUp() {
         useCase = mockk()
-        viewer = mockk(relaxed = true)
+        viewer = mockk()
         controller = HealthyFastFoodUIController(useCase, viewer)
         System.setOut(PrintStream(stdOut))
     }
