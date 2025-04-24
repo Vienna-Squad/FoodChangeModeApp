@@ -6,20 +6,22 @@ import io.mockk.verify
 import org.example.logic.model.Meal
 import org.example.logic.usecase.GetIraqiMealsUseCase
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.presentation.Viewer
 import org.example.presentation.controllers.IraqiMealsUIController
+import org.example.utils.viewer.ExceptionViewer
+import org.example.utils.viewer.ItemsViewer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
 
 class IraqiMealsUIControllerTest {
     private lateinit var iraqiMealsUIController: IraqiMealsUIController
-    private val viewer: Viewer = mockk(relaxed = true)
+    private val viewer: ItemsViewer<Meal> = mockk(relaxed = true)
     private val getIraqiMealsUseCase: GetIraqiMealsUseCase = mockk(relaxed = true)
+    private val exceptionViewer: ExceptionViewer = mockk(relaxed = true)
 
     @BeforeEach
     fun setup() {
-        iraqiMealsUIController = IraqiMealsUIController(getIraqiMealsUseCase, viewer)
+        iraqiMealsUIController = IraqiMealsUIController(getIraqiMealsUseCase, viewer, exceptionViewer)
     }
 
     @Test
@@ -34,7 +36,7 @@ class IraqiMealsUIControllerTest {
         //when
         iraqiMealsUIController.execute()
         //then
-        verify { viewer.showMealsDetails(meals) }
+        verify { viewer.viewItems(meals) }
     }
 
     @Test
@@ -45,7 +47,7 @@ class IraqiMealsUIControllerTest {
         //when
         iraqiMealsUIController.execute()
         //then
-        verify { viewer.showExceptionMessage(exception) }
+        verify { exceptionViewer.viewExceptionMessage(exception) }
     }
 
     private fun createIraqiMeal() =
