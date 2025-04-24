@@ -6,7 +6,7 @@ import org.example.logic.usecase.exceptions.EmptyRandomMealException
 import org.example.logic.usecase.exceptions.IngredientRandomMealGenerationException
 import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
-import org.example.logic.usecase.exceptions.NoMealFoundException
+
 
 
 class GuessIngredientGameUseCase(
@@ -49,15 +49,12 @@ class GuessIngredientGameUseCase(
 
     }
 
-    fun getResultOfGame(): IngredientGameResult {
-        val result = IngredientGameResult(
-            score = score,
-        )
-        return result
+    fun getResultOfGame(): Int {
+        return this.score
     }
 
     fun endGame() {
-        resetScore()
+        this.score = 0
     }
 
 
@@ -134,9 +131,6 @@ class GuessIngredientGameUseCase(
     }
 
 
-    private fun resetScore() {
-        this.score = 0
-    }
 
     companion object {
 
