@@ -28,8 +28,8 @@ class GetRandomPotatoMealsUseCaseTest {
     fun `should return empty list when no meals contain potato`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
-            createMeal(name = "salad"),
-            createMeal(name = "meat" )
+            createMeal(ingredients = listOf("fish")),
+            createMeal(ingredients = listOf("meat")  )
         )
 
         // When
@@ -77,22 +77,10 @@ class GetRandomPotatoMealsUseCaseTest {
         every { mealsRepository.getAllMeals() } returns list
 
         // When
-         getRandomPotatoMealsUseCase()
+         val result = getRandomPotatoMealsUseCase()
 
         // Then
-        assertThat(
-            list.containsAll(
-                listOf(
-                    createMeal(
-                        name = "Potato Meal 1",
-                        ingredients = listOf(
-                            "potatoes"
-                        )
-                    ),
-                    createMeal()
-                )
-            )
-        )
+        assertThat(result.map { it.name }).containsExactly("Potato Meal 1")
     }
 
 
