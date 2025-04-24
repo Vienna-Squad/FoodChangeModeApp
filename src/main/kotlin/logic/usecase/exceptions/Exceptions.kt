@@ -14,7 +14,7 @@ open class GuessPrepareTimeGameException(val attempt: Int, message: String) : Fo
 class InvalidMinutesException : GuessPrepareTimeGameException(0, INVALID_MINUTES_MESSAGE) {
     companion object {
         const val INVALID_MINUTES_MESSAGE =
-            "Are you stupid!! There is no time to prepare a meal that is in the negative."
+            "Are you stupid!! There is no time to prepare a meal that is in the NEGATIVE or ZERO."
     }
 }
 

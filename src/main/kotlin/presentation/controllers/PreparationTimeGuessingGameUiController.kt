@@ -1,18 +1,19 @@
 package org.example.presentation.controllers
 
 import org.example.logic.usecase.GuessPrepareTimeGameUseCase
-import org.example.logic.usecase.exceptions.GameOverException
 import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
+import org.example.logic.usecase.exceptions.InvalidMinutesException
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.logic.usecase.exceptions.TooHighException
-import org.example.logic.usecase.exceptions.TooLowException
+import org.example.utils.interactor.Interactor
+import org.example.utils.interactor.UserInteractor
 import org.example.utils.viewer.ExceptionViewer
 import org.example.utils.viewer.FoodExceptionViewer
 import org.koin.mp.KoinPlatform.getKoin
 
 class PreparationTimeGuessingGameUiController(
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase = getKoin().get(),
-    private val exceptionViewer: ExceptionViewer = FoodExceptionViewer()
+    private val exceptionViewer: ExceptionViewer = FoodExceptionViewer(),
+    private val interactor: Interactor = UserInteractor(),
 ) : UiController {
     override fun execute() {
         try {
@@ -21,30 +22,21 @@ class PreparationTimeGuessingGameUiController(
                     print("guess its preparation time of $name: ")
                     var attempt = 3
                     while (true) {
-                        val guessMinutes = readln().toLongOrNull() ?: -1
+                        val guessMinutes = interactor.getInput().toLongOrNull() ?: -1
                         try {
                             println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
                             break
-                        }catch (exception: GuessPrepareTimeGameException){
+                        } catch (exception: GuessPrepareTimeGameException) {
                             attempt = exception.attempt
-                            if (attempt == 0){
+                            if (attempt == 0) {
                                 exceptionViewer.viewExceptionMessage(exception)
                                 break
                             }
-                            print("${exception.message} try again: ")
+                            print("${exception.message}, try again: ")
                         }
-
-                        /*catch (exception: TooHighException) {
-                            attempt = exception.attempt
-                            print("${exception.message} try again: ")
-                        } catch (exception: TooLowException) {
-                            attempt = exception.attempt
-                            print("${exception.message} try again: ")
-                        } catch (exception: GameOverException) {
-                            exceptionViewer.viewExceptionMessage(exception)
-                            break
-                        }*/
                     }
+                } ?: run {
+                    exceptionViewer.viewExceptionMessage(InvalidMinutesException())
                 }
             }
         } catch (exception: NoMealFoundException) {
