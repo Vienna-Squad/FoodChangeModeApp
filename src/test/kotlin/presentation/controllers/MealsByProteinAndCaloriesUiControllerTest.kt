@@ -23,7 +23,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
     @BeforeEach
     fun setUp() {
         useCase = mockk()
-        viewer = mockk(relaxed = true)
+        viewer = mockk()
         controller = MealsByProteinAndCaloriesUiController(useCase, viewer)
         System.setOut(PrintStream(stdOut))
     }
