@@ -18,13 +18,10 @@ class GuessIngredientGameUseCase(
     fun getGameDetails(): IngredientGameDetails {
 
         val randomMeal = getRandomMeal()
-        if (randomMeal==null) throw IngredientRandomMealGenerationException("The Meal is null or empty")
-
         val ingredients = getIngredientsByCorrectMealId(randomMeal.id!!)
-        if (ingredients==null) throw EmptyRandomMealException("The All Ingredients Options List is null or empty")
 
         return IngredientGameDetails(
-            meal = randomMeal,
+            mealName = randomMeal.name!!,
             ingredients = ingredients,
         )
     }
@@ -38,9 +35,9 @@ class GuessIngredientGameUseCase(
             ingredientNumberOption = ingredientInputNumber
         )
 
-        val meal = ingredientGameDetails.meal
+        val meal = ingredientGameDetails.mealName
         val isCorrectResult = isMealContainsIngredient(
-            correctMeal = meal,
+            correctMealName = meal,
             resultIngredient = ingredient
         )
 
@@ -52,7 +49,7 @@ class GuessIngredientGameUseCase(
 
     }
 
-    fun getResultOfGame(): Int {
+    fun getScoreOfGame(): Int {
         return this.score
     }
 
@@ -68,11 +65,11 @@ class GuessIngredientGameUseCase(
             .ifEmpty { throw IngredientRandomMealGenerationException("The Meal list is null or empty")}
     }
 
-    private fun getRandomMeal(): Meal? {
-        return getFilterdMeals().randomOrNull()
+    private fun getRandomMeal(): Meal {
+        return getFilterdMeals().randomOrNull()?:throw IngredientRandomMealGenerationException("The Meal is null or empty")
     }
 
-    private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?>? {
+    private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?> {
 
         val correctIngredients = getFilterdMeals()
             .firstOrNull { it.id == correctMealId }
@@ -89,6 +86,8 @@ class GuessIngredientGameUseCase(
         val ingredients = correctIngredients
             ?.plus(wrongIngredient)
             ?.sortedBy { ingredient -> ingredient?.length }
+            .takeIf { items -> items?.size==3 }
+            ?: throw EmptyRandomMealException("The size of meal is less than 3 or empty")
 
         return ingredients
 
@@ -115,11 +114,11 @@ class GuessIngredientGameUseCase(
     }
 
     private fun isMealContainsIngredient(
-        correctMeal: Meal,
+        correctMealName: String,
         resultIngredient: String
     ): Boolean {
         val check = getFilterdMeals()
-            .firstOrNull { it == correctMeal }
+            .firstOrNull { it.name == correctMealName }
             ?.ingredients
             ?.any { ingredientItem -> ingredientItem.contains(resultIngredient, ignoreCase = true) } == true
 
@@ -152,7 +151,7 @@ class GuessIngredientGameUseCase(
 }
 
 data class IngredientGameDetails(
-    val meal: Meal,
+    val mealName: String,
     val ingredients: List<String?>,
 )
 

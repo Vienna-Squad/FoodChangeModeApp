@@ -16,7 +16,8 @@ class IngredientGuessGameUiController(
             var counter = 1
             do {
                 val gameDetails = guessIngredientGameUseCase.getGameDetails()
-                viewer.showMealDetails(gameDetails.meal)
+//                viewer.showMealDetails(gameDetails.meal)
+                println(gameDetails.mealName)
                 println("\nOptions : ${gameDetails.ingredients}\n")
                 println("\t(1) first Option")
                 println("\t(2) second Option")
@@ -29,14 +30,14 @@ class IngredientGuessGameUiController(
                     ingredientInputNumber = input
                 )
 
-                val result = guessIngredientGameUseCase.getResultOfGame()
+                val result = guessIngredientGameUseCase.getScoreOfGame()
                 println("Score : $result , CorrectResults : $counter")
                 counter++
 
             } while (counter <= 15)
         } catch (e: IngredientsOptionsException) {
             viewer.showExceptionMessage(e)
-            val score = guessIngredientGameUseCase.getResultOfGame()
+            val score = guessIngredientGameUseCase.getScoreOfGame()
             println("Score : $score ")
         }
         guessIngredientGameUseCase.endGame()
