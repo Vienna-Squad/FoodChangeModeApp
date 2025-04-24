@@ -18,7 +18,10 @@ class GuessIngredientGameUseCase(
     fun getGameDetails(): IngredientGameDetails {
 
         val randomMeal = getRandomMeal()
+        if (randomMeal==null) throw IngredientRandomMealGenerationException("The Meal is null or empty")
+
         val ingredients = getIngredientsByCorrectMealId(randomMeal.id!!)
+        if (ingredients==null) throw EmptyRandomMealException("The All Ingredients Options List is null or empty")
 
         return IngredientGameDetails(
             meal = randomMeal,
@@ -65,11 +68,11 @@ class GuessIngredientGameUseCase(
             .ifEmpty { throw IngredientRandomMealGenerationException("The Meal list is null or empty")}
     }
 
-    private fun getRandomMeal(): Meal {
-        return getFilterdMeals().randomOrNull() ?: throw IngredientRandomMealGenerationException("The Meal is null or empty")
+    private fun getRandomMeal(): Meal? {
+        return getFilterdMeals().randomOrNull()
     }
 
-    private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?> {
+    private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?>? {
 
         val correctIngredients = getFilterdMeals()
             .firstOrNull { it.id == correctMealId }
@@ -87,7 +90,7 @@ class GuessIngredientGameUseCase(
             ?.plus(wrongIngredient)
             ?.sortedBy { ingredient -> ingredient?.length }
 
-        return ingredients ?: throw EmptyRandomMealException("The All Ingredients Options List is null or empty")
+        return ingredients
 
     }
 
@@ -153,6 +156,3 @@ data class IngredientGameDetails(
     val ingredients: List<String?>,
 )
 
-data class IngredientGameResult(
-    val score: Int,
-)
