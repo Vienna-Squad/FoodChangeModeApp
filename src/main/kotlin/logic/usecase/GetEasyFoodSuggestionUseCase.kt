@@ -6,27 +6,35 @@ import org.example.logic.usecase.exceptions.NoMealFoundException
 import kotlin.random.Random
 
 class GetEasyFoodSuggestionUseCase(private val mealsRepository: MealsRepository) {
-    operator fun invoke() = mealsRepository.getAllMeals().filter{
-        isEasyMeal(it)
-    }.ifEmpty{
-        throw NoMealFoundException("easy meals")
+    operator fun invoke():List<Meal> {
+        val randomEasyMeals= mutableSetOf <Meal>()
+        val allEasyMeals=mealsRepository.getAllMeals().filter{
+            isEasyMeal(it)
+        }.ifEmpty{
+            throw NoMealFoundException("easy meals")
+        }
+        if (allEasyMeals.size<=10)return allEasyMeals
+        while (randomEasyMeals.size<10){
+            val randomIndex = Random.nextInt(0, allEasyMeals.size)
+            val randomMeal = allEasyMeals[randomIndex]
+                randomEasyMeals.add(randomMeal)
+            }
+        return randomEasyMeals.toList()
     }
-
-
-     fun isEasyMeal(meal: Meal): Boolean {
+    private fun isEasyMeal(meal: Meal): Boolean {
         return  hasSixOrFewerStepsToPrepare(meal.numberOfSteps)
                 &&isLessThanThirtyMinutesToMake(meal.minutes)
-                &&isLessThanSixIngredients(meal.numberOfIngredients)
+                &&hasLessThanSixIngredients(meal.numberOfIngredients)
     }
-     fun hasSixOrFewerStepsToPrepare(numberOfSteps: Int?): Boolean {
+     private fun hasSixOrFewerStepsToPrepare(numberOfSteps: Int?): Boolean {
         return (numberOfSteps ?: 0) <= 6
 
     }
-     fun isLessThanThirtyMinutesToMake(minutes: Long?): Boolean {
+    private fun isLessThanThirtyMinutesToMake(minutes: Long?): Boolean {
         return (minutes ?: 0) <= 30
 
     }
-     fun isLessThanSixIngredients(numberOfIngredients: Int?): Boolean {
+    private fun hasLessThanSixIngredients(numberOfIngredients: Int?): Boolean {
         return (numberOfIngredients ?: 0) <= 5
     }
 }

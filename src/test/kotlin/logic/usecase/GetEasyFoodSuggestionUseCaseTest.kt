@@ -1,22 +1,19 @@
 package logic.usecase
 
+import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
+import junit.framework.TestCase.assertEquals
 import org.example.data.CsvMealsRepository
 import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
 import org.example.logic.usecase.GetEasyFoodSuggestionUseCase
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.BeforeEach
-import com.google.common.truth.Truth.assertThat
-import io.mockk.verify
 import org.example.logic.usecase.exceptions.NoMealFoundException
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import java.sql.Date
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
+
 
 class GetEasyFoodSuggestionUseCaseTest {
     private lateinit var mealsRepository: CsvMealsRepository
@@ -27,6 +24,7 @@ class GetEasyFoodSuggestionUseCaseTest {
         mealsRepository = mockk(relaxed = true)
         getEasyFoodSuggestionUseCase = GetEasyFoodSuggestionUseCase(mealsRepository)
     }
+
     /**
      * easy meal is Under 30 minutes preparation time,
      * has 5 ingredients or fewer,
@@ -167,6 +165,7 @@ class GetEasyFoodSuggestionUseCaseTest {
             )
         )
     }
+
     @Test
     fun ` getEasyMeals should Throw NoMealFoundException having no easy meals found`() {
         //Given
@@ -215,215 +214,155 @@ class GetEasyFoodSuggestionUseCaseTest {
             )
         )
         //when
-        assertThrows<NoMealFoundException>{
+        assertThrows<NoMealFoundException> {
             getEasyFoodSuggestionUseCase.invoke()
         }
 
     }
-//endregion
 
     @Test
-    fun `getEasFoodSuggestion should call getAllMealsFunction`() {
-        //when
-        getEasyFoodSuggestionUseCase.invoke()
-
-        //then
-        verify { mealsRepository.getAllMeals() }
-    }
-
-    //region isEasyMeal test cases
-
-    @Test
-    fun `isEasyMeal should return true when meal is an easy meal`() {
-        //Given
-        //region fakeMeal
-        val fakeMeal =
-            Meal(
-                "Grilled Cheese Sandwich",
-                101,
-                10,
-                5001,
-                Date.valueOf("2024-03-10"),
-                listOf("easy", "quick", "snack", "cheese", "vegetarian"),
-                Nutrition(300f, 15f, 25f, 2f, 1f, 5f, 10f),
-                4,
-                listOf(
-                    "Butter the bread slices",
-                    "Place cheese between slices",
-                    "Grill on skillet until golden",
-                    "Serve hot"
-                ),
-                "A quick and satisfying cheesy snack.",
-                listOf("bread", "cheese", "butter", "salt", "pepper"),
-                5
-            )
-        //endregion
-
-        //when
-
-        val result = getEasyFoodSuggestionUseCase.isEasyMeal(fakeMeal)
-        assertTrue { result }
-    }
-
-    @Test
-    fun `isEasyMeal should return false when meal is not an easy meal (all conditions fail)`() {
-        val hardMeal = Meal(
-            "Big Lasagna",
-            2,
-            60,
-            101,
-            Date.valueOf("2024-01-01"),
-            listOf("dinner"),
-            Nutrition(800f, 20f, 60f, 10f, 3f, 5f, 7f),
-            10,
-            List(10) { "step $it" },
-            "A complex lasagna.",
-            listOf("pasta", "cheese", "meat", "sauce", "onion", "garlic", "oil"),
-            7
+    fun `getEasyMeals should return only one easy meal among hard meals`() {
+        every { mealsRepository.getAllMeals() } returns listOf(
+            createHardMeal(),
+            createMealTooManySteps(),
+            createMealTooLong(),
+            createMealTooManyIngredients(),
+            createEasyMeal()
         )
 
-        val result = getEasyFoodSuggestionUseCase.isEasyMeal(hardMeal)
-        assertFalse(result)
+        val result = getEasyFoodSuggestionUseCase.invoke()
+
+        assertEquals(listOf(createEasyMeal()), result)
     }
 
     @Test
-    fun `isEasyMeal should return false when only ingredients condition fails`() {
-        val partialHardMeal = Meal(
-            "Salad with extras",
-            3,
-            15,
-            102,
-            Date.valueOf("2024-01-01"),
-            listOf("light", "healthy"),
-            Nutrition(200f, 5f, 10f, 2f, 1f, 2f, 1f),
-            4,
-            listOf("Chop veggies", "Mix", "Add dressing", "Serve"),
-            "Slightly complex salad.",
-            listOf("lettuce", "tomato", "cucumber", "feta", "olive", "dressing"),
-            6 // too many ingredients
+    fun `getEasyMeals should throw NoMealFoundException when meal has too many steps`() {
+        every { mealsRepository.getAllMeals() } returns listOf(
+            createMealTooManySteps()
         )
 
-        val result = getEasyFoodSuggestionUseCase.isEasyMeal(partialHardMeal)
-        assertFalse(result)
+        assertThrows<NoMealFoundException> {
+            getEasyFoodSuggestionUseCase.invoke()
+        }
     }
 
     @Test
-    fun `isEasyMeal should return false when only minutes condition fails`() {
-        val mealWithTooMuchTime = Meal(
-            "Slow Cooked Meal",
-            5,
-            45,
-            104,
-            Date.valueOf("2024-01-01"),
-            listOf("slow"),
-            Nutrition(350f, 10f, 30f, 5f, 2f, 3f, 5f),
-            4,
-            listOf("Step 1", "Step 2", "Step 3", "Step 4"),
-            "Takes too long.",
-            listOf("rice", "chicken", "spices"),
-            3
+    fun `getEasyMeals should throw NoMealFoundException when meal takes too long to make`() {
+        every { mealsRepository.getAllMeals() } returns listOf(
+            createMealTooLong()
         )
 
-        val result = getEasyFoodSuggestionUseCase.isEasyMeal(mealWithTooMuchTime)
-        assertFalse(result)
+        assertThrows<NoMealFoundException> {
+            getEasyFoodSuggestionUseCase.invoke()
+        }
     }
 
     @Test
-    fun `isEasyMeal should return false when only steps condition fails`() {
-        val mealWithTooManySteps = Meal(
-            "Multi-step Omelette",
+    fun `getEasyMeals should throw NoMealFoundException when meal has too many ingredients`() {
+        every { mealsRepository.getAllMeals() } returns listOf(
+            createMealTooManyIngredients()
+        )
+
+        assertThrows<NoMealFoundException> {
+            getEasyFoodSuggestionUseCase.invoke()
+        }
+    }
+
+    @Test
+    fun `getEasyMeals should include meals exactly at thresholds (30min, 6 steps, 5 ingredients)`() {
+        val edgeCaseMeal = Meal(
+            "Edge Case Salad",
+            999,
+            30,
+            8888,
+            Date.valueOf("2024-04-01"),
+            listOf("healthy", "simple"),
+            Nutrition(150f, 10f, 20f, 1f, 0.5f, 2f, 2f),
             6,
-            15,
-            105,
-            Date.valueOf("2024-01-01"),
-            listOf("breakfast"),
-            Nutrition(250f, 8f, 20f, 2f, 1f, 2f, 3f),
-            7, // fails steps > 6
-            List(7) { "Step ${it + 1}" },
-            "Too many steps for an omelette.",
-            listOf("egg", "cheese", "milk"),
-            3
+            List(6) { "Step $it" },
+            "Meets all easy boundaries",
+            listOf("lettuce", "tomato", "olive", "feta", "cucumber"),
+            5
         )
+        every { mealsRepository.getAllMeals() } returns listOf(edgeCaseMeal)
 
-        val result = getEasyFoodSuggestionUseCase.isEasyMeal(mealWithTooManySteps)
-        assertFalse(result)
-    }
-//endregion
+        val result = getEasyFoodSuggestionUseCase.invoke()
 
-    //region isLessThanSevenStepsToPrepare test cases
-    @ParameterizedTest
-    @ValueSource(longs = [5,6])
-    fun `hasSixOrFewerStepsToPrepare Should return true when number of steps is equal to or less than 6`() {
-        //Given
-        val numberOfSteps = 6
-
-        //then
-        val result = getEasyFoodSuggestionUseCase.hasSixOrFewerStepsToPrepare(numberOfSteps)
-        assertTrue { result }
+        assertEquals(listOf(edgeCaseMeal), result)
     }
 
     @Test
-    fun `hasSixOrFewerStepsToPrepare Should return false when number of steps is more than six`() {
-        //Given
-        val numberOfSteps = 7
+    fun `getEasyMeals should return meals 10 randomly from more that 10 meals given`() {
+        val edgeCaseMeal = listOf(
+            createEasyMeal().copy("2"),
+            createEasyMeal().copy("3"),
+            createEasyMeal().copy("4"),
+            createEasyMeal().copy("5"),
+            createEasyMeal().copy("6"),
+            createEasyMeal().copy("7"),
+            createEasyMeal().copy("8"),
+            createEasyMeal().copy("9"),
+            createEasyMeal().copy("10"),
+            createEasyMeal().copy("11"),
+            createEasyMeal().copy("12"),
+        )
+        every { mealsRepository.getAllMeals() } returns edgeCaseMeal
+        val result = getEasyFoodSuggestionUseCase.invoke()
 
-        //then
-        val result = getEasyFoodSuggestionUseCase.hasSixOrFewerStepsToPrepare(numberOfSteps)
-        assertFalse { result }
+        assertEquals(10, result.size)
+
+        assertEquals(10, result.toSet().size)
     }
 
-    //endregion
+    // region helper factories
 
-    //region isLessThanThirtyMinutesToMake test cases
+    private fun createEasyMeal() = Meal(
+        "Easy Egg Toast",
+        1,
+        5,
+        1000,
+        Date.valueOf("2024-02-01"),
+        listOf("quick"),
+        Nutrition(200f, 10f, 15f, 1f, 1f, 2f, 3f),
+        3,
+        listOf("Toast bread", "Cook egg", "Assemble"),
+        "Simple toast with egg",
+        listOf("bread", "egg", "butter", "salt", "pepper"),
+        5
+    )
 
-    @ParameterizedTest
-    @ValueSource(longs = [15,30])
-    fun `isLessThanThirtyMinutesToMake should return true when time is less than or equal 30 minutes`(minutes: Long) {
-        // When
-        val result = getEasyFoodSuggestionUseCase.isLessThanThirtyMinutesToMake(minutes)
-        // Then
-        assertTrue(result)
-    }
+    private fun createHardMeal() = Meal(
+        "Heavy Lasagna",
+        2,
+        60,
+        101,
+        Date.valueOf("2024-01-01"),
+        listOf("dinner"),
+        Nutrition(800f, 20f, 60f, 10f, 3f, 5f, 7f),
+        10,
+        List(10) { "step $it" },
+        "Complex lasagna",
+        listOf("pasta", "cheese", "meat", "sauce", "onion", "garlic", "oil"),
+        7
+    )
 
-    @Test
-    fun `isLessThanThirtyMinutesToMake should return false when time is more than 30 minutes `() {
-        // Given
-        val minutes = 35L
+    private fun createMealTooManySteps() = createEasyMeal().copy(
+        id = 3,
+        steps = List(7) { "Step $it" },
+        numberOfSteps = 7
+    )
 
-        // When
-        val result = getEasyFoodSuggestionUseCase.isLessThanThirtyMinutesToMake(minutes)
+    private fun createMealTooLong() = createEasyMeal().copy(
+        id = 4,
+        minutes = 45
+    )
 
-        // Then
-        assertFalse(result)
-    }
-    //endregion
+    private fun createMealTooManyIngredients() = createEasyMeal().copy(
+        id = 5,
+        ingredients = listOf("a", "b", "c", "d", "e", "f"),
+        numberOfIngredients = 6
+    )
 
-    //region isLessThanThirtyMinutesToMake test cases
-    @ParameterizedTest
-    @ValueSource(longs = [3,5])
-    fun `isLessThanSixIngredients should return true when ingredients count is equal to or less than 5`() {
-        // Given
-        val count = 4
-
-        // When
-        val result = getEasyFoodSuggestionUseCase.isLessThanSixIngredients(count)
-
-        // Then
-        assertTrue(result)
-    }
-
-    @Test
-    fun `isLessThanSixIngredients should return false when ingredients count is 6 or more`() {
-        // Given
-        val count = 6
-
-        // When
-        val result = getEasyFoodSuggestionUseCase.isLessThanSixIngredients(count)
-
-        // Then
-        assertFalse(result)
-    }
-    //endregion
-
-
+    // endregion
 }
+
