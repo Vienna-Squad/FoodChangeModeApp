@@ -6,7 +6,7 @@ import org.example.logic.usecase.exceptions.EmptyRandomMealException
 import org.example.logic.usecase.exceptions.IngredientRandomMealGenerationException
 import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
-
+import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
 
 
 class GuessIngredientGameUseCase(
@@ -28,23 +28,27 @@ class GuessIngredientGameUseCase(
 
     fun setGame(ingredientGameDetails: IngredientGameDetails, ingredientInputNumber: Int) {
 
-        val ingredientsOptions = ingredientGameDetails.ingredients
+        try {
+            val ingredientsOptions = ingredientGameDetails.ingredients
+            val ingredient = getChosenIngredientByOptionNumber(
+                ingredientsOptions = ingredientsOptions,
+                ingredientNumberOption = ingredientInputNumber
+            )
 
-        val ingredient = getChosenIngredientByOptionNumber(
-            ingredientsOptions = ingredientsOptions,
-            ingredientNumberOption = ingredientInputNumber
-        )
+            val meal = ingredientGameDetails.mealName
+            val isCorrectResult = isMealContainsIngredient(
+                correctMealName = meal,
+                resultIngredient = ingredient!!
+            )
 
-        val meal = ingredientGameDetails.mealName
-        val isCorrectResult = isMealContainsIngredient(
-            correctMealName = meal,
-            resultIngredient = ingredient
-        )
-
-        if (isCorrectResult) {
-            updateScore()
-            if (this.score == FINAL_SCORE)
-                return
+            if (isCorrectResult) {
+                if (this.score == FINAL_SCORE) {
+                    return
+                }
+                updateScore()
+            }
+        }catch (e: InvalidInputNumberOfHighCalorieMeal){
+            print(e)
         }
 
     }
@@ -62,11 +66,12 @@ class GuessIngredientGameUseCase(
         return mealsRepository.getAllMeals()
             .filter { it.name != null && it.ingredients != null }
             .take(20)
-            .ifEmpty { throw IngredientRandomMealGenerationException("The Meal list is null or empty")}
+            .ifEmpty { throw IngredientRandomMealGenerationException("The Meal list is null or empty") }
     }
 
     private fun getRandomMeal(): Meal {
-        return getFilterdMeals().randomOrNull()?:throw IngredientRandomMealGenerationException("The Meal is null or empty")
+        return getFilterdMeals().randomOrNull()
+            ?: throw IngredientRandomMealGenerationException("The Meal is null or empty")
     }
 
     private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?> {
@@ -86,14 +91,17 @@ class GuessIngredientGameUseCase(
         val ingredients = correctIngredients
             ?.plus(wrongIngredient)
             ?.sortedBy { ingredient -> ingredient?.length }
-            .takeIf { items -> items?.size==3 }
+            .takeIf { items -> items?.size == 3 }
             ?: throw EmptyRandomMealException("The size of meal is less than 3 or empty")
 
         return ingredients
 
     }
 
-    private fun getChosenIngredientByOptionNumber(ingredientsOptions: List<String?>, ingredientNumberOption: Int): String {
+    private fun getChosenIngredientByOptionNumber(
+        ingredientsOptions: List<String?>,
+        ingredientNumberOption: Int
+    ): String? {
         return when (ingredientNumberOption) {
             FIRST_OPTION -> {
                 ingredientsOptions[FIRST_OPTION_INDEX]
@@ -110,7 +118,7 @@ class GuessIngredientGameUseCase(
             else -> {
                 throw IngredientUserInputException("InValid Input Number")
             }
-        } ?: throw IngredientsOptionsException("Something Wrong Happened")
+        }
     }
 
     private fun isMealContainsIngredient(
@@ -131,7 +139,6 @@ class GuessIngredientGameUseCase(
     private fun updateScore() {
         this.score += SCORE_INCREMENT
     }
-
 
 
     companion object {

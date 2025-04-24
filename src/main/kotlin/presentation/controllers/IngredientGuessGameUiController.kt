@@ -2,7 +2,12 @@ package org.example.presentation.controllers
 
 import org.example.logic.usecase.GuessIngredientGameUseCase
 import org.example.logic.usecase.IngredientGameDetails
+import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
+import org.example.utils.interactor.Interactor
+import org.example.utils.interactor.InteractorNumber
+import org.example.utils.interactor.UserInteractor
+import org.example.utils.interactor.UserInteractorNumber
 import org.example.utils.viewer.ExceptionViewer
 import org.example.utils.viewer.FoodExceptionViewer
 import org.example.utils.viewer.IngredientGameDetailsViewer
@@ -14,8 +19,9 @@ import org.koin.mp.KoinPlatform.getKoin
 class IngredientGuessGameUiController(
     private val guessIngredientGameUseCase: GuessIngredientGameUseCase = getKoin().get(),
     private val ingredientDetailsViewer: ItemDetailsViewer<IngredientGameDetails> = IngredientGameDetailsViewer(),
-    private val scoreViewer: IngredientGameScoreViewer = IngredientGameScoreViewer(),
-    private val exceptionViewer: ExceptionViewer = FoodExceptionViewer()
+    private val scoreViewer: ItemDetailsViewer<Int> = IngredientGameScoreViewer(),
+    private val exceptionViewer: ExceptionViewer = FoodExceptionViewer(),
+    private val interactorNumber: InteractorNumber = UserInteractorNumber()
 ) : UiController {
     override fun execute() {
 
@@ -25,8 +31,9 @@ class IngredientGuessGameUiController(
                 val gameDetails = guessIngredientGameUseCase.getGameDetails()
                 ingredientDetailsViewer.viewDetails(gameDetails)
 
-                print("Enter the Ingredient Input Number : ")
-                val input = readln().toIntOrNull() ?: -1
+                print(USER_INPUT_MESSAGE)
+                val input = interactorNumber.getInput()
+
                 guessIngredientGameUseCase.setGame(
                     ingredientGameDetails = gameDetails,
                     ingredientInputNumber = input
@@ -42,7 +49,17 @@ class IngredientGuessGameUiController(
             val score = guessIngredientGameUseCase.getScoreOfGame()
             exceptionViewer.viewExceptionMessage(e)
             scoreViewer.viewDetails(score)
+        } catch (e: IngredientUserInputException) {
+            val score = guessIngredientGameUseCase.getScoreOfGame()
+            exceptionViewer.viewExceptionMessage(e)
+            scoreViewer.viewDetails(score)
+        }finally {
+            guessIngredientGameUseCase.endGame()
         }
-        guessIngredientGameUseCase.endGame()
+
+    }
+
+    companion object {
+        const val USER_INPUT_MESSAGE = "Enter the Ingredient Input Number : "
     }
 }

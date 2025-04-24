@@ -11,6 +11,7 @@ import org.example.logic.usecase.IngredientGameDetails
 import org.example.logic.usecase.exceptions.EmptyRandomMealException
 import org.example.logic.usecase.exceptions.IngredientRandomMealGenerationException
 import org.example.logic.usecase.exceptions.IngredientUserInputException
+import org.example.logic.usecase.exceptions.IngredientsOptionsException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -61,28 +62,65 @@ class GuessIngredientGameUseCaseTest {
 
     @Test
     fun `setGame should throw IngredientUserInputException when the ingredientInputNumber is not in range from 1 to 3`() {
+
         // given
-        val input = 5
+        val input = 4
         val ingredientGameDetails = IngredientGameDetails(
             mealName = "Chicken",
-            ingredients = listOf("d","d","s")
+            ingredients = listOf("egg", "egg", "egg")
+            //                    1        2    3
         )
-        // when
-        val result = guessIngredientGameUseCase.setGame(ingredientGameDetails,input)
 
         // then
+        val exception = assertThrows<IngredientUserInputException> {
+            guessIngredientGameUseCase.setGame(ingredientGameDetails, input)
+        }
 
-        assertThrows<IngredientUserInputException>{
-            result
-        }.also {
-            assertEquals(it.message,"InValid Input Number")
+
+    }
+
+
+    @Test
+    fun `setGame should throw IngredientsOptionsException when the input ingredient is wrong`() {
+
+        // stubs
+        every { mealsRepository.getAllMeals() } returns correctMeals
+
+        // given
+        val inputOption = 2
+        val ingredientGameDetails = IngredientGameDetails(
+            mealName = "Grilled Chicken Salad",
+            ingredients = listOf("Chicken breast", "fake potato", "fake egg")
+        )
+
+        // then
+        assertThrows<IngredientsOptionsException> {
+            guessIngredientGameUseCase.setGame(ingredientGameDetails, inputOption)
         }
 
     }
 
     @Test
-    fun `endGame should reset score to 0 `() {
+    fun `setGame should update score when the input ingredient is correct`() {
 
+        // stubs
+        every { mealsRepository.getAllMeals() } returns correctMeals
+
+        // given
+        val inputOption = 1
+        val ingredientGameDetails = IngredientGameDetails(
+            mealName = "Grilled Chicken Salad",
+            ingredients = listOf("Chicken breast", "fake potato", "fake egg")
+        )
+        // when
+        guessIngredientGameUseCase.setGame(ingredientGameDetails, inputOption)
+
+        assertEquals(1000,guessIngredientGameUseCase.getScoreOfGame())
+
+    }
+
+    @Test
+    fun `endGame should reset score to 0 `() {
         // when
         guessIngredientGameUseCase.endGame()
 
