@@ -1,20 +1,16 @@
 package presentation.controllers
 
-import com.google.common.truth.Truth
-import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import logic.usecase.createMeals
-import org.checkerframework.checker.units.qual.m
-import org.example.logic.repository.MealsRepository
+import org.example.logic.model.Meal
 import org.example.logic.usecase.GetMealsByDateUseCase
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.presentation.FoodViewer
-import org.example.presentation.Interactor
-import org.example.presentation.Viewer
 import org.example.presentation.controllers.MealsByDateUiController
-import org.junit.jupiter.api.Assertions.*
+import org.example.utils.interactor.Interactor
+import org.example.utils.viewer.ExceptionViewer
+import org.example.utils.viewer.ItemsViewer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -26,7 +22,9 @@ internal class MealsByDateUiControllerTest{
     lateinit var getMealsByDateUseCase: GetMealsByDateUseCase
     lateinit var MealsByDateUiController: MealsByDateUiController
     lateinit var interactor: Interactor
-    lateinit var viewer: FoodViewer
+    lateinit var viewer: ItemsViewer<Meal>
+    lateinit var exceptionViewer: ExceptionViewer
+
 
 
 
@@ -34,15 +32,15 @@ internal class MealsByDateUiControllerTest{
         LocalDate.of(year, month, day).atStartOfDay(ZoneId.systemDefault()).toInstant().let { Date.from(it) }
 
     private val date1 = localDateToDate(2003, 4, 14)
-    private val date2 = localDateToDate(2000, 4, 14)
     private val dateNotFound = localDateToDate(2003, 7, 20)
 
     @BeforeEach
     fun setUp(){
         getMealsByDateUseCase= mockk(relaxed = true)
         viewer= mockk(relaxed = true)
+        exceptionViewer= mockk(relaxed = true)
         interactor= mockk()
-        MealsByDateUiController= MealsByDateUiController(getMealsByDateUseCase,viewer,interactor)
+        MealsByDateUiController= MealsByDateUiController(getMealsByDateUseCase,exceptionViewer,viewer,interactor)
     }
 
     @Test
@@ -60,8 +58,12 @@ internal class MealsByDateUiControllerTest{
         //when
         MealsByDateUiController.execute()
 
+
         //then
-        assertThat(getMealsByDateUseCase(date1)).isEqualTo(meals)
+        verify {
+            viewer.viewItems(meals)
+        }
+
 
     }
 
@@ -81,7 +83,7 @@ internal class MealsByDateUiControllerTest{
 
         // then
        verify {
-           viewer.showExceptionMessage(exception)
+           exceptionViewer.viewExceptionMessage(exception)
        }
 
     }
@@ -96,7 +98,7 @@ internal class MealsByDateUiControllerTest{
 
         // then
         verify {
-            viewer.showExceptionMessage(any())
+            exceptionViewer.viewExceptionMessage(any())
         }
 
     }
@@ -109,7 +111,7 @@ internal class MealsByDateUiControllerTest{
         )
 
         //given  (stubs)
-        every { interactor.getInput() }returns "37073"
+        every { interactor.getInput() } returns "14/4/2003" andThen "37073"
         every { getMealsByDateUseCase(date1) } returns meals
 
 
@@ -117,27 +119,32 @@ internal class MealsByDateUiControllerTest{
         MealsByDateUiController.execute()
 
         //then
-        assertThat(getMealsByDateUseCase(date1)).isEqualTo(meals)
+        verify {
+            viewer.viewItems(meals)
+        }
 
 
     }
     @Test
     fun `should return exception when the given id not matches with the meal in the list`(){
 
-        val exception=NoMealFoundException()
-
-        //given  (stubs)
-        every { interactor.getInput() } returns "14/4/2003" andThen "37074"
-        every { getMealsByDateUseCase(any()) } throws exception
-
+        val meals = listOf(
+            createMeals("fried potatoes", 37073, date1)
+        )
+        // given
+        every { interactor.getInput() } returns "14/4/2003" andThen "37074" // ID not found
+        every { getMealsByDateUseCase(date1) } returns meals
 
         //when
         MealsByDateUiController.execute()
 
         //then
         verify {
-            viewer.showExceptionMessage(exception)
+            exceptionViewer.viewExceptionMessage(
+                match { it is NoMealFoundException }
+            )
         }
+
 
 
     }
