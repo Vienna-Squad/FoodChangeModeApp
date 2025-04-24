@@ -42,7 +42,7 @@ class GetRandomPotatoMealsUseCaseTest {
     @Test
     fun `should return all meals when potato meals are 10 or less`() {
         // Given
-        val potatoMeals = (1..5).map { createMeal( ingredients = listOf("potatoes")) }
+        val potatoMeals = (1..10).map { createMeal( ingredients = listOf("potatoes")) }
         every { mealsRepository.getAllMeals() } returns potatoMeals
 
         // When
