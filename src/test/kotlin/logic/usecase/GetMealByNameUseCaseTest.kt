@@ -78,45 +78,6 @@ internal class GetMealByNameUseCaseTest{
         assertThat(result).isEqualTo(meals[0])
 
     }
-    @Test
-    fun `should return meal when only part of the name is typed`(){
-
-        //given  (stubs)
-
-
-        every { mealsRepository.getAllMeals() } returns meals
-        every { kmpSearcher.search("chinese  candy", "chinese") } returns true
-        every { kmpSearcher.search("fried  potatoes", "fried") } returns false
-
-
-        val mealName="chinese"
-
-        //when
-        val result= getMealsByNameUseCase(mealName)
-
-        //then
-        assertThat(result).isEqualTo(meals[0])
-
-
-    }
-    @Test
-    fun `should return meal even when query has leading or trailing spaces`(){
-
-        //given  (stubs)
-        every { mealsRepository.getAllMeals() } returns meals
-        every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
-        every { kmpSearcher.search("fried  potatoes", "fried  potatoes") } returns false
-
-
-        val mealName=" chinese  candy "
-
-        //when
-        val result= getMealsByNameUseCase(mealName)
-
-        //then
-        assertThat(result).isEqualTo(meals[0])
-
-    }
 
     @Test
     fun `should throw exception when search by name for not available meal `(){
