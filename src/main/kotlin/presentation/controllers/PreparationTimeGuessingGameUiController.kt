@@ -2,14 +2,10 @@ package org.example.presentation.controllers
 
 import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
-import org.example.presentation.FoodViewer
-import org.example.presentation.UiController
-import org.example.presentation.Viewer
 import org.koin.mp.KoinPlatform.getKoin
 
 class PreparationTimeGuessingGameUiController(
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase = getKoin().get(),
-    private val viewer: Viewer = FoodViewer()
 ) : UiController {
     override fun execute() {
         with(guessPrepareTimeGameUseCase.getRandomMeal()) {

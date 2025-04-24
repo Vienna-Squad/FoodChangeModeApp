@@ -1,7 +1,6 @@
 package org.example.presentation.controllers
 
 import org.example.logic.usecase.GuessIngredientGameUseCase
-import org.example.presentation.UiController
 import org.koin.mp.KoinPlatform.getKoin
 
 class IngredientGuessGameUiController(

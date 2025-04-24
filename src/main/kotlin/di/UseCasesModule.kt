@@ -1,4 +1,4 @@
-package org.example.dependencyinjection
+package di
 
 import org.example.logic.usecase.*
 import org.example.logic.usecase.GetHealthyFastFoodUseCase

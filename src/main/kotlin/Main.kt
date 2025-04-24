@@ -1,7 +1,7 @@
 package org.example
 
-import org.example.dependencyinjection.appModule
-import org.example.dependencyinjection.useCasesModule
+import di.appModule
+import di.useCasesModule
 import org.example.presentation.App
 import org.koin.core.context.GlobalContext.startKoin
 

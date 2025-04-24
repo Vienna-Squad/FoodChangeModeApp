@@ -1,16 +1,16 @@
 package org.example.presentation.controllers
 
+import org.example.logic.model.Meal
 import org.example.logic.usecase.SuggestHighCalorieMealUseCase
 import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.presentation.FoodViewer
-import org.example.presentation.UiController
-import org.example.presentation.Viewer
+import org.example.utils.viewer.ItemDetailsViewer
+import org.example.utils.viewer.MealDetailsViewer
 import org.koin.mp.KoinPlatform.getKoin
 
 class HighCalorieMealUIController(
     private val suggestHighCalorieMealUseCase: SuggestHighCalorieMealUseCase = getKoin().get(),
-    private val viewer: Viewer = FoodViewer()
+    private val viewer: ItemDetailsViewer<Meal> = MealDetailsViewer()
 ) : UiController {
     override fun execute() {
         do {
@@ -28,7 +28,7 @@ class HighCalorieMealUIController(
                 when (inputUser) {
 
                     1 -> {
-                        viewer.showMealDetails(
+                        viewer.viewDetails(
                             suggestHighCalorieMealUseCase.getSuggestionHighCalorieMealDetails(nameAndDescription.first!!)
                         )
                         break

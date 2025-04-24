@@ -1,14 +1,14 @@
 package org.example.presentation.controllers
 
+import org.example.logic.model.Meal
 import org.example.logic.usecase.GetEasyFoodSuggestionUseCase
-import org.example.presentation.FoodViewer
-import org.example.presentation.UiController
-import org.example.presentation.Viewer
+import org.example.utils.viewer.ItemsViewer
+import org.example.utils.viewer.MealsViewer
 import org.koin.mp.KoinPlatform.getKoin
 
 class EasyMealUIController(
     private val getEasyFoodSuggestionUseCase: GetEasyFoodSuggestionUseCase = getKoin().get(),
-    private val viewer: Viewer = FoodViewer()
+    private val viewer: ItemsViewer<Meal> = MealsViewer()
 ) : UiController {
     override fun execute() {
         val meals = getEasyFoodSuggestionUseCase()
@@ -16,7 +16,7 @@ class EasyMealUIController(
             println("No meals found")
         } else {
             println("Easy meals:")
-            viewer.showMealsDetails(meals)
+            viewer.viewItems(meals)
         }
     }
 }
