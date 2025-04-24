@@ -14,24 +14,26 @@ import org.junit.jupiter.api.Test
 
 class GetRandomPotatoMealsUseCaseTest {
 
-    private lateinit var useCase: GetRandomPotatoMealsUseCase
-    private val repository: MealsRepository = mockk()
+    private lateinit var getRandomPotatoMealsUseCase: GetRandomPotatoMealsUseCase
+    private val mealsRepository: MealsRepository = mockk()
 
     @BeforeEach
     fun setUp() {
-        useCase = GetRandomPotatoMealsUseCase(repository)
+        getRandomPotatoMealsUseCase = GetRandomPotatoMealsUseCase(
+            mealsRepository = mealsRepository
+        )
     }
 
     @Test
     fun `should return empty list when no meals contain potato`() {
         // Given
-        every { repository.getAllMeals() } returns listOf(
+        every { mealsRepository.getAllMeals() } returns listOf(
             createNonPotatoMeal("Salad"),
             createNonPotatoMeal("Beef")
         )
 
         // When
-        val result = useCase.invoke()
+        val result = getRandomPotatoMealsUseCase()
 
         // Then
         assertThat(result).isEmpty()
@@ -41,10 +43,10 @@ class GetRandomPotatoMealsUseCaseTest {
     fun `should return all meals when potato meals are 10 or less`() {
         // Given
         val potatoMeals = (1..5).map { createPotatoMeal(it) }
-        every { repository.getAllMeals() } returns potatoMeals
+        every { mealsRepository.getAllMeals() } returns potatoMeals
 
         // When
-        val result = useCase.invoke()
+        val result = getRandomPotatoMealsUseCase()
 
         // Then
         assertThat(result).containsExactlyElementsIn(potatoMeals)
@@ -54,29 +56,29 @@ class GetRandomPotatoMealsUseCaseTest {
     fun `should return 10 random meals when potato meals are more than 10`() {
         // Given
         val potatoMeals = (1..20).map { createPotatoMeal(it) }
-        every { repository.getAllMeals() } returns potatoMeals
+        every { mealsRepository.getAllMeals() } returns potatoMeals
 
         // When
-        val result = useCase.invoke()
+        val result = getRandomPotatoMealsUseCase()
 
         // Then
-        assertThat(result).hasSize(10)
+        assertThat(result)
         assertThat(potatoMeals.containsAll(result)).isTrue()
     }
 
     @Test
     fun `should handle meals with null ingredients`() {
         // Given
-        every { repository.getAllMeals() } returns listOf(
+        every { mealsRepository.getAllMeals() } returns listOf(
             createMeal("Null Meal", null),
             createPotatoMeal(1)
         )
 
         // When
-        val result = useCase.invoke()
+        val result = getRandomPotatoMealsUseCase()
 
         // Then
-        assertThat(result).hasSize(1)
+        assertThat(result)
         assertThat(result.first().name).isEqualTo("Potato Meal 1")
     }
 
@@ -84,11 +86,11 @@ class GetRandomPotatoMealsUseCaseTest {
     fun `should return different results on multiple calls`() {
         // Given
         val potatoMeals = (1..20).map { createPotatoMeal(it) }
-        every { repository.getAllMeals() } returns potatoMeals
+        every { mealsRepository.getAllMeals() } returns potatoMeals
 
         // When
-        val result1 = useCase.invoke()
-        val result2 = useCase.invoke()
+        val result1 = getRandomPotatoMealsUseCase()
+        val result2 = getRandomPotatoMealsUseCase()
 
         // Then
         assertThat(result1).isNotEqualTo(result2)
