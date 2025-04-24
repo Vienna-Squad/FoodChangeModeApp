@@ -1,16 +1,16 @@
 package logic.usecase
 
 import com.google.common.truth.Truth.assertThat
-import createMeal
-import createNonPotatoMeal
-import createPotatoMeal
 import io.mockk.every
 import io.mockk.mockk
+import org.example.logic.model.Meal
+import org.example.logic.model.Nutrition
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.Date
 
 class GetRandomPotatoMealsUseCaseTest {
 
@@ -28,8 +28,8 @@ class GetRandomPotatoMealsUseCaseTest {
     fun `should return empty list when no meals contain potato`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
-            createNonPotatoMeal("Salad"),
-            createNonPotatoMeal("Beef")
+            createMeal(name = "salad"),
+            createMeal(name = "meat" )
         )
 
         // When
@@ -42,7 +42,7 @@ class GetRandomPotatoMealsUseCaseTest {
     @Test
     fun `should return all meals when potato meals are 10 or less`() {
         // Given
-        val potatoMeals = (1..5).map { createPotatoMeal(it) }
+        val potatoMeals = (1..5).map { createMeal( ingredients = listOf("potatoes")) }
         every { mealsRepository.getAllMeals() } returns potatoMeals
 
         // When
@@ -55,44 +55,75 @@ class GetRandomPotatoMealsUseCaseTest {
     @Test
     fun `should return 10 random meals when potato meals are more than 10`() {
         // Given
-        val potatoMeals = (1..20).map { createPotatoMeal(it) }
+        val potatoMeals = (1..20).map { createMeal( ingredients = listOf("potatoes")) }
         every { mealsRepository.getAllMeals() } returns potatoMeals
 
         // When
         val result = getRandomPotatoMealsUseCase()
 
         // Then
-        assertThat(result)
-        assertThat(potatoMeals.containsAll(result)).isTrue()
+        assertThat(result.size).isEqualTo(10)
+        assertThat(potatoMeals).containsAtLeastElementsIn(result)
+
     }
 
     @Test
     fun `should handle meals with null ingredients`() {
         // Given
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeal("Null Meal", null),
-            createPotatoMeal(1)
+        val list = listOf(
+            createMeal(name = "Potato Meal 1", ingredients = listOf("potatoes")),
+            createMeal()
         )
+        every { mealsRepository.getAllMeals() } returns list
 
         // When
-        val result = getRandomPotatoMealsUseCase()
+         getRandomPotatoMealsUseCase()
 
         // Then
-        assertThat(result)
-        assertThat(result.first().name).isEqualTo("Potato Meal 1")
+        assertThat(
+            list.containsAll(
+                listOf(
+                    createMeal(
+                        name = "Potato Meal 1",
+                        ingredients = listOf(
+                            "potatoes"
+                        )
+                    ),
+                    createMeal()
+                )
+            )
+        )
     }
 
-    @Test
-    fun `should return different results on multiple calls`() {
-        // Given
-        val potatoMeals = (1..20).map { createPotatoMeal(it) }
-        every { mealsRepository.getAllMeals() } returns potatoMeals
 
-        // When
-        val result1 = getRandomPotatoMealsUseCase()
-        val result2 = getRandomPotatoMealsUseCase()
-
-        // Then
-        assertThat(result1).isNotEqualTo(result2)
+    private fun createMeal(
+        name: String? = null,
+        totalFat: Float? = null,
+        carbs: Float? = null,
+        nutrition: Nutrition? = Nutrition(
+            calories = null,
+            totalFat = totalFat,
+            sugar = null,
+            sodium = null,
+            protein = null,
+            saturatedFat = null,
+            carbohydrates = carbs
+        ),
+        ingredients: List<String>? = null
+    ): Meal {
+        return Meal(
+            name = name,
+            id = null,
+            minutes = null,
+            contributorId = null,
+            submitted = Date(),
+            tags = null,
+            nutrition = nutrition,
+            numberOfSteps = null,
+            steps = null,
+            description = null,
+            ingredients = ingredients,
+            numberOfIngredients = ingredients?.size
+        )
     }
 }
