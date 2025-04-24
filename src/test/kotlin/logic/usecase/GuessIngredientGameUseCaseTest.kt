@@ -12,6 +12,7 @@ import org.example.logic.usecase.exceptions.EmptyRandomMealException
 import org.example.logic.usecase.exceptions.IngredientRandomMealGenerationException
 import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -61,7 +62,7 @@ class GuessIngredientGameUseCaseTest {
     }
 
     @Test
-    fun `setGame should throw IngredientUserInputException when the ingredientInputNumber is not in range from 1 to 3`() {
+    fun `guessGame should throw IngredientUserInputException when the ingredientInputNumber is not in range from 1 to 3`() {
 
         // given
         val input = 4
@@ -72,8 +73,8 @@ class GuessIngredientGameUseCaseTest {
         )
 
         // then
-        val exception = assertThrows<IngredientUserInputException> {
-            guessIngredientGameUseCase.setGame(ingredientGameDetails, input)
+        assertThrows<IngredientUserInputException> {
+            guessIngredientGameUseCase.guessGame(ingredientGameDetails, input)
         }
 
 
@@ -81,7 +82,7 @@ class GuessIngredientGameUseCaseTest {
 
 
     @Test
-    fun `setGame should throw IngredientsOptionsException when the input ingredient is wrong`() {
+    fun `guessGame should throw IngredientsOptionsException when the input ingredient is wrong`() {
 
         // stubs
         every { mealsRepository.getAllMeals() } returns correctMeals
@@ -95,13 +96,13 @@ class GuessIngredientGameUseCaseTest {
 
         // then
         assertThrows<IngredientsOptionsException> {
-            guessIngredientGameUseCase.setGame(ingredientGameDetails, inputOption)
+            guessIngredientGameUseCase.guessGame(ingredientGameDetails, inputOption)
         }
 
     }
 
     @Test
-    fun `setGame should update score when the input ingredient is correct`() {
+    fun `guessGame should return true if userGuess is true`() {
 
         // stubs
         every { mealsRepository.getAllMeals() } returns correctMeals
@@ -113,20 +114,12 @@ class GuessIngredientGameUseCaseTest {
             ingredients = listOf("Chicken breast", "fake potato", "fake egg")
         )
         // when
-        guessIngredientGameUseCase.setGame(ingredientGameDetails, inputOption)
+        val result = guessIngredientGameUseCase.guessGame(ingredientGameDetails, inputOption)
 
-        assertEquals(1000,guessIngredientGameUseCase.getScoreOfGame())
+        assertTrue(result)
 
     }
 
-    @Test
-    fun `endGame should reset score to 0 `() {
-        // when
-        guessIngredientGameUseCase.endGame()
-
-        // then
-        assertEquals(0, guessIngredientGameUseCase.getScoreOfGame())
-    }
 
 }
 

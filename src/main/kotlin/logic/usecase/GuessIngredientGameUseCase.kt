@@ -6,14 +6,12 @@ import org.example.logic.usecase.exceptions.EmptyRandomMealException
 import org.example.logic.usecase.exceptions.IngredientRandomMealGenerationException
 import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
-import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
 
 
 class GuessIngredientGameUseCase(
     private val mealsRepository: MealsRepository
 ) {
 
-    private var score = 0
 
     fun getGameDetails(): IngredientGameDetails {
 
@@ -26,41 +24,33 @@ class GuessIngredientGameUseCase(
         )
     }
 
-    fun setGame(ingredientGameDetails: IngredientGameDetails, ingredientInputNumber: Int) {
+    fun guessGame(
+        ingredientGameDetails: IngredientGameDetails,
+        ingredientInputNumber: Int,
+    ): Boolean {
 
-        try {
-            val ingredientsOptions = ingredientGameDetails.ingredients
-            val ingredient = getChosenIngredientByOptionNumber(
-                ingredientsOptions = ingredientsOptions,
-                ingredientNumberOption = ingredientInputNumber
-            )
+        val ingredientsOptions = ingredientGameDetails.ingredients
+        val ingredient = getChosenIngredientByOptionNumber(
+            ingredientsOptions = ingredientsOptions,
+            ingredientNumberOption = ingredientInputNumber
+        )
 
-            val meal = ingredientGameDetails.mealName
-            val isCorrectResult = isMealContainsIngredient(
-                correctMealName = meal,
-                resultIngredient = ingredient!!
-            )
+        val meal = ingredientGameDetails.mealName
+        val isCorrectResult = isMealContainsIngredient(
+            correctMealName = meal,
+            resultIngredient = ingredient!!
+        )
 
-            if (isCorrectResult) {
-                if (this.score == FINAL_SCORE) {
-                    return
-                }
-                updateScore()
-            }
-        }catch (e: InvalidInputNumberOfHighCalorieMeal){
-            print(e)
-        }
+        return isCorrectResult
 
     }
 
-    fun getScoreOfGame(): Int {
-        return this.score
+    fun updateScore(score: Int): Int {
+        return if (score == FINAL_SCORE) FINAL_SCORE
+        else score.plus(SCORE_INCREMENT)
     }
 
-    fun endGame() {
-        this.score = 0
-    }
-
+    // helper functions
 
     private fun getFilterdMeals(): List<Meal> {
         return mealsRepository.getAllMeals()
@@ -134,10 +124,6 @@ class GuessIngredientGameUseCase(
             return true
         else
             throw IngredientsOptionsException("Your Answer Not Correct End Game")
-    }
-
-    private fun updateScore() {
-        this.score += SCORE_INCREMENT
     }
 
 
