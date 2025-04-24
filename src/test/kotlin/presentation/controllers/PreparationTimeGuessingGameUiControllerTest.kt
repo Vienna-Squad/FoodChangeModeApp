@@ -6,6 +6,8 @@ import io.mockk.verify
 import org.example.logic.model.Meal
 import org.example.logic.usecase.GuessPrepareTimeGameUseCase
 import org.example.logic.usecase.exceptions.GameOverException
+import org.example.logic.usecase.exceptions.GuessPrepareTimeGameException
+import org.example.logic.usecase.exceptions.InvalidMinutesException
 import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.logic.usecase.exceptions.TooHighException
 import org.example.logic.usecase.exceptions.TooLowException
@@ -97,6 +99,24 @@ class PreparationTimeGuessingGameUiControllerTest {
         preparationTimeGuessingGameUiController.execute()
         //then
         verify(exactly = 1) { interactor.getInput() }
+    }
+
+    @Test
+    fun `when userp and show congratulation message`() {
+        // given
+        val meal = createMeal(name = "Test Meal", minutes = 30L)
+        every { guessPrepareTimeGameUseCase.getRandomMeal() } returns meal
+        every { interactor.getInput() } returns "invalid" // triggers toLongOrNull() == null → -1
+
+        val exception = InvalidMinutesException()
+        every { guessPrepareTimeGameUseCase.guess(-1, 30L, 3) } throws exception
+
+        // when
+        preparationTimeGuessingGameUiController.execute()
+
+        // then
+        verify { exceptionViewer.viewExceptionMessage(exception) }
+        verify { guessPrepareTimeGameUseCase.guess(-1, 30L, 3) }
     }
 
 

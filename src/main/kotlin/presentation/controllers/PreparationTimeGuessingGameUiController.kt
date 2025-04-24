@@ -26,6 +26,9 @@ class PreparationTimeGuessingGameUiController(
                         try {
                             println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
                             break
+                        }catch (e:InvalidMinutesException){
+                            exceptionViewer.viewExceptionMessage(e)
+                            break
                         } catch (exception: GuessPrepareTimeGameException) {
                             attempt = exception.attempt
                             if (attempt == 0) {
