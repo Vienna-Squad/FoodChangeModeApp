@@ -26,6 +26,14 @@ internal class GetMealsByDateUseCaseTest{
     private val date2 = localDateToDate(2000, 4, 14)
     private val dateNotFound = localDateToDate(2003, 7, 20)
 
+    val meals=listOf(
+        createMeals("chinese  candy", 23933, date1),
+        createMeals("fried  potatoes", 37073, date2),
+        createMeals("apple a day  milk shake", 5289, date1)
+
+
+    )
+
     @BeforeEach
     fun setUp(){
 
@@ -39,41 +47,24 @@ internal class GetMealsByDateUseCaseTest{
     fun `should return meals that match the given date `(){
 
         //given  (stubs)
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createMeals("chinese  candy", 23933, date1),
-            createMeals("fried  potatoes", 37073, date2),
-            createMeals("apple a day  milk shake", 5289, date1)
-
-
-        )
+        every { mealsRepository.getAllMeals() } returns meals
 
         //when
-        val result= getMealsByDateUseCase.invoke(date1)
+        val result= getMealsByDateUseCase(date1)
 
         //then
-        assertThat(result).containsExactly(
-            createMeals("chinese  candy", 23933, date1),
-            createMeals("apple a day  milk shake", 5289, date1)
-
-        )
-
-
+        assertThat(result).containsExactly(meals[0],meals[2])
     }
 
     @Test
     fun `should throw exception when search by date for not available meal `(){
 
         //given  (stubs)
-        every { mealsRepository.getAllMeals() }returns listOf(
-            createMeals("alouette  potatoes", 59389,date1),
-            createMeals("chinese  candy", 23933, date2),
-            createMeals("fried  potatoes", 37073, date2),
-            createMeals("apple a day  milk shake", 5289, date1)
-        )
+        every { mealsRepository.getAllMeals() }returns meals
 
         //when && then
         assertThrows<NoMealFoundException> {
-            getMealsByDateUseCase.invoke(dateNotFound)
+            getMealsByDateUseCase(dateNotFound)
         }
 
     }

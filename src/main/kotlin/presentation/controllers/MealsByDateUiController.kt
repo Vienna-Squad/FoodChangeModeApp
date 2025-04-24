@@ -18,6 +18,7 @@ class MealsByDateUiController(
     private val getMealsByDateUseCase: GetMealsByDateUseCase = getKoin().get(),
     private val exceptionViewer: ExceptionViewer=FoodExceptionViewer(),
     private val viewerMeals:ItemsViewer<Meal> = MealsByDateDetailsViewer(),
+    private val viewMealById:ItemDetailsViewer<Meal> = MealDetailsViewer(),
     private val interactor: Interactor=UserInteractor()
 ) : UiController {
     override fun execute() {
@@ -47,9 +48,9 @@ class MealsByDateUiController(
 
         try {
             mealId.toLongOrNull()?.let { id ->
-                mealsByDate.find { meal ->
-                    meal.id == id
-                }?: throw NoMealFoundException()
+                val meal = mealsByDate.find { mealId-> mealId.id == id } ?: throw NoMealFoundException()
+
+                viewMealById.viewDetails(meal)
                 println()
             }
         }catch (e:NoMealFoundException) {

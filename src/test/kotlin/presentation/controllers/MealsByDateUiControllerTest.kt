@@ -10,6 +10,7 @@ import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.presentation.controllers.MealsByDateUiController
 import org.example.utils.interactor.Interactor
 import org.example.utils.viewer.ExceptionViewer
+import org.example.utils.viewer.ItemDetailsViewer
 import org.example.utils.viewer.ItemsViewer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,6 +25,7 @@ internal class MealsByDateUiControllerTest{
     lateinit var interactor: Interactor
     lateinit var viewer: ItemsViewer<Meal>
     lateinit var exceptionViewer: ExceptionViewer
+    lateinit var itemViewer:ItemDetailsViewer<Meal>
 
 
 
@@ -32,27 +34,33 @@ internal class MealsByDateUiControllerTest{
         LocalDate.of(year, month, day).atStartOfDay(ZoneId.systemDefault()).toInstant().let { Date.from(it) }
 
     private val date1 = localDateToDate(2003, 4, 14)
+    private val date2 = localDateToDate(2000, 4, 14)
     private val dateNotFound = localDateToDate(2003, 7, 20)
 
+    val meals= listOf(
+        createMeals("chinese  candy",37073 , date1),
+        createMeals("fried  potatoes", 23933, date2),
+        createMeals("apple a day  milk shake", 5289, date1)
+
+
+    )
     @BeforeEach
     fun setUp(){
         getMealsByDateUseCase= mockk(relaxed = true)
         viewer= mockk(relaxed = true)
+        itemViewer= mockk(relaxed = true)
         exceptionViewer= mockk(relaxed = true)
         interactor= mockk()
-        MealsByDateUiController= MealsByDateUiController(getMealsByDateUseCase,exceptionViewer,viewer,interactor)
+        MealsByDateUiController= MealsByDateUiController(getMealsByDateUseCase,exceptionViewer,viewer,itemViewer,interactor)
     }
 
     @Test
     fun `should return meals when the given date matches the submitted date in meal`() {
-        val meals= listOf(
-        createMeals("chinese  candy", 23933, date1),
-        createMeals("fried  potatoes", 37073, date1),
-        )
+
 
         //given  (stubs)
         every { interactor.getInput() }returns "14/4/2003"
-        every { getMealsByDateUseCase(date1) } returns meals
+        every { getMealsByDateUseCase(date1) } returns listOf(meals[0],meals[2])
 
 
         //when
@@ -61,7 +69,7 @@ internal class MealsByDateUiControllerTest{
 
         //then
         verify {
-            viewer.viewItems(meals)
+            viewer.viewItems(listOf(meals[0],meals[2]))
         }
 
 
@@ -72,19 +80,20 @@ internal class MealsByDateUiControllerTest{
 
         //given  (stubs)
 
-        val exception=NoMealFoundException()
         every { interactor.getInput() }returns "20/7/2003"
 
-        every { getMealsByDateUseCase(dateNotFound) }throws exception
+        every { getMealsByDateUseCase(dateNotFound) }throws NoMealFoundException()
 
 
         // when
         MealsByDateUiController.execute()
 
         // then
-       verify {
-           exceptionViewer.viewExceptionMessage(exception)
-       }
+        verify {
+            exceptionViewer.viewExceptionMessage(
+                match { it is NoMealFoundException }
+            )
+        }
 
     }
     @Test
@@ -106,13 +115,10 @@ internal class MealsByDateUiControllerTest{
     @Test
     fun `should return meals description when the given id matches a meal in the list`(){
 
-        val meals= listOf(
-            createMeals("fried  potatoes", 37073, date1),
-        )
 
         //given  (stubs)
         every { interactor.getInput() } returns "14/4/2003" andThen "37073"
-        every { getMealsByDateUseCase(date1) } returns meals
+        every { getMealsByDateUseCase(date1) } returns listOf(meals[0],meals[2])
 
 
         //when
@@ -120,20 +126,18 @@ internal class MealsByDateUiControllerTest{
 
         //then
         verify {
-            viewer.viewItems(meals)
+            itemViewer.viewDetails(meals[0])
         }
+
 
 
     }
     @Test
     fun `should return exception when the given id not matches with the meal in the list`(){
 
-        val meals = listOf(
-            createMeals("fried potatoes", 37073, date1)
-        )
         // given
         every { interactor.getInput() } returns "14/4/2003" andThen "37074" // ID not found
-        every { getMealsByDateUseCase(date1) } returns meals
+        every { getMealsByDateUseCase(date1) } returns listOf(meals[0],meals[2])
 
         //when
         MealsByDateUiController.execute()
