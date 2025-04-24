@@ -4,9 +4,7 @@ import org.example.logic.usecase.GuessIngredientGameUseCase
 import org.example.logic.usecase.IngredientGameDetails
 import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
-import org.example.utils.interactor.Interactor
 import org.example.utils.interactor.InteractorNumber
-import org.example.utils.interactor.UserInteractor
 import org.example.utils.interactor.UserInteractorNumber
 import org.example.utils.viewer.ExceptionViewer
 import org.example.utils.viewer.FoodExceptionViewer
@@ -25,6 +23,8 @@ class IngredientGuessGameUiController(
 ) : UiController {
     override fun execute() {
 
+        var scoreOfUser = 0
+
         try {
             var counter = 1
             do {
@@ -34,32 +34,31 @@ class IngredientGuessGameUiController(
                 print(USER_INPUT_MESSAGE)
                 val input = interactorNumber.getInput()
 
-                guessIngredientGameUseCase.setGame(
+                val userGuess = guessIngredientGameUseCase.guessGame(
                     ingredientGameDetails = gameDetails,
                     ingredientInputNumber = input
                 )
 
-                val score = guessIngredientGameUseCase.getScoreOfGame()
-                scoreViewer.viewDetails(score)
+                if (userGuess == true)
+                   scoreOfUser = guessIngredientGameUseCase.updateScore(scoreOfUser)
 
                 counter++
 
             } while (counter <= 15)
         } catch (e: IngredientsOptionsException) {
-            val score = guessIngredientGameUseCase.getScoreOfGame()
             exceptionViewer.viewExceptionMessage(e)
-            scoreViewer.viewDetails(score)
+            scoreViewer.viewDetails(scoreOfUser)
         } catch (e: IngredientUserInputException) {
-            val score = guessIngredientGameUseCase.getScoreOfGame()
             exceptionViewer.viewExceptionMessage(e)
-            scoreViewer.viewDetails(score)
-        }finally {
-            guessIngredientGameUseCase.endGame()
+            scoreViewer.viewDetails(scoreOfUser)
+        } finally {
+            println(END_MESSAGE)
         }
 
     }
 
     companion object {
         const val USER_INPUT_MESSAGE = "Enter the Ingredient Input Number : "
+        const val END_MESSAGE = "End Game"
     }
 }
