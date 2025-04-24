@@ -1,6 +1,7 @@
 package org.example.presentation.controllers
 
 
+import org.example.logic.model.RankedMealResult
 import org.example.logic.usecase.GetRankedSeafoodByProteinUseCase
 import org.example.logic.usecase.exceptions.NoSeafoodFoundException
 import org.example.presentation.FoodViewer
@@ -18,21 +19,35 @@ class RankedSeafoodByProteinUiController(
             val results = getRankedSeafoodByProteinUseCase()
 
             if (results.isEmpty()) {
-                println("\u001B[33mNo seafood meals with protein information found.\u001B[0m")
+                displayEmptyResults()
             } else {
-                println("\u001B[32mRank | Meal Name                      | Protein (g)\u001B[0m")
-                println("-----|--------------------------------|------------")
-                results.forEach { rankedMeal ->
-                    val rankStr = rankedMeal.rank.toString().padEnd(4)
-                    val nameStr = (rankedMeal.name ?: "Unnamed Meal").take(30).padEnd(30)
-                    val proteinStr = rankedMeal.protein?.toString() ?: "N/A"
-                    println("$rankStr | $nameStr | $proteinStr")
-                }
+                displayResults(results)
             }
         } catch (e: NoSeafoodFoundException) {
             viewer.showExceptionMessage(e)
         } catch (e: Exception) {
             viewer.showExceptionMessage(e)
         }
+
+    }
+
+
+    private fun displayEmptyResults() {
+        println("\u001B[33mNo seafood meals with protein information found.\u001B[0m")
+    }
+
+    private fun displayResults(results: List<RankedMealResult>) {
+        println("\u001B[32mRank | Meal Name                      | Protein (g)\u001B[0m")
+        println("-----|--------------------------------|------------")
+        results.forEach { rankedMeal ->
+            printMeal(rankedMeal)
+        }
+    }
+
+    private fun printMeal(rankedMeal: RankedMealResult) {
+        val rankStr = rankedMeal.rank.toString().padEnd(4)
+        val nameStr = (rankedMeal.name ?: "Unnamed Meal").take(30).padEnd(30)
+        val proteinStr = rankedMeal.protein?.toString() ?: "N/A"
+        println("$rankStr | $nameStr | $proteinStr")
     }
 }
