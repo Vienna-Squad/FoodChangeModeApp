@@ -11,6 +11,7 @@ import org.example.logic.usecase.GetRandomPotatoMealsUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.Date
+import kotlin.test.assertTrue
 
 class GetRandomPotatoMealsUseCaseTest {
 
@@ -49,7 +50,7 @@ class GetRandomPotatoMealsUseCaseTest {
         val result = getRandomPotatoMealsUseCase()
 
         // Then
-        assertThat(result).containsExactlyElementsIn(potatoMeals)
+        assertTrue(result == potatoMeals)
     }
 
     @Test
