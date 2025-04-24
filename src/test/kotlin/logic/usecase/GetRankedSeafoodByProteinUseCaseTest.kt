@@ -22,8 +22,8 @@ class GetRankedSeafoodByProteinUseCaseTest {
         val meals = listOf(
             createSeafoodMeal("Salmon", 25f),
             createSeafoodMeal("Tuna", 30f),
-            createSeafoodMeal("Shrimp", 20f),
-            createMeal("Chicken", null) // Non-seafood
+            createSeafoodMeal("طعمية بالسمك المشوي", 20f),
+            createMeal("اي حاجه مفيهاش زفارة", null) // Non-seafood
         )
 
         every { mockRepository.getAllMeals() } returns meals
@@ -34,7 +34,7 @@ class GetRankedSeafoodByProteinUseCaseTest {
         assertThat(result).containsExactly(
             RankedMealResult(1, "Tuna", 30f),
             RankedMealResult(2, "Salmon", 25f),
-            RankedMealResult(3, "Shrimp", 20f)
+            RankedMealResult(3, "طعمية بالسمك المشوي", 20f)
         ).inOrder()
     }
 
