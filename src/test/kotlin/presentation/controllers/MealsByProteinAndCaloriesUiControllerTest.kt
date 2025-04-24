@@ -18,7 +18,6 @@ class MealsByProteinAndCaloriesUiControllerTest {
 
     private val stdOut = ByteArrayOutputStream()
     private val originalOut = System.out
-    private val originalIn = System.`in`
 
     @BeforeEach
     fun setUp() {
@@ -31,7 +30,6 @@ class MealsByProteinAndCaloriesUiControllerTest {
     @AfterEach
     fun tearDown() {
         System.setOut(originalOut)
-        System.setIn(originalIn)
         stdOut.reset()
     }
 
