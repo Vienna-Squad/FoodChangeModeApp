@@ -1,8 +1,8 @@
 package org.example.logic.usecase
 
+import org.example.logic.model.Meal
+import org.example.presentation.model.RankedMealResult
 import org.example.logic.repository.MealsRepository
-
-data class RankedMealResult(val rank: Int, val name: String?, val protein: Float?)
 
 class GetRankedSeafoodByProteinUseCase(private val mealsRepository: MealsRepository) {
 
@@ -11,7 +11,7 @@ class GetRankedSeafoodByProteinUseCase(private val mealsRepository: MealsReposit
      *
      * @return A list of ranked meals with rank, name, and protein.
      */
-    operator fun invoke(): List<RankedMealResult> {
+    operator fun invoke(): List<Meal> {
         val allMeals = mealsRepository.getAllMeals()
 
         return allMeals
@@ -27,13 +27,6 @@ class GetRankedSeafoodByProteinUseCase(private val mealsRepository: MealsReposit
             }
             .sortedByDescending { meal ->
                 meal.nutrition?.protein ?: 0.0f
-            }
-            .mapIndexed { index, meal ->
-                RankedMealResult(
-                    rank = index + 1, // Rank starts from 1
-                    name = meal.name,
-                    protein = meal.nutrition?.protein
-                )
             }
     }
 }
