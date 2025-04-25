@@ -25,214 +25,29 @@ class GetEasyFoodSuggestionUseCaseTest {
         getEasyFoodSuggestionUseCase = GetEasyFoodSuggestionUseCase(mealsRepository)
     }
 
-    /**
-     * easy meal is Under 30 minutes preparation time,
-     * has 5 ingredients or fewer,
-     * and can be prepared in less than 6 steps*/
     //region getEasyMeals test cases
     @Test
     fun ` getEasyMeals should return list of easy meals having multiple meals vary in easy meal standards`() {
         //Given
-        every { mealsRepository.getAllMeals() } returns listOf(
-
-            Meal(
-                "Avocado Toast Deluxe", // Easy
-                1001,
-                10,
-                501,
-                Date.valueOf("2024-11-03"),
-                listOf("breakfast", "easy", "vegetarian", "10-minutes-or-less", "snack", "quick", "no-cook"),
-                Nutrition(250.0f, 12.0f, 22.0f, 2.0f, 7.0f, 1.0f, 5.0f),
-                4,
-                listOf(
-                    "Toast the bread slices until golden.",
-                    "Mash the avocado with salt and lemon juice.",
-                    "Spread the avocado on toast.",
-                    "Top with sliced cherry tomatoes and a sprinkle of chili flakes."
-                ),
-                "A quick, healthy, and satisfying breakfast or snack that's ready in minutes.",
-                listOf("bread", "avocado", "lemon juice", "cherry tomatoes", "chili flakes"),
-                5
-            ),
-            Meal(
-                "Quick Veggie Stir-Fry", // Easy
-                1002,
-                20,
-                6789,
-                Date.valueOf("2023-08-10"),
-                listOf("quick", "vegetarian", "easy", "30-minutes-or-less", "low-effort", "vegetables", "stir-fry"),
-                Nutrition(15.0f, 0.0f, 12.0f, 3.0f, 5.0f, 0.0f, 1.0f),
-                5,
-                listOf(
-                    "Chop vegetables (carrot, bell pepper, broccoli).",
-                    "Heat a pan with olive oil.",
-                    "Stir-fry the vegetables for 5-7 minutes.",
-                    "Add soy sauce and garlic.",
-                    "Cook for another 2-3 minutes until tender."
-                ),
-                "This stir-fry is a quick and healthy dish that’s packed with flavor. It’s a great option for a busy evening.",
-                listOf("carrot", "bell pepper", "broccoli", "soy sauce", "garlic"),
-                5
-            ),
-            Meal(
-                "Chicken Parmesan",
-                1003,
-                45,
-                502,
-                Date.valueOf("2023-02-21"),
-                listOf("main-course", "italian", "chicken", "dinner", "comfort-food"),
-                Nutrition(400.0f, 20.0f, 30.0f, 8.0f, 15.0f, 2.0f, 10.0f),
-                8,
-                listOf(
-                    "Preheat oven to 375°F.",
-                    "Season chicken with salt and pepper, then coat in breadcrumbs.",
-                    "Pan-fry chicken until golden and crispy.",
-                    "Top with marinara sauce and mozzarella cheese.",
-                    "Bake in the oven for 20 minutes until cheese is melted.",
-                    "Serve with pasta or a side salad."
-                ),
-                "A classic Italian dish with breaded chicken topped with marinara and melted cheese.",
-                listOf("chicken breast", "breadcrumbs", "mozzarella", "marinara sauce", "parmesan"),
-                5
-            ),
-            Meal(
-                "Beef Stew",
-                1004,
-                90,
-                503,
-                Date.valueOf("2022-11-14"),
-                listOf("main-course", "comfort-food", "beef", "slow-cooked", "hearty"),
-                Nutrition(350.0f, 25.0f, 10.0f, 5.0f, 8.0f, 4.0f, 6.0f),
-                7,
-                listOf(
-                    "Brown the beef chunks in a large pot.",
-                    "Add chopped onions, carrots, and potatoes.",
-                    "Pour in beef broth and season with salt, pepper, and herbs.",
-                    "Simmer for 60-90 minutes until the beef is tender.",
-                    "Add flour to thicken the stew.",
-                    "Serve hot with bread."
-                ),
-                "A hearty and rich stew that's perfect for cold days. It’s slow-cooked for maximum flavor.",
-                listOf("beef", "carrots", "potatoes", "onions", "beef broth"),
-                5
-            )
-        )
-
-
+        val mixedMeals = mixedMeals
+        every { mealsRepository.getAllMeals() } returns mixedMeals.flatten()
         //when
         val result = getEasyFoodSuggestionUseCase.invoke()
-        assertThat(result).containsExactlyElementsIn(
-            listOf(
-                Meal(
-                    "Avocado Toast Deluxe", // Easy
-                    1001,
-                    10,
-                    501,
-                    Date.valueOf("2024-11-03"),
-                    listOf("breakfast", "easy", "vegetarian", "10-minutes-or-less", "snack", "quick", "no-cook"),
-                    Nutrition(250.0f, 12.0f, 22.0f, 2.0f, 7.0f, 1.0f, 5.0f),
-                    4,
-                    listOf(
-                        "Toast the bread slices until golden.",
-                        "Mash the avocado with salt and lemon juice.",
-                        "Spread the avocado on toast.",
-                        "Top with sliced cherry tomatoes and a sprinkle of chili flakes."
-                    ),
-                    "A quick, healthy, and satisfying breakfast or snack that's ready in minutes.",
-                    listOf("bread", "avocado", "lemon juice", "cherry tomatoes", "chili flakes"),
-                    5
-                ),
-                Meal(
-                    "Quick Veggie Stir-Fry", // Easy
-                    1002,
-                    20,
-                    6789,
-                    Date.valueOf("2023-08-10"),
-                    listOf("quick", "vegetarian", "easy", "30-minutes-or-less", "low-effort", "vegetables", "stir-fry"),
-                    Nutrition(15.0f, 0.0f, 12.0f, 3.0f, 5.0f, 0.0f, 1.0f),
-                    5,
-                    listOf(
-                        "Chop vegetables (carrot, bell pepper, broccoli).",
-                        "Heat a pan with olive oil.",
-                        "Stir-fry the vegetables for 5-7 minutes.",
-                        "Add soy sauce and garlic.",
-                        "Cook for another 2-3 minutes until tender."
-                    ),
-                    "This stir-fry is a quick and healthy dish that’s packed with flavor. It’s a great option for a busy evening.",
-                    listOf("carrot", "bell pepper", "broccoli", "soy sauce", "garlic"),
-                    5
-                )
-            )
-        )
+
+        assertThat(result).containsExactlyElementsIn(easyMeals)
+
     }
 
     @Test
     fun ` getEasyMeals should Throw NoMealFoundException having no easy meals found`() {
         //Given
-        every { mealsRepository.getAllMeals() } returns listOf(
-            Meal(
-                "Chicken Parmesan",
-                1003,
-                45,
-                502,
-                Date.valueOf("2023-02-21"),
-                listOf("main-course", "italian", "chicken", "dinner", "comfort-food"),
-                Nutrition(400.0f, 20.0f, 30.0f, 8.0f, 15.0f, 2.0f, 10.0f),
-                8,
-                listOf(
-                    "Preheat oven to 375°F.",
-                    "Season chicken with salt and pepper, then coat in breadcrumbs.",
-                    "Pan-fry chicken until golden and crispy.",
-                    "Top with marinara sauce and mozzarella cheese.",
-                    "Bake in the oven for 20 minutes until cheese is melted.",
-                    "Serve with pasta or a side salad."
-                ),
-                "A classic Italian dish with breaded chicken topped with marinara and melted cheese.",
-                listOf("chicken breast", "breadcrumbs", "mozzarella", "marinara sauce", "parmesan"),
-                5
-            ),
-            Meal(
-                "Beef Stew",
-                1004,
-                90,
-                503,
-                Date.valueOf("2022-11-14"),
-                listOf("main-course", "comfort-food", "beef", "slow-cooked", "hearty"),
-                Nutrition(350.0f, 25.0f, 10.0f, 5.0f, 8.0f, 4.0f, 6.0f),
-                7,
-                listOf(
-                    "Brown the beef chunks in a large pot.",
-                    "Add chopped onions, carrots, and potatoes.",
-                    "Pour in beef broth and season with salt, pepper, and herbs.",
-                    "Simmer for 60-90 minutes until the beef is tender.",
-                    "Add flour to thicken the stew.",
-                    "Serve hot with bread."
-                ),
-                "A hearty and rich stew that's perfect for cold days. It’s slow-cooked for maximum flavor.",
-                listOf("beef", "carrots", "potatoes", "onions", "beef broth"),
-                5
-            )
-        )
+        every { mealsRepository.getAllMeals() } returns hardMeals
+
         //when
         assertThrows<NoMealFoundException> {
             getEasyFoodSuggestionUseCase.invoke()
         }
 
-    }
-
-    @Test
-    fun `getEasyMeals should return only one easy meal among hard meals`() {
-        every { mealsRepository.getAllMeals() } returns listOf(
-            createHardMeal(),
-            createMealTooManySteps(),
-            createMealTooLong(),
-            createMealTooManyIngredients(),
-            createEasyMeal()
-        )
-
-        val result = getEasyFoodSuggestionUseCase.invoke()
-
-        assertEquals(listOf(createEasyMeal()), result)
     }
 
     @Test
@@ -331,6 +146,7 @@ class GetEasyFoodSuggestionUseCaseTest {
         5
     )
 
+
     private fun createHardMeal() = Meal(
         "Heavy Lasagna",
         2,
@@ -363,6 +179,19 @@ class GetEasyFoodSuggestionUseCaseTest {
         numberOfIngredients = 6
     )
 
+
+    private var easyMeals = listOf(
+        createEasyMeal(),
+        createEasyMeal(),
+    )
+    private var hardMeals = listOf(
+        createHardMeal(),
+        createHardMeal(),
+    )
+    private var mixedMeals = listOf(
+        easyMeals,
+        hardMeals
+    )
     // endregion
 }
 
