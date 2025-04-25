@@ -4,34 +4,72 @@ import org.example.logic.model.Meal
 import org.example.logic.usecase.GetMealsByDateUseCase
 import org.example.logic.usecase.exceptions.IncorrectDateFormatException
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.utils.viewer.ItemsViewer
-import org.example.utils.viewer.MealsViewer
+import org.example.presentation.*
+import org.example.utils.interactor.Interactor
+import org.example.utils.interactor.UserInteractor
+import org.example.utils.viewer.*
 import org.koin.mp.KoinPlatform.getKoin
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatterBuilder
+import java.util.Date
 
 class MealsByDateUiController(
     private val getMealsByDateUseCase: GetMealsByDateUseCase = getKoin().get(),
-    private val viewer: ItemsViewer<Meal> = MealsViewer()
+    private val exceptionViewer: ExceptionViewer=FoodExceptionViewer(),
+    private val viewerMeals:ItemsViewer<Meal> = MealsByDateDetailsViewer(),
+    private val viewMealById:ItemDetailsViewer<Meal> = MealDetailsViewer(),
+    private val interactor: Interactor=UserInteractor()
 ) : UiController {
     override fun execute() {
         print("Enter date (dd/MM/yyyy): ")
-        val inputDate = readln()
+        val inputDate = interactor.getInput()
+
         try {
-            val meals = getMealsByDateUseCase(inputDate)
+
+            val date: Date = dateFormat(inputDate)
+            val mealsByDate = getMealsByDateUseCase(date)
+
             println("Meals on $inputDate:")
-            viewer.viewItems(meals)
+            viewerMeals.viewItems(mealsByDate)
+
             print("Enter meal ID to view details: ")
-            val meal = readln().toLongOrNull()?.let { id ->
-                meals.find { meal ->
-                    meal.id == id
-                }
-            }
-            println()
-            println(meal ?: "No meal found with this ID.")
+            val mealId=interactor.getInput()
+            getMealById(mealId,mealsByDate)
+
         } catch (e: IncorrectDateFormatException) {
-            println("${e.message} Please use dd/MM/yyyy format.")
+            exceptionViewer.viewExceptionMessage(IncorrectDateFormatException("${e.message} Please use dd/MM/yyyy format."))
         } catch (e: NoMealFoundException) {
-            println(e.message)
+            exceptionViewer.viewExceptionMessage(e)
         }
+    }
+
+    private fun getMealById(mealId:String,mealsByDate:List<Meal>){
+
+        try {
+            mealId.toLongOrNull()?.let { id ->
+                val meal = mealsByDate.find { mealId-> mealId.id == id } ?: throw NoMealFoundException()
+
+                viewMealById.viewDetails(meal)
+                println()
+            }
+        }catch (e:NoMealFoundException) {
+            exceptionViewer.viewExceptionMessage(e)
+        }
+    }
+
+    private fun dateFormat(date:String): Date {
+
+        return try {
+            val formatter= DateTimeFormatterBuilder().appendPattern("d/M/yyyy").toFormatter()
+            val localDate= LocalDate.parse(date,formatter)
+            Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+        }catch (e:Exception){
+            throw IncorrectDateFormatException("Incorrect date format")
+        }
+
+
     }
 
 }
