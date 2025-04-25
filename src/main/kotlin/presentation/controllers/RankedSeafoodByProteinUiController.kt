@@ -1,21 +1,18 @@
 package org.example.presentation.controllers
 
-import org.example.logic.model.RankedMealResult
+import org.example.logic.model.Meal
 import org.example.logic.usecase.GetRankedSeafoodByProteinUseCase
-import org.example.presentation.FoodViewer
-import org.example.presentation.UiController
-import org.example.presentation.Viewer
+import org.example.presentation.model.RankedMealResult
 import org.koin.mp.KoinPlatform.getKoin
 
 class RankedSeafoodByProteinUiController(
     private val getRankedSeafoodByProteinUseCase: GetRankedSeafoodByProteinUseCase = getKoin().get(),
-    private val viewer: Viewer = FoodViewer()
 ) : UiController {
     override fun execute() {
         println("--- Seafood Meals Sorted by Protein (Highest First) ---")
-
-        val results: List<RankedMealResult> = getRankedSeafoodByProteinUseCase()
-
+        val results: List<RankedMealResult> = getRankedSeafoodByProteinUseCase().mapIndexed { index, meal ->
+            toRankedMealResult(index + 1, meal)
+        }
         if (results.isEmpty()) {
             println("\u001B[33mNo seafood meals with protein information found.\u001B[0m")
         } else {
@@ -31,4 +28,10 @@ class RankedSeafoodByProteinUiController(
             }
         }
     }
+
+    private fun toRankedMealResult(rank: Int, meal: Meal) = RankedMealResult(
+        rank = rank, // Rank starts from 1
+        name = meal.name,
+        protein = meal.nutrition?.protein
+    )
 }

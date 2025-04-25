@@ -18,8 +18,8 @@ class CsvMealsRepository(
         return allMeals
     }
 
-    private fun parseCsvFileToListOfMeals() = csvFileReader.readLinesFromFile().drop(1).forEach {
-        mealsCsvParser.parseOneLine(it).let { meal ->
+    private fun parseCsvFileToListOfMeals() = csvFileReader.getLinesAsList().drop(1).forEach {
+        mealsCsvParser.parseLineIntoMeal(it).let { meal ->
             if (meal.description.isNullOrEmpty()) meal.description = null
             allMeals.add(meal)
         }

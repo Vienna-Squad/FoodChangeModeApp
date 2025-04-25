@@ -1,22 +1,22 @@
 package org.example.presentation.controllers
 
+import org.example.logic.model.Meal
 import org.example.logic.usecase.GetMealByNameUseCase
 import org.example.logic.usecase.exceptions.NoMealFoundException
-import org.example.presentation.FoodViewer
-import org.example.presentation.UiController
-import org.example.presentation.Viewer
+import org.example.utils.viewer.ItemDetailsViewer
+import org.example.utils.viewer.MealDetailsViewer
 import org.koin.mp.KoinPlatform.getKoin
 
 class MealByNameUiController(
     private val getMealByNameUseCase: GetMealByNameUseCase = getKoin().get(),
-    private val viewer: Viewer = FoodViewer()
+    private val viewer: ItemDetailsViewer<Meal> = MealDetailsViewer()
 ) : UiController {
     override fun execute() {
         print("Enter name to search for a meal: ")
         val inputName = readln()
         try {
             val meal = getMealByNameUseCase(inputName)
-            viewer.showMealDetails(meal)
+            viewer.viewDetails(meal)
         } catch (e: NoMealFoundException) {
             println(e.message)
         }
