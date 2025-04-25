@@ -29,7 +29,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when mealsRepository returns list of meals should getRandomMeal() return random meal from them`() {
+    fun `should return random meal from non-empty list`() {
         //given
         val meals = listOf(
             createMeal("koshary"),
@@ -45,7 +45,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when mealsRepository returns empty list should getRandomMeal() throws NoMealFoundException`() {
+    fun `should throw NoMealFoundException when no meals found`() {
         //given
         every { mealsRepository.getAllMeals() } returns emptyList()
         //when && then
@@ -55,7 +55,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed correct answer -with allowed attempts- should return congratulation message`() {
+    fun `should return success when guess is correct`() {
         //given
         val randomMeal = createMeal()
         //when
@@ -65,7 +65,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed incorrect answer -with allowed attempts- greater than the correct answer should throw TooHighException with remaining attempts`() {
+    fun `should throw TooHighException when guess is too high`() {
         //given
         val randomMeal = createMeal()
         //when && then
@@ -77,7 +77,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed incorrect answer -with allowed attempts- less than the correct answer should throw TooHighException with remaining attempts`() {
+    fun `should throw TooLowException when guess is too low`() {
         //given
         val randomMeal = createMeal()
         //when && then
@@ -89,7 +89,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed correct answer -with the last attempt- should return congratulation message`() {
+    fun `should return success when correct on last attempt`() {
         //given
         val randomMeal = createMeal()
         //when
@@ -99,7 +99,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed incorrect answer -with the last attempt- should throw GameOverException with its message`() {
+    fun `should throw GameOverException when wrong on last attempt`() {
         //given
         val randomMeal = createMeal()
         //when && then
@@ -111,7 +111,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed any answer -with negative attempt- should throw InvalidAttemptsException with its message`() {
+    fun `should throw InvalidAttemptsException when attempts is negative`() {
         //given
         val randomMeal = createMeal()
         //when && then
@@ -123,7 +123,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed any answer -with ZERO attempts- should throw InvalidAttemptsException with its message`() {
+    fun `should throw InvalidAttemptsException when attempts is zero`() {
         //given
         val randomMeal = createMeal()
         //when && then
@@ -135,7 +135,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed with NEGATIVE minutes as a answer -with allowed attempts- should throw InvalidMinutesException with its message`() {
+    fun `should throw InvalidMinutesException when guess is negative`() {
         //given
         val randomMeal = createMeal()
         //when && then
@@ -146,7 +146,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed with NEGATIVE minutes as a answer -with not allowed attempts- should throw InvalidAttemptsException with its message`() {
+    fun `should prioritize InvalidAttemptsException over InvalidMinutesException`() {
         //given
         val randomMeal = createMeal()
         //when && then
@@ -157,7 +157,7 @@ class GuessPrepareTimeGameUseCaseTest {
     }
 
     @Test
-    fun `when user guessed incorrect answer greater than the correct one -with the last attempt- should throw GameOverException with its message`() {
+    fun `should throw GameOverException when too high on last attempt`() {
         //given
         val randomMeal = createMeal()
         val givenException = GameOverException(correctAnswer = randomMeal.minutes!!)
