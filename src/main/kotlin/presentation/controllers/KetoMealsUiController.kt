@@ -25,23 +25,25 @@ class KetoMealsUiController(
         while (true) {
             try {
                 val meal = getKetoMealUseCase(seenMeals)
-                val input = interactor.getInput()
 
                 println("Meal: ${meal.name}")
                 println(meal.description ?: "No description available.")
                 println("1 - Like    |   2 - Dislike ")
                 print("Your choice: ")
 
+                val input = interactor.getInput()
                 when (input) {
                     "1" -> {
                         println("\n Full Details of ${meal.name}")
                         viewer.viewDetails(meal)
                         break
                     }
+
                     "2" -> {
                         seenMeals.add(meal)
                         println("\n try another one\n")
                     }
+
                     else -> {
                         println("Exiting Keto Meal Suggestions")
                         break
