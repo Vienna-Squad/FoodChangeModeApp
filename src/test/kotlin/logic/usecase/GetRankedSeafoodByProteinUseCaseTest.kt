@@ -18,7 +18,7 @@ class GetRankedSeafoodByProteinUseCaseTest {
     private val useCase = GetRankedSeafoodByProteinUseCase(mockRepository)
 
     @Test
-    fun `should return ranked seafood meals by protein descending`() {
+    fun `given seafood meals with protein data when use case is executed then return meals ranked by protein descending`() {
         val meals = listOf(
             createSeafoodMeal("Salmon", 25f),
             createSeafoodMeal("Tuna", 30f),
@@ -39,7 +39,7 @@ class GetRankedSeafoodByProteinUseCaseTest {
     }
 
     @Test
-    fun `should handle various seafood tags`() {
+    fun `given meals with various seafood tags when use case is executed then include all valid seafood meals`() {
         val meals = listOf(
             createMeal("Fish Tacos", 22f, listOf("mexican", "fish")),
             createMeal("Seafood Pasta", 18f, listOf("pasta", "seafood")),
@@ -59,7 +59,7 @@ class GetRankedSeafoodByProteinUseCaseTest {
     }
 
     @Test
-    fun `should throw when no seafood meals found`() {
+    fun `given non-seafood meals when use case is executed then throw NoSeafoodFoundException`() {
         val meals = listOf(
             createMeal("Chicken Curry", 25f, listOf("poultry")),
             createMeal("Beef Steak", 30f, listOf("meat"))
@@ -73,7 +73,7 @@ class GetRankedSeafoodByProteinUseCaseTest {
     }
 
     @Test
-    fun `should throw when no meals with protein data`() {
+    fun `given seafood meals without protein data when use case is executed then throw NoSeafoodFoundException`() {
         val meals = listOf(
             createSeafoodMeal("Mystery Fish", null),
             createSeafoodMeal("Unknown Seafood", null)
@@ -87,7 +87,7 @@ class GetRankedSeafoodByProteinUseCaseTest {
     }
 
     @Test
-    fun `should throw when repository is empty`() {
+    fun `given empty repository when use case is executed then throw NoSeafoodFoundException`() {
         every { mockRepository.getAllMeals() } returns emptyList()
 
         assertThrows<NoSeafoodFoundException> {
