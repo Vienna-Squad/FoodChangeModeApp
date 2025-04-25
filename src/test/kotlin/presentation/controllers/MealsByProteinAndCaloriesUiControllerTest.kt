@@ -39,7 +39,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
     }
 
     @Test
-    fun `execute should show meals when valid input is provided`() {
+    fun `given valid input when execute is called then show matching meals`() {
         provideInput("500", "30")
         val meals = listOf(
             createMeal(name = "Chicken Salad", calories = 500f, protein = 30f),
@@ -55,7 +55,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
     }
 
     @Test
-    fun `execute should print invalid input message if calories is not a number`() {
+    fun `given non-numeric calories input when execute is called then show invalid input message`() {
         provideInput("abc", "30")
 
         controller.execute()
@@ -67,7 +67,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
     }
 
     @Test
-    fun `execute should print invalid input message if protein is not a number`() {
+    fun `given non-numeric protein input when execute is called then show invalid input message`() {
         provideInput("500", "xyz")
 
         controller.execute()
@@ -79,7 +79,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
     }
 
     @Test
-    fun `execute should print error message for IllegalArgumentException`() {
+    fun `given valid input and use case throws IllegalArgumentException when execute is called then show error message`() {
         provideInput("500", "30")
         every { useCase.invoke(500f, 30f) } throws IllegalArgumentException("Bad input")
 
@@ -91,7 +91,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
     }
 
     @Test
-    fun `execute should print warning for NoMatchingMealsFoundException`() {
+    fun `given valid input and use case throws NoMatchingMealsFoundException when execute is called then show warning message`() {
         provideInput("500", "30")
         every { useCase.invoke(500f, 30f) } throws NoMatchingMealsFoundException("No meals found")
 
@@ -103,7 +103,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
     }
 
     @Test
-    fun `execute should print unexpected error for generic exception`() {
+    fun `given valid input and use case throws generic exception when execute is called then show unexpected error message`() {
         provideInput("500", "30")
         every { useCase.invoke(500f, 30f) } throws RuntimeException("Something went wrong")
 
