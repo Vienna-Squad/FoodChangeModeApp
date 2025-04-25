@@ -156,6 +156,18 @@ class GuessPrepareTimeGameUseCaseTest {
         assertThat(exception.message).isEqualTo(INVALID_ATTEMPTS_MESSAGE)
     }
 
+    @Test
+    fun `when user guessed incorrect answer greater than the correct one -with the last attempt- should throw GameOverException with its message`() {
+        //given
+        val randomMeal = createMeal()
+        val givenException = GameOverException(correctAnswer = randomMeal.minutes!!)
+        //when && then
+        val exception = assertThrows<GameOverException> {
+            guessPrepareTimeGameUseCase.guess(60, randomMeal.minutes, 1)
+        }
+        assertThat(exception.message).isEqualTo(givenException.message)
+    }
+
     private fun createMeal(name: String? = null) =
         Meal(
             name = name,
