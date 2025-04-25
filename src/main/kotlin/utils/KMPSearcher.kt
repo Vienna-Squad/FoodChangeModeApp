@@ -1,62 +1,57 @@
 package org.example.utils
 
+
 class KMPSearcher {
-    /**
-     * Searches for a pattern in a text using the Knuth-Morris-Pratt (KMP) algorithm.
-     * @param text The text to search in.
-     * @param pattern The pattern to search for.
-     * @return True if the pattern is found in the text, false otherwise.
-     */
+
     fun search(text: String, pattern: String): Boolean {
         if (pattern.isEmpty()) return false
-        val n = text.length
-        val m = pattern.length
-        if (m > n) return false
+        val textLength = text.length
+        val patternLength = pattern.length
+        if (patternLength > textLength) return false
 
-        val lps = computeLPSArray(pattern)
-        var i = 0
-        var j = 0
+        val longestPrefixSuffixArray = computeLongestPrefixSuffixArray(pattern)
+        var textIndex = 0
+        var patternIndex = 0
 
-        while (i < n) {
-            if (pattern[j] == text[i]) {
-                i++
-                j++
+        while (textIndex < textLength) {
+            if (pattern[patternIndex] == text[textIndex]) {
+                textIndex++
+                patternIndex++
             }
-            if (j == m) {
+            if (patternIndex == patternLength) {
                 return true
-            } else if (i < n && pattern[j] != text[i]) {
-                if (j != 0) {
-                    j = lps[j - 1]
+            } else if (textIndex < textLength && pattern[patternIndex] != text[textIndex]) {
+                if (patternIndex != 0) {
+                    patternIndex = longestPrefixSuffixArray[patternIndex - 1]
                 } else {
-                    i++
+                    textIndex++
                 }
             }
         }
         return false
     }
 
+    private fun computeLongestPrefixSuffixArray(pattern: String): IntArray {
+        val longestPrefixSuffixArray = IntArray(pattern.length)
+        var prefixLength = 0
+        var patternIndex = 1
 
-    private fun computeLPSArray(pattern: String): IntArray {
-        val lps = IntArray(pattern.length)
-        var length = 0
-        var i = 1
+        longestPrefixSuffixArray[0] = 0
 
-        lps[0] = 0
-
-        while (i < pattern.length) {
-            if (pattern[i] == pattern[length]) {
-                length++
-                lps[i] = length
-                i++
+        while (patternIndex < pattern.length) {
+            if (pattern[patternIndex] == pattern[prefixLength]) {
+                prefixLength++
+                longestPrefixSuffixArray[patternIndex] = prefixLength
+                patternIndex++
             } else {
-                if (length != 0) {
-                    length = lps[length - 1]
+                if (prefixLength != 0) {
+                    prefixLength = longestPrefixSuffixArray[prefixLength - 1]
                 } else {
-                    lps[i] = 0
-                    i++
+                    longestPrefixSuffixArray[patternIndex] = 0
+                    patternIndex++
                 }
             }
         }
-        return lps
+        return longestPrefixSuffixArray
     }
 }
