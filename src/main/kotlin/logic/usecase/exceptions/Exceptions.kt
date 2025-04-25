@@ -43,3 +43,5 @@ class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, TOO
     }
 }
 class NoMatchingMealsFoundException(message: String = "No meals matching the protein and calories criteria") : FoodChangeMoodException(message)
+
+class NoHealthyFastFoodFoundException(message: String = "No healthy fast food meals found") : FoodChangeMoodException(message)
