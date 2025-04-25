@@ -20,7 +20,7 @@ class GetMealsByProteinAndCaloriesUseCaseTest {
     private val useCase = GetMealsByProteinAndCaloriesUseCase(mockRepository)
 
     @Test
-    fun `should return matching meals within tolerance`() {
+    fun `given meals with nutrition data when within tolerance then return matching meals`() {
         val meals = listOf(
             createMeal("Perfect Match", 500f, 30f),
             createMeal("Close Calories", 520f, 30f),
@@ -45,7 +45,7 @@ class GetMealsByProteinAndCaloriesUseCaseTest {
     }
 
     @Test
-    fun `should throw when no meals have nutrition data`() {
+    fun `given meals without nutrition data when invoked then throw NoMatchingMealsFoundException`() {
         val meals = listOf(
             createMeal("No Nutrition 1", null, null),
             createMeal("No Nutrition 2", null, null)
@@ -59,7 +59,7 @@ class GetMealsByProteinAndCaloriesUseCaseTest {
     }
 
     @Test
-    fun `should throw when no meals match criteria`() {
+    fun `given meals with unmatched criteria when invoked then throw NoMatchingMealsFoundException`() {
         val meals = listOf(
             createMeal("Too High", 600f, 40f),
             createMeal("Too Low", 400f, 20f)
@@ -73,7 +73,7 @@ class GetMealsByProteinAndCaloriesUseCaseTest {
     }
 
     @Test
-    fun `should throw when repository is empty`() {
+    fun `given empty repository when invoked then throw NoMatchingMealsFoundException`() {
         every { mockRepository.getAllMeals() } returns emptyList()
 
         assertThrows<NoMatchingMealsFoundException> {
@@ -83,7 +83,7 @@ class GetMealsByProteinAndCaloriesUseCaseTest {
 
     @ParameterizedTest
     @ValueSource(floats = [0f, -100f])
-    fun `should throw for invalid calories input`(invalidCalories: Float) {
+    fun `given invalid calories input when invoked then throw IllegalArgumentException`(invalidCalories: Float) {
         assertThrows<IllegalArgumentException> {
             useCase(invalidCalories, 30f)
         }
@@ -91,7 +91,7 @@ class GetMealsByProteinAndCaloriesUseCaseTest {
 
     @ParameterizedTest
     @ValueSource(floats = [0f, -10f])
-    fun `should throw for invalid protein input`(invalidProtein: Float) {
+    fun `given invalid protein input when invoked then throw IllegalArgumentException`(invalidProtein: Float) {
         assertThrows<IllegalArgumentException> {
             useCase(500f, invalidProtein)
         }
