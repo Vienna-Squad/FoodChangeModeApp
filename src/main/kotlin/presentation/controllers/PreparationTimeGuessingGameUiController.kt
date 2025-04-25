@@ -8,11 +8,14 @@ import org.example.utils.interactor.Interactor
 import org.example.utils.interactor.UserInteractor
 import org.example.utils.viewer.ExceptionViewer
 import org.example.utils.viewer.FoodExceptionViewer
+import org.example.utils.viewer.ItemDetailsViewer
+import org.example.utils.viewer.MessageViewer
 import org.koin.mp.KoinPlatform.getKoin
 
 class PreparationTimeGuessingGameUiController(
     private val guessPrepareTimeGameUseCase: GuessPrepareTimeGameUseCase = getKoin().get(),
     private val exceptionViewer: ExceptionViewer = FoodExceptionViewer(),
+    private val messageViewer: ItemDetailsViewer<String> = MessageViewer(),
     private val interactor: Interactor = UserInteractor(),
 ) : UiController {
     override fun execute() {
@@ -22,12 +25,12 @@ class PreparationTimeGuessingGameUiController(
                     print("guess its preparation time of $name: ")
                     var attempt = 3
                     while (true) {
-                        val guessMinutes = interactor.getInput().toLongOrNull() ?: -1
+                        val guessMinutes = interactor.getInput().toLongOrNull() ?: run {
+                            exceptionViewer.viewExceptionMessage(InvalidMinutesException())
+                            return
+                        }
                         try {
-                            println(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
-                            break
-                        }catch (e:InvalidMinutesException){
-                            exceptionViewer.viewExceptionMessage(e)
+                            messageViewer.viewDetails(guessPrepareTimeGameUseCase.guess(guessMinutes, minutes, attempt))
                             break
                         } catch (exception: GuessPrepareTimeGameException) {
                             attempt = exception.attempt
@@ -35,7 +38,7 @@ class PreparationTimeGuessingGameUiController(
                                 exceptionViewer.viewExceptionMessage(exception)
                                 break
                             }
-                            print("${exception.message}, try again: ")
+                            messageViewer.viewDetails("${exception.message}, try again: ")
                         }
                     }
                 } ?: run {
