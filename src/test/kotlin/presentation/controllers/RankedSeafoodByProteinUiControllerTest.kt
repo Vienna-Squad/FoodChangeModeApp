@@ -39,7 +39,7 @@ class RankedSeafoodByProteinUiControllerTest {
     }
 
     @Test
-    fun `execute should display results when use case returns data`() {
+    fun `given valid seafood results when execute is called then display ranked meals with protein`() {
         val results = listOf(
             RankedMealResult(rank = 1, name = "Salmon", protein = 25f),
             RankedMealResult(rank = 2, name = "Tuna", protein = 22f)
@@ -56,7 +56,7 @@ class RankedSeafoodByProteinUiControllerTest {
     }
 
     @Test
-    fun `execute should display empty message when use case returns empty list`() {
+    fun `given empty seafood list when execute is called then display no meals found message`() {
         every { useCase.invoke() } returns emptyList()
 
         controller.execute()
@@ -67,7 +67,7 @@ class RankedSeafoodByProteinUiControllerTest {
     }
 
     @Test
-    fun `execute should show exception message when NoSeafoodFoundException is thrown`() {
+    fun `given NoSeafoodFoundException when execute is called then viewer should display the exception message`() {
         val exception = NoSeafoodFoundException("No seafood found")
         every { useCase.invoke() } throws exception
 
@@ -77,7 +77,7 @@ class RankedSeafoodByProteinUiControllerTest {
     }
 
     @Test
-    fun `execute should show exception message when generic exception is thrown`() {
+    fun `given generic exception when execute is called then viewer should display the exception message`() {
         val exception = RuntimeException("Something went wrong")
         every { useCase.invoke() } throws exception
 
