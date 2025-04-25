@@ -11,7 +11,7 @@ import java.util.*
 
 class MealsCsvParser {
 
-    fun parseOneLine(line: String): Meal {
+    fun parseLineIntoMeal(line: String): Meal {
         val meal = smartCsvParser(line)
          try {
            return Meal(

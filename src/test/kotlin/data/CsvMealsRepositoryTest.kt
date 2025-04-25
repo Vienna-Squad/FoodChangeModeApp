@@ -1,18 +1,18 @@
 package data
 
 import com.google.common.truth.Truth.assertThat
+import data.fakes.lineWithEmptyDescription
+import data.fakes.parsedMeal
+import data.fakes.parsedMealWithNullDescription
+import data.fakes.validListOfRows
 import io.mockk.every
 import io.mockk.mockk
 import org.example.data.CsvFileReader
 import org.example.data.CsvMealsRepository
 import org.example.data.MealsCsvParser
-import org.example.logic.model.Meal
-import org.example.logic.model.Nutrition
 import org.example.logic.repository.MealsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.text.SimpleDateFormat
-import java.util.*
 
 class CsvMealsRepositoryTest {
     private lateinit var mealsCsvParser: MealsCsvParser
@@ -29,33 +29,9 @@ class CsvMealsRepositoryTest {
     @Test
     fun `getAllMeals should return meals parsed from real CSV`() {
         // Given
-        val validCsvLine = "emptyline\nGrilled Cheese Sandwich,101,10,5001,2024-03-10," +
-                "\"['easy','quick']\",\"[300.0,15.0,25.0,2.0,1.0,5.0,10.0]\",4," +
-                "\"['Butter bread','Add cheese','Grill','Serve']\",\"A cheesy snack\"," +
-                "\"['bread','cheese','butter']\",3"
-
-        every { csvFileReader.getLinesAsList() } returns listOf(
-            "emptyline", "Grilled Cheese Sandwich,101,10,5001,2024-03-10,\" +\n" +
-                    " \"\\\"['easy','quick']\\\",\\\"[300.0,15.0,25.0,2.0,1.0,5.0,10.0]\\\",4,\" +\n" +
-                    " \"\\\"['Butter bread','Add cheese','Grill','Serve']\\\",\\\"A cheesy snack\\\",\" +\n" +
-                    "\"\\\"['bread','cheese','butter']\\\",3\""
-        )
-
-        val parsedMeal = Meal(
-            name = "Grilled Cheese Sandwich",
-            id = 101,
-            minutes = 10,
-            contributorId = 5001,
-            submitted = constructDate("2024-03-10"),
-            tags = listOf("easy", "quick"),
-            nutrition = Nutrition(300f, 15f, 25f, 2f, 1f, 5f, 10f),
-            numberOfSteps = 4,
-            steps = listOf("Butter bread", "Add cheese", "Grill", "Serve"),
-            description = "A cheesy snack",
-            ingredients = listOf("bread", "cheese", "butter"),
-            numberOfIngredients = 3
-        )
-        every { mealsCsvParser.parseOneLine(any()) } returns parsedMeal
+        every { csvFileReader.getLinesAsList() }returns validListOfRows
+        val parsedMeal = parsedMeal
+        every { mealsCsvParser.parseLineIntoMeal(any()) } returns parsedMeal
         // When
         val actualMeals = mealRepository.getAllMeals()
         // Then
@@ -67,30 +43,13 @@ class CsvMealsRepositoryTest {
     @Test
     fun `getAllMeals should return meal with null description when description is empty`() {
         // Given
-        val lineWithEmptyDescription =
-            "Grilled Cheese Sandwich,101,10,5001,2024-03-10," +
-                    "\"['easy','quick']\",\"[300.0,15.0,25.0,2.0,1.0,5.0,10.0]\",4," +
-                    "\"['Butter bread','Add cheese','Grill','Serve']\",\"\",\"['bread','cheese','butter']\",3"
+        val lineWithEmptyDescription =lineWithEmptyDescription
 
-        every { csvFileReader.getLinesAsList() } returns listOf(
-            "emptyline",lineWithEmptyDescription)
+        every { csvFileReader.getLinesAsList() } returns listOf("emptyline",lineWithEmptyDescription)
 
-        val parsedMealWithNullDescription = Meal(
-            name = "Grilled Cheese Sandwich",
-            id = 101,
-            minutes = 10,
-            contributorId = 5001,
-            submitted = constructDate("2024-03-10"),
-            tags = listOf("easy", "quick"),
-            nutrition = Nutrition(300f, 15f, 25f, 2f, 1f, 5f, 10f),
-            numberOfSteps = 4,
-            steps = listOf("Butter bread", "Add cheese", "Grill", "Serve"),
-            description = null, // <- Important part
-            ingredients = listOf("bread", "cheese", "butter"),
-            numberOfIngredients = 3
-        )
+        val parsedMealWithNullDescription = parsedMealWithNullDescription
 
-        every { mealsCsvParser.parseOneLine(any()) } returns parsedMealWithNullDescription
+        every { mealsCsvParser.parseLineIntoMeal(any()) } returns parsedMealWithNullDescription
 
         // When
         val actualMeals = mealRepository.getAllMeals()
@@ -113,8 +72,3 @@ class CsvMealsRepositoryTest {
 }
 
 
-private fun constructDate(dateString: String): Date {
-    val formatter = SimpleDateFormat("yyyy-MM-dd")
-    return formatter.parse(dateString)
-
-}
