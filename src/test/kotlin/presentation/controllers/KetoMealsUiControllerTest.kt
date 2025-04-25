@@ -32,7 +32,7 @@ class KetoMealsUiControllerTest {
     }
 
     @Test
-    fun `show meal details when user selects like`() {
+    fun `should show meal details when user selects like`() {
         // Given
         val meal = createKetoMeal()
         every { getKetoMealUseCase(any()) } returns meal
@@ -46,7 +46,7 @@ class KetoMealsUiControllerTest {
     }
 
     @Test
-    fun ` exit when user selects invalid option`() {
+    fun ` should exit when user selects invalid option`() {
         // Given
         val meal = createKetoMeal()
         every { getKetoMealUseCase(any()) } returns meal
@@ -60,7 +60,7 @@ class KetoMealsUiControllerTest {
     }
 
     @Test
-    fun `show exception when no keto meals found`() {
+    fun `should show exception when no keto meals found`() {
         // Given
         val exception = NoMealFoundException("No keto meals available")
         every { getKetoMealUseCase(any()) } throws exception
@@ -73,7 +73,7 @@ class KetoMealsUiControllerTest {
     }
 
     @Test
-    fun `show another meal when user selects dislike`() {
+    fun `should show another meal when user selects dislike`() {
         // Given
         val meal1 = createKetoMeal("Meal 1")
         val meal2 = createKetoMeal("Meal 2")
