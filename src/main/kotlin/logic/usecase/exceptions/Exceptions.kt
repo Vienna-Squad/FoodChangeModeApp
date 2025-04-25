@@ -41,3 +41,4 @@ class TooLowException(attempt: Int) : GuessPrepareTimeGameException(attempt, TOO
         const val TOO_LOW_MESSAGE = "Your guess is too low"
     }
 }
+class NoMatchingMealsFoundException(message: String = "No meals matching the protein and calories criteria") : FoodChangeMoodException(message)
