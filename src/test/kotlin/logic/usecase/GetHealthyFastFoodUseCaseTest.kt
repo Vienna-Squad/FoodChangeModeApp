@@ -28,7 +28,7 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `invoke should throw when no meals have nutrition data`() {
+    fun `should throw when no meals have nutrition data`() {
         val meals = listOf(
             createMealWithNullNutrition("Meal1", 10),
             createMealWithNullNutrition("Meal2", 12)
@@ -46,7 +46,7 @@ class GetHealthyFastFoodUseCaseTest {
 
 
     @Test
-    fun `invoke should throw when no meals meet healthy criteria`() {
+    fun `should throw when no meals meet healthy criteria`() {
         val meals = listOf(
             createHealthyFastFoodMeal("High Fat Meal", 20, 20f, 6f, 40f),
             createHealthyFastFoodMeal("Slow Meal", 30, 5f, 1f, 10f)
@@ -60,7 +60,7 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `invoke should return only meals meeting all healthy fast food criteria`() {
+    fun `should return only meals meeting all healthy fast food criteria`() {
         val meals = listOf(
             // Healthy fast food (meets all criteria)
             createHealthyFastFoodMeal("Quick Salad", 10, 5f, 1f, 10f),
@@ -84,7 +84,7 @@ class GetHealthyFastFoodUseCaseTest {
 
 
     @Test
-    fun `invoke should return multiple meals when they meet criteria`() {
+    fun `should return multiple meals when they meet criteria`() {
         val meals = listOf(
             // These will set the averages (totalFat=10, saturatedFat=3, carbs=20)
             createHealthyFastFoodMeal("High Fat Meal", 20, 20f, 6f, 40f),
@@ -105,7 +105,7 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `invoke should compare fat values against average`() {
+    fun `should compare fat values against average`() {
         val meals = listOf(
             // Average values: totalFat=15, saturatedFat=5, carbs=20
             createHealthyFastFoodMeal("Avg Meal", 20, 15f, 5f, 20f),
@@ -124,7 +124,7 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `invoke should filter based on average values`() {
+    fun `should filter based on average values`() {
         // Given - setup averages of 30f fat, 15f saturated fat, 40f carbs
         val healthyMeal = createHealthyFastFoodMeal(
             minutes = 10,
