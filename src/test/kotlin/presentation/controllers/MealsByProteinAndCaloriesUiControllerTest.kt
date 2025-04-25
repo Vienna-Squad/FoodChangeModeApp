@@ -5,15 +5,15 @@ import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
 import org.example.logic.usecase.GetMealsByProteinAndCaloriesUseCase
 import org.example.logic.usecase.exceptions.NoMatchingMealsFoundException
-import org.example.presentation.Viewer
 import org.example.presentation.controllers.MealsByProteinAndCaloriesUiController
+import org.example.utils.viewer.ItemsViewer
 import org.junit.jupiter.api.*
 import java.io.*
 
 class MealsByProteinAndCaloriesUiControllerTest {
 
     private lateinit var useCase: GetMealsByProteinAndCaloriesUseCase
-    private lateinit var viewer: Viewer
+    private lateinit var viewer: ItemsViewer<Meal>
     private lateinit var controller: MealsByProteinAndCaloriesUiController
 
     private val stdOut = ByteArrayOutputStream()
@@ -51,7 +51,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
 
         val output = stdOut.toString()
         assert(output.contains("Found 2 matching meals"))
-        verify { viewer.showMealsDetails(meals) }
+        verify { viewer.viewItems(meals) }
     }
 
     @Test
@@ -63,7 +63,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
         val output = stdOut.toString()
         assert(output.contains("Invalid input"))
         verify(exactly = 0) { useCase.invoke(any(), any()) }
-        verify(exactly = 0) { viewer.showMealsDetails(any()) }
+        verify(exactly = 0) { viewer.viewItems(any()) }
     }
 
     @Test
@@ -75,7 +75,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
         val output = stdOut.toString()
         assert(output.contains("Invalid input"))
         verify(exactly = 0) { useCase.invoke(any(), any()) }
-        verify(exactly = 0) { viewer.showMealsDetails(any()) }
+        verify(exactly = 0) { viewer.viewItems(any()) }
     }
 
     @Test
@@ -87,7 +87,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
 
         val output = stdOut.toString()
         assert(output.contains("Error: Bad input"))
-        verify(exactly = 0) { viewer.showMealsDetails(any()) }
+        verify(exactly = 0) { viewer.viewItems(any()) }
     }
 
     @Test
@@ -99,7 +99,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
 
         val output = stdOut.toString()
         assert(output.contains("No meals found"))
-        verify(exactly = 0) { viewer.showMealsDetails(any()) }
+        verify(exactly = 0) { viewer.viewItems(any()) }
     }
 
     @Test
@@ -111,7 +111,7 @@ class MealsByProteinAndCaloriesUiControllerTest {
 
         val output = stdOut.toString()
         assert(output.contains("Unexpected error: Something went wrong"))
-        verify(exactly = 0) { viewer.showMealsDetails(any()) }
+        verify(exactly = 0) { viewer.viewItems(any()) }
     }
 
     private fun createMeal(name: String, calories: Float?, protein: Float?): Meal {

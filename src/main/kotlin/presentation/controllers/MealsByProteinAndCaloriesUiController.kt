@@ -3,7 +3,6 @@ package org.example.presentation.controllers
 import org.example.logic.model.Meal
 import org.example.logic.usecase.GetMealsByProteinAndCaloriesUseCase
 import org.example.logic.usecase.exceptions.NoMatchingMealsFoundException
-import org.example.presentation.UiController
 import org.example.utils.viewer.ItemsViewer
 import org.example.utils.viewer.MealsViewer
 import org.koin.mp.KoinPlatform.getKoin
