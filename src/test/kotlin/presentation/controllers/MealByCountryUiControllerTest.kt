@@ -51,9 +51,9 @@ class MealByCountryUiControllerTest {
     }
 
     @Test
-    fun `should show exception message when getMealsOfCountryUseCase throws NoMealFoundException for no matching meals`() {
+    fun `should throws NoMealFoundException message when getMealsOfCountryUseCase no matching meals`() {
         // Given
-        val exception = NoMealFoundException("No meals found for country 'france'.")
+        val exception = NoMealFoundException("No meals found for country 'epgtanoo'.")
         every { interactor.getInput() } returns "epgtanoo"
         every { getMealsOfCountryUseCase("epgtanoo") } throws exception
 
@@ -66,7 +66,7 @@ class MealByCountryUiControllerTest {
     }
 
     @Test
-    fun `should show exception message when getMealsOfCountryUseCase throws NoMealFoundException for empty input`() {
+    fun `should throws NoMealFoundException message when getMealsOfCountryUseCase  empty input`() {
         // Given
         val exception = NoMealFoundException("Country name cannot be empty.")
         every { interactor.getInput() } returns "   "
