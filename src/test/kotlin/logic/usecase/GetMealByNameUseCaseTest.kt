@@ -41,7 +41,7 @@ internal class GetMealByNameUseCaseTest{
         )
 
     @Test
-    fun `should return meals that match the given name`(){
+    fun `should return meal when the input name matches a meal in the list`(){
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() } returns meals
@@ -61,7 +61,7 @@ internal class GetMealByNameUseCaseTest{
     }
 
     @Test
-    fun `should return the meal regardless of name case`(){
+    fun `should return the meal when name matches regardless of case`(){
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() } returns meals
@@ -80,7 +80,7 @@ internal class GetMealByNameUseCaseTest{
     }
 
     @Test
-    fun `should throw exception when search by name for not available meal `(){
+    fun `should throw no meal found exception when no meal matches the input name`(){
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() } returns meals

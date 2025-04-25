@@ -21,6 +21,11 @@ internal class MealByNameUiControllerTest{
     lateinit var interactor: Interactor
     lateinit var exceptionViewer: ExceptionViewer
 
+    val meal= listOf(
+        createMeals("chinese  candy"),
+        createMeals("fried potato")
+    )
+
 
     @BeforeEach
     fun setUp(){
@@ -34,12 +39,8 @@ internal class MealByNameUiControllerTest{
     }
 
     @Test
-    fun `should show meal details when meal is found`(){
+    fun `should display meal details when a meal is found by name`(){
 
-        val meal= listOf(
-            createMeals("chinese  candy"),
-            createMeals("fried potato")
-        )
         //given
         every { interactor.getInput() }returns "chinese  candy"
 
@@ -57,12 +58,8 @@ internal class MealByNameUiControllerTest{
 
 
     @Test
-    fun `should throw exception when search by name for not available meal `(){
+    fun `should show no meal found exception message when no meal is found for the given name`(){
 
-        val meal= listOf(
-            createMeals("chinese  candy"),
-            createMeals("fried potato")
-        )
         //given  (stubs)
         every { interactor.getInput() }returns "not-exist"
 
