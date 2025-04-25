@@ -11,6 +11,7 @@ class IncorrectDateFormatException(message: String) : FoodChangeMoodException(me
 
 
 open class GuessPrepareTimeGameException(val attempt: Int, message: String) : FoodChangeMoodException(message)
+class NoSeafoodFoundException(message: String = "No seafood meals found") : FoodChangeMoodException(message)
 class InvalidMinutesException : GuessPrepareTimeGameException(0, INVALID_MINUTES_MESSAGE) {
     companion object {
         const val INVALID_MINUTES_MESSAGE =
