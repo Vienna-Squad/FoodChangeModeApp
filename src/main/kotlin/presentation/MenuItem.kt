@@ -17,6 +17,7 @@ import org.example.presentation.controllers.MealsByProteinAndCaloriesUiControlle
 import org.example.presentation.controllers.PotatoesMealsUiController
 import org.example.presentation.controllers.PreparationTimeGuessingGameUiController
 import org.example.presentation.controllers.RankedSeafoodByProteinUiController
+import org.example.presentation.controllers.UiController
 
 enum class MenuItem(val title: String, private val uiController: UiController = ExitUIController()) {
     MEAL_BY_NAME("Find Meal By Name", MealByNameUiController()),

@@ -2,6 +2,7 @@ package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.exceptions.NoMatchingMealsFoundException
 import kotlin.math.abs
 
 class GetMealsByProteinAndCaloriesUseCase(private val mealsRepository: MealsRepository) {
@@ -17,23 +18,32 @@ class GetMealsByProteinAndCaloriesUseCase(private val mealsRepository: MealsRepo
      * @return A list of meals that fall within the allowed range.
      */
     operator fun invoke(desiredCalories: Float, desiredProtein: Float): List<Meal> {
+
+        require(desiredCalories > 0) { "Calories must be positive" }
+        require(desiredProtein > 0) { "Protein must be positive" }
+
         val allMeals = mealsRepository.getAllMeals()
+        if (allMeals.isEmpty()) {
+            throw NoMatchingMealsFoundException("No meals available in repository")
+        }
 
-        return allMeals.filter { meal ->
-
+        val matchingMeals = allMeals.filter { meal ->
             val nutrition = meal.nutrition
             val calories = nutrition?.calories
             val protein = nutrition?.protein
 
-
-            if (nutrition != null && calories != null && protein != null) {
-                val calorieDiff = abs(calories - desiredCalories)
-                val proteinDiff = abs(protein - desiredProtein)
-
-                calorieDiff <= CALORIE_TOLERANCE && proteinDiff <= PROTEIN_TOLERANCE
+            if (calories != null && protein != null) {
+                abs(calories - desiredCalories) <= CALORIE_TOLERANCE &&
+                        abs(protein - desiredProtein) <= PROTEIN_TOLERANCE
             } else {
                 false
             }
         }
+
+        if (matchingMeals.isEmpty()) {
+            throw NoMatchingMealsFoundException()
+        }
+
+        return matchingMeals
     }
 }

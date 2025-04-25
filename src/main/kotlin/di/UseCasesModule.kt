@@ -1,4 +1,4 @@
-package org.example.dependencyinjection
+package di
 
 import org.example.logic.usecase.*
 import org.example.logic.usecase.GetHealthyFastFoodUseCase
@@ -17,7 +17,7 @@ val useCasesModule = module {
     single { GetRandomPotatoMealsUseCase(get()) }
     single { GetRankedSeafoodByProteinUseCase(get()) }
     single { GuessPrepareTimeGameUseCase(get()) }
-    single { SuggestHighCalorieMealUseCase(get()) }
+    single { GetHighCalorieMealUseCase(get()) }
     single { GuessIngredientGameUseCase(get()) }
     single { GetEggFreeSweetsUseCase(get()) }
     single { GetHealthyFastFoodUseCase(get()) }
