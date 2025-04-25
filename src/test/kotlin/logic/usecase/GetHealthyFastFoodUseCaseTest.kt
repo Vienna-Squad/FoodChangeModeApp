@@ -17,7 +17,7 @@ class GetHealthyFastFoodUseCaseTest {
     private val useCase = GetHealthyFastFoodUseCase(mockRepository)
 
     @Test
-    fun `invoke should throw when no meals exist`() {
+    fun `should throw when no meals exist`() {
         every { mockRepository.getAllMeals() } returns emptyList()
 
         val exception = assertThrows<NoHealthyFastFoodFoundException> {
