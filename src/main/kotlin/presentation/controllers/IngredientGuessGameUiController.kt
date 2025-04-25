@@ -1,46 +1,64 @@
 package org.example.presentation.controllers
 
 import org.example.logic.usecase.GuessIngredientGameUseCase
+import org.example.logic.usecase.IngredientGameDetails
+import org.example.logic.usecase.exceptions.IngredientUserInputException
+import org.example.logic.usecase.exceptions.IngredientsOptionsException
+import org.example.utils.interactor.InteractorNumber
+import org.example.utils.interactor.UserInteractorNumber
+import org.example.utils.viewer.ExceptionViewer
+import org.example.utils.viewer.FoodExceptionViewer
+import org.example.utils.viewer.IngredientGameDetailsViewer
+import org.example.utils.viewer.ItemDetailsViewer
+import org.example.utils.viewer.utils.viewer.IngredientGameScoreViewer
+
 import org.koin.mp.KoinPlatform.getKoin
 
 class IngredientGuessGameUiController(
-    private val guessIngredientGameUseCase: GuessIngredientGameUseCase = getKoin().get()
+    private val guessIngredientGameUseCase: GuessIngredientGameUseCase = getKoin().get(),
+    private val ingredientDetailsViewer: ItemDetailsViewer<IngredientGameDetails> = IngredientGameDetailsViewer(),
+    private val scoreViewer: ItemDetailsViewer<Int> = IngredientGameScoreViewer(),
+    private val exceptionViewer: ExceptionViewer = FoodExceptionViewer(),
+    private val interactorNumber: InteractorNumber = UserInteractorNumber()
 ) : UiController {
     override fun execute() {
-        // init
-        var score = 0
-        var counter = 0
-        var randomNumber = true
-        var correctGuess = true
 
-        while (correctGuess && counter < 15) {
+        var scoreOfUser = 0
 
-            val randomMeal = guessIngredientGameUseCase.generateRandomMeal()
-            println("The Meal : ${randomMeal}\n")
+        try {
+            var counter = 1
+            do {
+                val gameDetails = guessIngredientGameUseCase.getGameDetails()
+                ingredientDetailsViewer.viewDetails(gameDetails)
 
-            val showUserList =
-                guessIngredientGameUseCase.generateIngredientListOptions(randomMeal.name, randomNumber)
-            randomNumber = !randomNumber
-            println("$showUserList\n")
-            println("\tPress (1) for option 1 \n\tPress (2) for option 2 \n\tPress (3) for option 3\n")
+                print(USER_INPUT_MESSAGE)
+                val input = interactorNumber.getInput()
 
-            print("Enter the Ingredient Input Number : ")
-            val input = readln().toIntOrNull() ?: -1
+                val userGuess = guessIngredientGameUseCase.guessGame(
+                    ingredientGameDetails = gameDetails,
+                    ingredientInputNumber = input
+                )
 
-            val ingredientUserInput = guessIngredientGameUseCase.getIngredientOptionByNumber(showUserList, input)
+                if (userGuess == true)
+                   scoreOfUser = guessIngredientGameUseCase.updateScore(scoreOfUser)
 
-
-            correctGuess = guessIngredientGameUseCase.checkIngredientUserInput(ingredientUserInput, randomMeal.name)
-
-
-            if (correctGuess) {
-                score = guessIngredientGameUseCase.updateScore(score)
                 counter++
-            } else {
-                println("failure try again later ...")
-                println("Your Score : $score")
-                println("End Game \n\n")
-            }
+
+            } while (counter <= 15)
+        } catch (e: IngredientsOptionsException) {
+            exceptionViewer.viewExceptionMessage(e)
+            scoreViewer.viewDetails(scoreOfUser)
+        } catch (e: IngredientUserInputException) {
+            exceptionViewer.viewExceptionMessage(e)
+            scoreViewer.viewDetails(scoreOfUser)
+        } finally {
+            println(END_MESSAGE)
         }
+
+    }
+
+    companion object {
+        const val USER_INPUT_MESSAGE = "Enter the Ingredient Input Number : "
+        const val END_MESSAGE = "End Game"
     }
 }
