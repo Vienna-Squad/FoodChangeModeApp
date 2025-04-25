@@ -90,18 +90,48 @@ class GetIraqiMealsUseCaseTest {
         assertThat(getIraqiMealsUseCase()).isEqualTo(iraqiTaggedMeals)
     }
 
-    private fun createMeal(hasIraqiTag: Boolean = false, hasIraqInDescription: Boolean = false) =
+
+    @Test
+    fun `when call getAllMeals() from mealsRepository and it returns a list includes meal with iraqi null tags should not be considered iraqi`() {
+        //given
+        val iraqiMeals = listOf(
+            createMeal(hasIraqiTag = true),
+            createMeal(hasIraqiTag = null),
+            createMeal(hasIraqInDescription = true),
+            createMeal(hasIraqiTag = true, hasIraqInDescription = null),
+        )
+        every { mealsRepository.getAllMeals() } returns iraqiMeals
+        //when && then
+        assertThat(getIraqiMealsUseCase().size).isEqualTo(3)
+    }
+
+    @Test
+    fun `when call getAllMeals() from mealsRepository and it returns a list includes meal with iraqi null description should not be considered iraqi`() {
+        //given
+        val iraqiMeals = listOf(
+            createMeal(hasIraqiTag = true),
+            createMeal(hasIraqInDescription = null),
+            createMeal(hasIraqInDescription = true),
+            createMeal(hasIraqiTag = null, hasIraqInDescription = true),
+        )
+        every { mealsRepository.getAllMeals() } returns iraqiMeals
+        //when && then
+        assertThat(getIraqiMealsUseCase().size).isEqualTo(3)
+    }
+
+
+    private fun createMeal(hasIraqiTag: Boolean? = false, hasIraqInDescription: Boolean? = false) =
         Meal(
             name = null,
             id = null,
             minutes = null,
             contributorId = null,
             submitted = Date(),
-            tags = if (hasIraqiTag) listOf("iraqi") else listOf("egyptian"),
+            tags = if(hasIraqiTag==null) null else if (hasIraqiTag) listOf("iraqi") else listOf("egyptian"),
             nutrition = null,
             numberOfSteps = null,
             steps = null,
-            description = if (hasIraqInDescription) "Popular meal in Iraq" else "Popular meal in Egypt",
+            description = if(hasIraqInDescription==null) null else if (hasIraqInDescription) "Popular meal in Iraq" else "Popular meal in Egypt",
             ingredients = null,
             numberOfIngredients = null
         )
