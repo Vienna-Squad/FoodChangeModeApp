@@ -23,7 +23,7 @@ class GetKetoMealUseCaseTest {
     }
 
     @Test
-    fun `should throw exception when no keto meals available`() {
+    fun ` getKetoMeal should throw exception when no keto meals available`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
             createMeal(totalFat = 10f, carbs = 50f),
@@ -37,7 +37,7 @@ class GetKetoMealUseCaseTest {
     }
 
     @Test
-    fun `should return keto meal when available`() {
+    fun `getKetoMeal should return keto meal when available`() {
         // Given
         val ketoMeal = createMeal(totalFat = 25f, carbs = 10f)
         every { mealsRepository.getAllMeals() } returns listOf(
@@ -54,7 +54,7 @@ class GetKetoMealUseCaseTest {
     }
 
     @Test
-    fun `should exclude seen meals`() {
+    fun `getKetoMeal should exclude seen meals`() {
         // Given
         val seenKetoMeal = createMeal(totalFat = 25f, carbs = 10f)
         val newKetoMeal = createMeal(totalFat = 22f, carbs = 12f)
@@ -72,7 +72,7 @@ class GetKetoMealUseCaseTest {
     }
 
     @Test
-    fun `should throw exception when nutrition data is missing`() {
+    fun `getKetoMeal should throw exception when nutrition data is missing`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
             createMeal(nutrition = null),
@@ -86,7 +86,7 @@ class GetKetoMealUseCaseTest {
     }
 
     @Test
-    fun `should throw exception when partial nutrition data`() {
+    fun `getKetoMeal should throw exception when partial nutrition data`() {
         // Given
         every { mealsRepository.getAllMeals() } returns listOf(
             createMeal(totalFat = 25f, carbs = null),
