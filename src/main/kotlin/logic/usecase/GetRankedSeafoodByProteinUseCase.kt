@@ -1,9 +1,9 @@
 package org.example.logic.usecase
 
 import org.example.logic.model.Meal
-import org.example.logic.model.RankedMealResult
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.exceptions.NoSeafoodFoundException
+import org.example.presentation.model.RankedMealResult
 
 class GetRankedSeafoodByProteinUseCase(private val mealsRepository: MealsRepository) {
 

@@ -5,10 +5,10 @@ import io.mockk.every
 import io.mockk.mockk
 import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
-import org.example.logic.model.RankedMealResult
 import org.example.logic.repository.MealsRepository
 import org.example.logic.usecase.GetRankedSeafoodByProteinUseCase
 import org.example.logic.usecase.exceptions.NoSeafoodFoundException
+import org.example.presentation.model.RankedMealResult
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
