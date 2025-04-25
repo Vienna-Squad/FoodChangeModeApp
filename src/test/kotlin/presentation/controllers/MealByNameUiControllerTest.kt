@@ -12,39 +12,39 @@ import org.example.utils.viewer.ItemDetailsViewer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class MealByNameUiControllerTest{
+internal class MealByNameUiControllerTest {
 
 
     lateinit var getMealsByNameUseCase: GetMealByNameUseCase
-    lateinit var viewer:ItemDetailsViewer<Meal>
+    lateinit var viewer: ItemDetailsViewer<Meal>
     lateinit var MealByNameUiController: MealByNameUiController
     lateinit var interactor: Interactor
     lateinit var exceptionViewer: ExceptionViewer
 
-    val meal= listOf(
+    val meal = listOf(
         createMeals("chinese  candy"),
         createMeals("fried potato")
     )
 
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
 
-        getMealsByNameUseCase= mockk(relaxed = true)
-        viewer= mockk(relaxed = true)
-        exceptionViewer= mockk(relaxed = true)
-        interactor= mockk()
-        MealByNameUiController=MealByNameUiController(getMealsByNameUseCase,viewer,exceptionViewer,interactor)
+        getMealsByNameUseCase = mockk(relaxed = true)
+        viewer = mockk(relaxed = true)
+        exceptionViewer = mockk(relaxed = true)
+        interactor = mockk()
+        MealByNameUiController = MealByNameUiController(getMealsByNameUseCase, viewer, exceptionViewer, interactor)
 
     }
 
     @Test
-    fun `should display meal details when a meal is found by name`(){
+    fun `should display meal details when a meal is found by name`() {
 
         //given
-        every { interactor.getInput() }returns "chinese  candy"
+        every { interactor.getInput() } returns "chinese  candy"
 
-        every { getMealsByNameUseCase("chinese  candy") }returns meal[0]
+        every { getMealsByNameUseCase("chinese  candy") } returns meal[0]
 
         //when
         MealByNameUiController.execute()
@@ -58,10 +58,10 @@ internal class MealByNameUiControllerTest{
 
 
     @Test
-    fun `should show no meal found exception message when no meal is found for the given name`(){
+    fun `should show no meal found exception message when no meal is found for the given name`() {
 
         //given  (stubs)
-        every { interactor.getInput() }returns "not-exist"
+        every { interactor.getInput() } returns "not-exist"
 
         every { getMealsByNameUseCase("not-exist") } throws NoMealFoundException()
 
@@ -72,13 +72,11 @@ internal class MealByNameUiControllerTest{
         verify {
             exceptionViewer.viewExceptionMessage(
                 match {
-                it is NoMealFoundException
-            })
+                    it is NoMealFoundException
+                })
         }
 
     }
-
-
 
 
 }

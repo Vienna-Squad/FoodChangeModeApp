@@ -16,32 +16,29 @@ import java.time.ZoneId
 import java.util.*
 
 
-
-internal class GetMealByNameUseCaseTest{
+internal class GetMealByNameUseCaseTest {
 
     lateinit var getMealsByNameUseCase: GetMealByNameUseCase
     lateinit var mealsRepository: MealsRepository
     lateinit var kmpSearcher: KMPSearcher
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
 
-        mealsRepository= mockk()
-        kmpSearcher= mockk()
-
-        getMealsByNameUseCase= GetMealByNameUseCase(mealsRepository,kmpSearcher)
-
+        mealsRepository = mockk()
+        kmpSearcher = mockk()
+        getMealsByNameUseCase = GetMealByNameUseCase(mealsRepository, kmpSearcher)
 
     }
 
-    val meals=listOf(
+    val meals = listOf(
         createMeals("chinese  candy"),
         createMeals("fried  potatoes"),
 
         )
 
     @Test
-    fun `should return meal when the input name matches a meal in the list`(){
+    fun `should return meal when the input name matches a meal in the list`() {
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() } returns meals
@@ -49,30 +46,28 @@ internal class GetMealByNameUseCaseTest{
         every { kmpSearcher.search("fried  potatoes", "chinese  candy") } returns false
 
 
-        val mealName="chinese  candy"
+        val mealName = "chinese  candy"
 
         //when
-        val result= getMealsByNameUseCase(mealName)
+        val result = getMealsByNameUseCase(mealName)
 
         //then
         assertThat(result).isEqualTo(meals[0])
 
-
     }
 
     @Test
-    fun `should return the meal when name matches regardless of case`(){
+    fun `should return the meal when name matches regardless of case`() {
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() } returns meals
         every { kmpSearcher.search("chinese  candy", "chinese  candy") } returns true
         every { kmpSearcher.search("chinese  candy", "ChInesE  CAndy") } returns true
 
-
-        val mealName="ChInesE  CAndy"
+        val mealName = "ChInesE  CAndy"
 
         //when
-        val result= getMealsByNameUseCase(mealName)
+        val result = getMealsByNameUseCase(mealName)
 
         //then
         assertThat(result).isEqualTo(meals[0])
@@ -80,7 +75,7 @@ internal class GetMealByNameUseCaseTest{
     }
 
     @Test
-    fun `should throw no meal found exception when no meal matches the input name`(){
+    fun `should throw no meal found exception when no meal matches the input name`() {
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() } returns meals
