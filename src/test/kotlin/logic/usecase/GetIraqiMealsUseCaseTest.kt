@@ -29,7 +29,7 @@ class GetIraqiMealsUseCaseTest {
     }
 
     @Test
-    fun `when call getAllMeals() from mealsRepository and it returns list of meals should that getIraqiMealsUseCase return just iraqi meals`() {
+    fun `should return only iraqi meals from mixed list`() {
         //given
         val iraqiMeals = listOf(
             createMeal(hasIraqiTag = true, hasIraqInDescription = true),
@@ -44,7 +44,7 @@ class GetIraqiMealsUseCaseTest {
     }
 
     @Test
-    fun `when call getAllMeals() from mealsRepository and it returns empty list should getIraqiMealsUseCase throw NoMealsFoundException`() {
+    fun `should throw NoMealsFoundException when meal list is empty`() {
         //given
         every { mealsRepository.getAllMeals() } returns emptyList()
         //when && then
@@ -54,7 +54,7 @@ class GetIraqiMealsUseCaseTest {
     }
 
     @Test
-    fun `when call getAllMeals() from mealsRepository and it returns a list of non-iraqi meals should getIraqiMealsUseCase throw NoMealsFoundException`() {
+    fun `should throw NoMealsFoundException when no iraqi meals found`() {
         //given
         every { mealsRepository.getAllMeals() } returns nonIraqiMeals
         //when && then
@@ -64,7 +64,7 @@ class GetIraqiMealsUseCaseTest {
     }
 
     @Test
-    fun `when call getAllMeals() from mealsRepository and it returns a list includes meal without iraqi tag but has iraq in description should still be considered iraqi`() {
+    fun `should detect iraqi meals by description only`() {
         //given iraqiDescribedMeals
         val iraqiDescribedMeals = listOf(
             createMeal(hasIraqInDescription = true),
@@ -77,7 +77,7 @@ class GetIraqiMealsUseCaseTest {
     }
 
     @Test
-    fun `when call getAllMeals() from mealsRepository and it returns a list includes meal with iraqi tag but has no iraq in description should still be considered iraqi`() {
+    fun `should detect iraqi meals by tag only`() {
         //given
         val iraqiTaggedMeals = listOf(
             createMeal(hasIraqiTag = true),
@@ -92,7 +92,7 @@ class GetIraqiMealsUseCaseTest {
 
 
     @Test
-    fun `when call getAllMeals() from mealsRepository and it returns a list includes meal with iraqi null tags should not be considered iraqi`() {
+    fun `should skip meals with null tags`() {
         //given
         val iraqiMeals = listOf(
             createMeal(hasIraqiTag = true),
@@ -106,7 +106,7 @@ class GetIraqiMealsUseCaseTest {
     }
 
     @Test
-    fun `when call getAllMeals() from mealsRepository and it returns a list includes meal with iraqi null description should not be considered iraqi`() {
+    fun `should skip meals with null descriptions`() {
         //given
         val iraqiMeals = listOf(
             createMeal(hasIraqiTag = true),
@@ -127,11 +127,11 @@ class GetIraqiMealsUseCaseTest {
             minutes = null,
             contributorId = null,
             submitted = Date(),
-            tags = if(hasIraqiTag==null) null else if (hasIraqiTag) listOf("iraqi") else listOf("egyptian"),
+            tags = if (hasIraqiTag == null) null else if (hasIraqiTag) listOf("iraqi") else listOf("egyptian"),
             nutrition = null,
             numberOfSteps = null,
             steps = null,
-            description = if(hasIraqInDescription==null) null else if (hasIraqInDescription) "Popular meal in Iraq" else "Popular meal in Egypt",
+            description = if (hasIraqInDescription == null) null else if (hasIraqInDescription) "Popular meal in Iraq" else "Popular meal in Egypt",
             ingredients = null,
             numberOfIngredients = null
         )

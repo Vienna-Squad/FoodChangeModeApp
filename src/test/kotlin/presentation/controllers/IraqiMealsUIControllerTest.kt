@@ -25,7 +25,7 @@ class IraqiMealsUIControllerTest {
     }
 
     @Test
-    fun `when call execute() in iraqiMealsUIController and getIraqiMealsUseCase returns list of meals should viewer show the meals details`() {
+    fun `should show iraqi meals when use case returns them`() {
         //given
         val meals = listOf(
             createIraqiMeal(),
@@ -40,7 +40,7 @@ class IraqiMealsUIControllerTest {
     }
 
     @Test
-    fun `when call execute() in iraqiMealsUIController and getIraqiMealsUseCase throws NoMealFoundException should viewer show the exception message`() {
+    fun `should show exception when use case throws NoMealFoundException`() {
         //given
         val exception = NoMealFoundException("iraqi meals")
         every { getIraqiMealsUseCase() } throws exception
