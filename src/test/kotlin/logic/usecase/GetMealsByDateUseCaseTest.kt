@@ -44,7 +44,7 @@ internal class GetMealsByDateUseCaseTest{
     }
 
     @Test
-    fun `should return meals that match the given date `(){
+    fun `should return meals only when the given date matches meal date`(){
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() } returns meals
@@ -57,7 +57,7 @@ internal class GetMealsByDateUseCaseTest{
     }
 
     @Test
-    fun `should throw exception when search by date for not available meal `(){
+    fun `should throw no meal found exception when no meals are found for the given date`(){
 
         //given  (stubs)
         every { mealsRepository.getAllMeals() }returns meals

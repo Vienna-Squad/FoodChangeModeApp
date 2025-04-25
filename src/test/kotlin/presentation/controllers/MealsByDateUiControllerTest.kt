@@ -55,7 +55,7 @@ internal class MealsByDateUiControllerTest{
     }
 
     @Test
-    fun `should return meals when the given date matches the submitted date in meal`() {
+    fun `should return meals when the given date matches the meal's date`() {
 
 
         //given  (stubs)
@@ -76,7 +76,7 @@ internal class MealsByDateUiControllerTest{
     }
 
     @Test
-    fun `should throw exception when search by date for not available meal `(){
+    fun `should throw no meal found exception when no meals are found for the given date `(){
 
         //given  (stubs)
 
@@ -97,7 +97,7 @@ internal class MealsByDateUiControllerTest{
 
     }
     @Test
-    fun `should throw exception when invalid date format `(){
+    fun `should throw incorrect date format exception when date format is invalid `(){
 
         //given  (stubs)
         every { interactor.getInput() }returns "candy"
@@ -113,7 +113,7 @@ internal class MealsByDateUiControllerTest{
     }
 
     @Test
-    fun `should return meals description when the given id matches a meal in the list`(){
+    fun `should return meal description when the given id matches a meal on the selected date`(){
 
 
         //given  (stubs)
@@ -133,7 +133,7 @@ internal class MealsByDateUiControllerTest{
 
     }
     @Test
-    fun `should return exception when the given id not matches with the meal in the list`(){
+    fun `should return no meal found exception when the given id not matches a meal on the selected date`(){
 
         // given
         every { interactor.getInput() } returns "14/4/2003" andThen "37074" // ID not found
