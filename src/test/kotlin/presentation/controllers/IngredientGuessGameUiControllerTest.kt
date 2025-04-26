@@ -1,11 +1,8 @@
 package presentation.controllers
 
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.example.logic.usecase.GuessIngredientGameUseCase
-import org.example.logic.usecase.IngredientGameDetails
-import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.presentation.controllers.IngredientGuessGameUiController
 import org.example.utils.interactor.InteractorNumber
 import org.example.utils.viewer.ExceptionViewer

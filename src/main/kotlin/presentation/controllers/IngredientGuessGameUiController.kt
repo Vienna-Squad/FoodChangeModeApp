@@ -1,9 +1,9 @@
 package org.example.presentation.controllers
 
 import org.example.logic.usecase.GuessIngredientGameUseCase
-import org.example.logic.usecase.IngredientGameDetails
 import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
+import org.example.presentation.model.IngredientGameDetails
 import org.example.utils.interactor.InteractorNumber
 import org.example.utils.interactor.UserInteractorNumber
 import org.example.utils.viewer.ExceptionViewer
@@ -36,7 +36,7 @@ class IngredientGuessGameUiController(
 
                 val userGuess = guessIngredientGameUseCase.guessGame(
                     ingredientGameDetails = gameDetails,
-                    ingredientInputNumber = input
+                    ingredientGuessNumber = input
                 )
 
                 if (userGuess == true)
