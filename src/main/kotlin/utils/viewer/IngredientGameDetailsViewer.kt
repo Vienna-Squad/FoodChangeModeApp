@@ -1,10 +1,11 @@
 package org.example.utils.viewer
 
-import org.example.logic.usecase.IngredientGameDetails
+import org.example.presentation.model.IngredientGameDetails
+
 
 class IngredientGameDetailsViewer: ItemDetailsViewer<IngredientGameDetails> {
     override fun viewDetails(item: IngredientGameDetails) {
-        println(item.mealName)
+        println("\nMeal : ${item.meal.name}")
         println("\nOptions : ${item.ingredients}\n")
         println("\t(1) first Option")
         println("\t(2) second Option")
