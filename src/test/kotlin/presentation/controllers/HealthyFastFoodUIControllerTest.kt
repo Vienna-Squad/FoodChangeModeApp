@@ -5,17 +5,17 @@ import org.example.logic.model.Meal
 import org.example.logic.model.Nutrition
 import org.example.logic.usecase.GetHealthyFastFoodUseCase
 import org.example.logic.usecase.exceptions.NoHealthyFastFoodFoundException
-import org.example.presentation.Viewer
 import org.example.presentation.controllers.HealthyFastFoodUIController
 import org.junit.jupiter.api.*
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import com.google.common.truth.Truth.assertThat
+import org.example.utils.viewer.ItemsViewer
 
 class HealthyFastFoodUIControllerTest {
 
     private lateinit var useCase: GetHealthyFastFoodUseCase
-    private lateinit var viewer: Viewer
+    private lateinit var viewer: ItemsViewer<Meal>
     private lateinit var controller: HealthyFastFoodUIController
 
     private val stdOut = ByteArrayOutputStream()
@@ -50,7 +50,7 @@ class HealthyFastFoodUIControllerTest {
         // Then
         val output = stdOut.toString()
         assertThat(output).contains("Healthy Fast Food Suggestions")
-        verify { viewer.showMealsDetails(meals) }
+        verify { viewer.viewItems(meals) }
     }
 
     @Test
@@ -65,7 +65,7 @@ class HealthyFastFoodUIControllerTest {
         // Then
         val output = stdOut.toString()
         assertThat(output).contains("No healthy fast food found")
-        verify(exactly = 0) { viewer.showMealsDetails(any()) }
+        verify(exactly = 0) { viewer.viewItems(any()) }
     }
 
     @Test
@@ -80,7 +80,7 @@ class HealthyFastFoodUIControllerTest {
         // Then
         val output = stdOut.toString()
         assertThat(output).contains("Error fetching healthy fast food: Something went wrong")
-        verify(exactly = 0) { viewer.showMealsDetails(any()) }
+        verify(exactly = 0) { viewer.viewItems(any()) }
     }
 
     private fun createHealthyFastFoodMeal(

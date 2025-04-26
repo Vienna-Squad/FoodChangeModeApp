@@ -3,12 +3,12 @@ package presentation.controllers
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.example.logic.model.RankedMealResult
 import org.example.logic.usecase.GetRankedSeafoodByProteinUseCase
 import org.example.logic.usecase.exceptions.NoSeafoodFoundException
-import org.example.presentation.Viewer
 import org.junit.jupiter.api.Test
 import org.example.presentation.controllers.RankedSeafoodByProteinUiController
+import org.example.presentation.model.RankedMealResult
+import org.example.utils.viewer.ExceptionViewer
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
@@ -18,7 +18,8 @@ import org.junit.jupiter.api.*
 class RankedSeafoodByProteinUiControllerTest {
 
     private lateinit var useCase: GetRankedSeafoodByProteinUseCase
-    private lateinit var viewer: Viewer
+    //private lateinit var viewer: ItemsViewer<Meal>
+    private lateinit var viewerException: ExceptionViewer
     private lateinit var controller: RankedSeafoodByProteinUiController
 
     private val stdOut = ByteArrayOutputStream()
@@ -26,9 +27,9 @@ class RankedSeafoodByProteinUiControllerTest {
 
     @BeforeEach
     fun setUp() {
-        useCase = mockk()
-        viewer = mockk(relaxed = true)
-        controller = RankedSeafoodByProteinUiController(useCase, viewer)
+        useCase = mockk(relaxed = true)
+        viewerException =mockk(relaxed = true)
+        controller = RankedSeafoodByProteinUiController(useCase, viewerException)
         System.setOut(PrintStream(stdOut))
     }
 
@@ -52,7 +53,7 @@ class RankedSeafoodByProteinUiControllerTest {
         assert(output.contains("Salmon"))
         assert(output.contains("Tuna"))
         assert(output.contains("Protein (g)"))
-        verify(exactly = 0) { viewer.showExceptionMessage(any()) }
+        verify(exactly = 0) { viewerException.viewExceptionMessage(any()) }
     }
 
     @Test
@@ -63,7 +64,7 @@ class RankedSeafoodByProteinUiControllerTest {
 
         val output = stdOut.toString()
         assert(output.contains("No seafood meals with protein information found"))
-        verify(exactly = 0) { viewer.showExceptionMessage(any()) }
+        verify(exactly = 0) { viewerException.viewExceptionMessage(any()) }
     }
 
     @Test
@@ -73,7 +74,7 @@ class RankedSeafoodByProteinUiControllerTest {
 
         controller.execute()
 
-        verify { viewer.showExceptionMessage(exception) }
+        verify { viewerException.viewExceptionMessage(exception) }
     }
 
     @Test
@@ -83,6 +84,6 @@ class RankedSeafoodByProteinUiControllerTest {
 
         controller.execute()
 
-        verify { viewer.showExceptionMessage(exception) }
+        verify { viewerException.viewExceptionMessage(exception) }
     }
 }
