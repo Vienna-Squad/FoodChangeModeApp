@@ -4,22 +4,16 @@ import org.example.logic.model.Meal
 import org.example.logic.usecase.GetHighCalorieMealUseCase
 import org.example.logic.usecase.exceptions.EmptyRandomMealException
 import org.example.logic.usecase.exceptions.InvalidInputNumberOfHighCalorieMeal
-import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.utils.interactor.HighCalorieMealInteractor
 import org.example.utils.interactor.UserHighCalorieMealInteractor
-import org.example.utils.viewer.AnotherSuggestionMealViewer
-import org.example.utils.viewer.ExceptionViewer
-import org.example.utils.viewer.FoodExceptionViewer
-import org.example.utils.viewer.HighCalorieMealViewer
-import org.example.utils.viewer.ItemDetailsViewer
-import org.example.utils.viewer.MealDetailsViewer
+import org.example.utils.viewer.*
 import org.koin.mp.KoinPlatform.getKoin
 
 class HighCalorieMealUIController(
     private val suggestHighCalorieMealUseCase: GetHighCalorieMealUseCase = getKoin().get(),
     private val showMealDetailsViewer: ItemDetailsViewer<Meal> = MealDetailsViewer(),
     private val highCalorieMealViewer: ItemDetailsViewer<Meal> = HighCalorieMealViewer(),
-    private val anotherSuggestionMealViewer: ItemDetailsViewer<String> = AnotherSuggestionMealViewer(),
+    private val anotherSuggestionMealViewer: ItemDetailsViewer<String> = MessageViewer(),
     private val exceptionViewer: ExceptionViewer = FoodExceptionViewer(),
     private val highCalorieMealInteractor: HighCalorieMealInteractor = UserHighCalorieMealInteractor()
 ) : UiController {
