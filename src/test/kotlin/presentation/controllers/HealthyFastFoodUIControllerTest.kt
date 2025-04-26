@@ -10,22 +10,22 @@ import org.junit.jupiter.api.*
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import com.google.common.truth.Truth.assertThat
+import org.example.utils.viewer.ExceptionViewer
 import org.example.utils.viewer.ItemsViewer
 
 class HealthyFastFoodUIControllerTest {
 
-    private lateinit var useCase: GetHealthyFastFoodUseCase
-    private lateinit var viewer: ItemsViewer<Meal>
     private lateinit var controller: HealthyFastFoodUIController
+    private val useCase: GetHealthyFastFoodUseCase = mockk(relaxed = true)
+    private val viewer: ItemsViewer<Meal> = mockk(relaxed = true)
+    private val viewerException: ExceptionViewer = mockk(relaxed = true)
 
     private val stdOut = ByteArrayOutputStream()
     private val originalOut = System.out
 
     @BeforeEach
     fun setUp() {
-        useCase = mockk()
-        viewer = mockk()
-        controller = HealthyFastFoodUIController(useCase, viewer)
+        controller = HealthyFastFoodUIController(useCase, viewer, viewerException)
         System.setOut(PrintStream(stdOut))
     }
 
@@ -63,24 +63,18 @@ class HealthyFastFoodUIControllerTest {
         controller.execute()
 
         // Then
-        val output = stdOut.toString()
-        assertThat(output).contains("No healthy fast food found")
-        verify(exactly = 0) { viewer.viewItems(any()) }
+        verify { viewerException.viewExceptionMessage(match { it.message == "No healthy fast food found" }) }
     }
 
     @Test
     fun `given unexpected error when executing then generic error should be printed`() {
         // Given
         val exception = RuntimeException("Something went wrong")
-        every { useCase.invoke() } throws exception
-
+        every { useCase() } throws exception
         // When
         controller.execute()
-
         // Then
-        val output = stdOut.toString()
-        assertThat(output).contains("Error fetching healthy fast food: Something went wrong")
-        verify(exactly = 0) { viewer.viewItems(any()) }
+        verify { viewerException.viewExceptionMessage(match { it.message == "Something went wrong" }) }
     }
 
     private fun createHealthyFastFoodMeal(
