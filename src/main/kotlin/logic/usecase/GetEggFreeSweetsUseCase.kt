@@ -2,13 +2,14 @@ package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
+import org.example.logic.usecase.exceptions.NoMealFoundException
 
 class GetEggFreeSweetsUseCase(
     private val mealsRepository: MealsRepository
 ) {
     operator fun invoke(seenMeals: MutableSet<Meal>) = mealsRepository.getAllMeals()
         .filter { isEggFreeSweet(it) && it !in seenMeals }
-        .randomOrNull()
+        .randomOrNull()?:throw NoMealFoundException()
 
     private fun isEggFreeSweet(meal: Meal): Boolean {
 

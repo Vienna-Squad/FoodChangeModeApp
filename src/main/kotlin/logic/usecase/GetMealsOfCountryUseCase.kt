@@ -2,38 +2,49 @@ package org.example.logic.usecase
 
 import org.example.logic.model.Meal
 import org.example.logic.repository.MealsRepository
-import org.example.logic.usecase.exceptions.NotACountryException
+import org.example.logic.usecase.exceptions.NoMealFoundException
 import org.example.utils.KMPSearcher
+import org.example.utils.getRandomItem
 
 
 class GetMealsOfCountryUseCase(
     private val mealsRepository: MealsRepository,
     private val kmpSearcher: KMPSearcher = KMPSearcher()
 ) {
-    /**
-     * Explores meals related to a specified country using KMP string matching with partial match.
-     * Searches in both tags and description, shuffles the results, and returns up to 20 meals.
-     * @param countryInput The country name or adjective entered by the user (e.g., "Italy" or "Italian").
-     * @throws NotACountryException if the country input is empty or not close to a real country.
-     */
+
     operator fun invoke(countryInput: String): List<Meal> {
         if (countryInput.isBlank()) {
-            throw NotACountryException("Country name cannot be empty.")
+            throw NoMealFoundException("Country name cannot be empty.")
         }
-
         val normalizedCountry = countryInput.trim().lowercase()
-        return mealsRepository.getAllMeals()
+        val filteredMeals = mealsRepository.getAllMeals()
             .filter { meal -> hasMatchingCountry(meal, normalizedCountry) }
-            .shuffled()
-            .take(20)
+        return selectRandomMeals(filteredMeals)
     }
+
 
     private fun hasMatchingCountry(meal: Meal, countryInput: String): Boolean {
         val matchesInTags = meal.tags?.any { tag ->
             kmpSearcher.search(tag.lowercase(), countryInput)
         } ?: false
 
-        val matchesInDescription = kmpSearcher.search(meal.description?.lowercase() ?: "", countryInput)
+        val matchesInDescription = meal.description?.let { desc ->
+            kmpSearcher.search(desc.lowercase(), countryInput)
+        } ?: false
+
         return matchesInTags || matchesInDescription
+    }
+
+
+    private fun selectRandomMeals(filteredMeals: List<Meal>): List<Meal> {
+        if (filteredMeals.size <= 20 && filteredMeals.isNotEmpty()) {
+            return filteredMeals
+        }
+        val meals = mutableSetOf<Meal>()
+        while (meals.size < 20) {
+            val randomMeals = filteredMeals.getRandomItem() ?: throw NoMealFoundException()
+            meals.add(randomMeals)
+        }
+        return meals.toList()
     }
 }
