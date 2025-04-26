@@ -17,7 +17,7 @@ class GetHealthyFastFoodUseCaseTest {
     private val useCase = GetHealthyFastFoodUseCase(mockRepository)
 
     @Test
-    fun `should throw when no meals exist`() {
+    fun `Given no meals exist When useCase is invoked Then throw NoHealthyFastFoodFoundException`() {
         every { mockRepository.getAllMeals() } returns emptyList()
 
         val exception = assertThrows<NoHealthyFastFoodFoundException> {
@@ -28,7 +28,7 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `should throw when no meals have nutrition data`() {
+    fun `Given meals without nutrition data When useCase is invoked Then throw NoHealthyFastFoodFoundException`() {
         val meals = listOf(
             createMealWithNullNutrition("Meal1", 10),
             createMealWithNullNutrition("Meal2", 12)
@@ -43,10 +43,8 @@ class GetHealthyFastFoodUseCaseTest {
         assertThat(exception.message).isEqualTo("No meals with nutrition data available")
     }
 
-
-
     @Test
-    fun `should throw when no meals meet healthy criteria`() {
+    fun `Given meals that don't meet healthy criteria When useCase is invoked Then throw NoHealthyFastFoodFoundException`() {
         val meals = listOf(
             createHealthyFastFoodMeal("High Fat Meal", 20, 20f, 6f, 40f),
             createHealthyFastFoodMeal("Slow Meal", 30, 5f, 1f, 10f)
@@ -60,17 +58,12 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `should return only meals meeting all healthy fast food criteria`() {
+    fun `Given multiple meals When some meet healthy fast food criteria Then return only healthy fast food meals`() {
         val meals = listOf(
-            // Healthy fast food (meets all criteria)
             createHealthyFastFoodMeal("Quick Salad", 10, 5f, 1f, 10f),
-            // Not fast (prep time > 15 mins)
             createHealthyFastFoodMeal("Slow Soup", 20, 5f, 1f, 10f),
-            // High fat
             createHealthyFastFoodMeal("Fatty Fish", 10, 25f, 1f, 10f),
-            // High saturated fat
             createHealthyFastFoodMeal("Buttery Pasta", 10, 5f, 8f, 10f),
-            // High carbs
             createHealthyFastFoodMeal("Sweet Dessert", 10, 5f, 1f, 45f)
         )
 
@@ -82,15 +75,11 @@ class GetHealthyFastFoodUseCaseTest {
         assertThat(result[0].name).isEqualTo("Quick Salad")
     }
 
-
     @Test
-    fun `should return multiple meals when they meet criteria`() {
+    fun `Given multiple meals When multiple meet healthy criteria Then return all healthy fast food meals`() {
         val meals = listOf(
-            // These will set the averages (totalFat=10, saturatedFat=3, carbs=20)
             createHealthyFastFoodMeal("High Fat Meal", 20, 20f, 6f, 40f),
             createHealthyFastFoodMeal("High Saturated Meal", 20, 20f, 6f, 40f),
-
-            // These should be included (below average)
             createHealthyFastFoodMeal("Salad", 10, 5f, 1f, 10f),
             createHealthyFastFoodMeal("Grilled Fish", 12, 6f, 2f, 8f),
             createHealthyFastFoodMeal("Veggie Wrap", 15, 7f, 1.5f, 12f)
@@ -105,13 +94,10 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `should compare fat values against average`() {
+    fun `Given meals with different fat values When useCase is invoked Then return only meals below average fat values`() {
         val meals = listOf(
-            // Average values: totalFat=15, saturatedFat=5, carbs=20
             createHealthyFastFoodMeal("Avg Meal", 20, 15f, 5f, 20f),
-            // Below average values
             createHealthyFastFoodMeal("Healthy Meal", 10, 10f, 3f, 15f),
-            // Above average values
             createHealthyFastFoodMeal("Unhealthy Meal", 10, 20f, 8f, 30f)
         )
 
@@ -124,29 +110,25 @@ class GetHealthyFastFoodUseCaseTest {
     }
 
     @Test
-    fun `should filter based on average values`() {
-        // Given - setup averages of 30f fat, 15f saturated fat, 40f carbs
+    fun `Given meals When filtering based on average nutrition values Then return meals meeting criteria`() {
         val healthyMeal = createHealthyFastFoodMeal(
             minutes = 10,
-            totalFat = 25f, // below average
-            saturatedFat = 10f, // below average
-            carbs = 35f // below average
+            totalFat = 25f,
+            saturatedFat = 10f,
+            carbs = 35f
         )
 
         every { mockRepository.getAllMeals() } returns listOf(
             healthyMeal,
-            createHealthyFastFoodMeal(minutes = 10, totalFat = 35f, saturatedFat = 10f, carbs = 35f), // fat too high
-            createHealthyFastFoodMeal(minutes = 10, totalFat = 25f, saturatedFat = 20f, carbs = 35f), // saturated fat too high
-            createHealthyFastFoodMeal(minutes = 10, totalFat = 25f, saturatedFat = 10f, carbs = 45f) // carbs too high
+            createHealthyFastFoodMeal(minutes = 10, totalFat = 35f, saturatedFat = 10f, carbs = 35f),
+            createHealthyFastFoodMeal(minutes = 10, totalFat = 25f, saturatedFat = 20f, carbs = 35f),
+            createHealthyFastFoodMeal(minutes = 10, totalFat = 25f, saturatedFat = 10f, carbs = 45f)
         )
 
-        // When
         val result = useCase()
 
-        // Then
         assertThat(result).containsExactly(healthyMeal)
     }
-
 
     private fun createMealWithNullNutrition(name: String, minutes: Long): Meal {
         return Meal(
@@ -164,7 +146,6 @@ class GetHealthyFastFoodUseCaseTest {
             numberOfIngredients = null
         )
     }
-
 
     private fun createHealthyFastFoodMeal(
         name: String = "Test Meal",

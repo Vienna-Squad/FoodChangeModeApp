@@ -36,39 +36,48 @@ class HealthyFastFoodUIControllerTest {
     }
 
     @Test
-    fun `execute should show meals when use case returns data`() {
+    fun `given healthy meals when executing then meals should be shown`() {
+        // Given
         val meals = listOf(
             createHealthyFastFoodMeal("High Fat Meal", 20, 20f, 6f, 40f),
             createHealthyFastFoodMeal("Slow Meal", 30, 5f, 1f, 10f)
         )
         every { useCase.invoke() } returns meals
 
+        // When
         controller.execute()
 
+        // Then
         val output = stdOut.toString()
         assertThat(output).contains("Healthy Fast Food Suggestions")
         verify { viewer.showMealsDetails(meals) }
     }
 
     @Test
-    fun `execute should print warning when NoHealthyFastFoodFoundException is thrown`() {
+    fun `given no healthy meals when executing then warning should be printed`() {
+        // Given
         val exception = NoHealthyFastFoodFoundException("No healthy fast food found")
         every { useCase.invoke() } throws exception
 
+        // When
         controller.execute()
 
+        // Then
         val output = stdOut.toString()
         assertThat(output).contains("No healthy fast food found")
         verify(exactly = 0) { viewer.showMealsDetails(any()) }
     }
 
     @Test
-    fun `execute should print error when generic exception is thrown`() {
+    fun `given unexpected error when executing then generic error should be printed`() {
+        // Given
         val exception = RuntimeException("Something went wrong")
         every { useCase.invoke() } throws exception
 
+        // When
         controller.execute()
 
+        // Then
         val output = stdOut.toString()
         assertThat(output).contains("Error fetching healthy fast food: Something went wrong")
         verify(exactly = 0) { viewer.showMealsDetails(any()) }
