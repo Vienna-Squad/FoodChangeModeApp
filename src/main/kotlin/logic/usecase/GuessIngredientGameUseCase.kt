@@ -40,9 +40,9 @@ class GuessIngredientGameUseCase(
         val isGuessIngredientCorrect = ingredientGameDetails.meal
             .ingredients
             ?.any { correctIngredient -> correctIngredient == guessIngredient }
-            ?: throw IngredientsOptionsException("Your Guess Not Correct , End Game")
 
-        return isGuessIngredientCorrect
+        return if (isGuessIngredientCorrect == true) true
+        else throw IngredientsOptionsException("Your Guess Not Correct , End Game")
 
     }
 
@@ -55,8 +55,8 @@ class GuessIngredientGameUseCase(
     private fun getRandomMeal(): Meal {
         return mealsRepository.getAllMeals()
             .filter(::filterNameAndIngredients)
-            .shuffled()
             .ifEmpty { throw IngredientRandomMealGenerationException("The Meal list is null or empty") }
+            .shuffled()
             .random()
     }
 
@@ -67,20 +67,23 @@ class GuessIngredientGameUseCase(
     private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?> {
 
         val correctIngredients = mealsRepository.getAllMeals()
-            .firstOrNull { it.id == correctMealId }
-            ?.ingredients
-            ?.take(2)
+            .first { it.id == correctMealId }
+            .ingredients
+            ?.random()
             ?.ifEmpty { throw EmptyRandomMealException("The Correct Ingredients List is null or empty") }
 
         val wrongIngredient = mealsRepository.getAllMeals()
-            .firstOrNull { it.id != correctMealId }
-            ?.ingredients
-            ?.random()
+            .takeLast(20)
+            .shuffled()
+            .filter { it.id != correctMealId }
+            .random()
+            .ingredients
+            ?.takeLast(2)
             ?.ifEmpty { throw EmptyRandomMealException("The Wrong Ingredients List is null or empty") }
 
-        val ingredients = correctIngredients
-            ?.plus(wrongIngredient)
-            ?.sortedBy { ingredient -> ingredient?.length }
+        val ingredients = wrongIngredient
+            ?.plus(correctIngredients)
+            ?.shuffled()
             .takeIf { items -> items?.size == 3 }
             ?: throw EmptyRandomMealException("The size of meal is less than 3 or empty")
 
