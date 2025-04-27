@@ -12,13 +12,12 @@ import org.example.logic.usecase.exceptions.IngredientRandomMealGenerationExcept
 import org.example.logic.usecase.exceptions.IngredientUserInputException
 import org.example.logic.usecase.exceptions.IngredientsOptionsException
 import org.example.presentation.model.IngredientGameDetails
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.Date
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+
 
 class GuessIngredientGameUseCaseTest {
 
@@ -41,34 +40,34 @@ class GuessIngredientGameUseCaseTest {
     }
 
     @Test
-    fun `getGameDetails should throw EmptyRandomMealException when the list of ingredient is null or empty`() {
-        // stubs
-        every { mealsRepository.getAllMeals() } returns mealsThatContainOnlyRandomMealsWithOneIngredientItem
-        // when & then
-        assertThrows<EmptyRandomMealException> {
-            guessIngredientGameUseCase.getGameDetails()
-        }
-    }
-
-    @Test
-    fun `getGameDetails should throw EmptyRandomMealException when id of meal is null`() {
+    fun `getGameDetails should throw IngredientRandomMealGenerationException when the ingredient of meal is null or empty`() {
         // stubs
         every { mealsRepository.getAllMeals() } returns listOf(
             Meal(
                 name = "meal",
-                id = null,
+                id = 2L,
                 minutes = null,
-                contributorId = null,
+                contributorId = 2L,
                 submitted = Date(),
                 tags = null,
                 nutrition = null,
                 numberOfSteps = null,
                 steps = null,
                 description = null,
-                ingredients =listOf("3443","3434","#$434"),
-                numberOfIngredients = null
+                ingredients = null,
+                numberOfIngredients =null
             )
         )
+        // when & then
+        assertThrows<IngredientRandomMealGenerationException> {
+            guessIngredientGameUseCase.getGameDetails()
+        }
+    }
+
+    @Test
+    fun `getGameDetails should throw EmptyRandomMealException when the list of ingredient is null or empty`() {
+        // stubs
+        every { mealsRepository.getAllMeals() } returns mealsThatContainOnlyRandomMealsWithOneIngredientItem
         // when & then
         assertThrows<EmptyRandomMealException> {
             guessIngredientGameUseCase.getGameDetails()
@@ -84,7 +83,10 @@ class GuessIngredientGameUseCaseTest {
         // when
         val result = guessIngredientGameUseCase.getGameDetails()
 
-        assertThat(result.meal).isEqualTo(correctRandomMeal)
+        println(result.meal.name)
+        print(correctRandomMeal.name)
+
+        assertThat(result.meal.name).isEqualTo(correctRandomMeal.name)
     }
 
     @Test
@@ -105,7 +107,6 @@ class GuessIngredientGameUseCaseTest {
 
 
     }
-
 
     @Test
     fun `guessGame should throw IngredientsOptionsException when the input ingredient is wrong`() {
@@ -153,18 +154,48 @@ class GuessIngredientGameUseCaseTest {
             ingredients = listOf("Chicken breast", "fake potato", "fake egg")
         )
 
-        val result = guessIngredientGameUseCase.guessGame(ingredientGameDetails,guessNumber)
-
-        // then
-        assertFalse(result)
+        // then & when
+        assertThrows <IngredientsOptionsException>{
+            guessIngredientGameUseCase.guessGame(ingredientGameDetails,guessNumber)
+        }
 
     }
 
     @Test
-    fun `guessGame should return true if userGuess is true`() {
+    fun `guessGame should return false when the input ingredient negative number`() {
 
         // stubs
         every { mealsRepository.getAllMeals() } returns correctMeals
+
+        // given
+        val guessNumber = -1
+        val ingredientGameDetails = IngredientGameDetails(
+            meal= Meal(
+                name = "chicken",
+                id = null,
+                minutes = null,
+                contributorId = null,
+                submitted = Date(),
+                tags = null,
+                nutrition = null,
+                numberOfSteps = null,
+                steps = null,
+                description = null,
+                ingredients = listOf("Chicken breast","Chicken breast","Chicken breast"),
+                numberOfIngredients = 3
+            ),
+            ingredients = listOf("Chicken breast", "fake potato", "fake egg")
+        )
+
+        // then & when
+        assertThrows <IngredientUserInputException>{
+            guessIngredientGameUseCase.guessGame(ingredientGameDetails,guessNumber)
+        }
+
+    }
+
+    @Test
+    fun `guessGame should return true if userGuess and and ingredient is the same`() {
 
         // given
         val inputOption = 1
@@ -186,9 +217,9 @@ class GuessIngredientGameUseCaseTest {
             ingredients = listOf("Chicken breast", "fake potato", "fake egg")
         )
         // when
-        val result = guessIngredientGameUseCase.guessGame(ingredientGameDetails, inputOption)
+        guessIngredientGameUseCase.guessGame(ingredientGameDetails, inputOption)
 
-        assertTrue(result)
+        assertEquals("Chicken breast",ingredientGameDetails.ingredients[0])
 
     }
 
@@ -283,12 +314,12 @@ val correctMeals = listOf(
         numberOfSteps = 3,
         steps = listOf("Grill chicken", "Chop veggies", "Mix all"),
         description = "A healthy and fresh grilled chicken salad.",
-        ingredients = listOf("Chicken breast", "Chicken breast", "Chicken breast"),
+        ingredients = listOf("Chicken breast", "Chicken breast", "Chicken breast","Mix all"),
         numberOfIngredients = 1
     ),
     Meal(
         name = "Grilled Chicken Salad",
-        id = 1L,
+        id = 2L,
         minutes = 20L,
         contributorId = 101L,
         submitted = Date(),
