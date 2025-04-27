@@ -17,7 +17,7 @@ class GuessIngredientGameUseCase(
 
         val randomMeal = getRandomMeal()
         val ingredients =
-            getIngredientsByCorrectMealId(randomMeal.id ?: throw EmptyRandomMealException(" Meal id is null"))
+            getIngredientsByCorrectMealId(randomMeal.id!!)
 
         return IngredientGameDetails(
             meal = randomMeal,
@@ -31,11 +31,12 @@ class GuessIngredientGameUseCase(
     ): Boolean {
 
         val guessIngredientIndex = ingredientGuessNumber - 1
-        var guessIngredient: String? = ""
+        var guessIngredient: String? = null
 
         if (guessIngredientIndex in 0..2)
             guessIngredient = ingredientGameDetails.ingredients[guessIngredientIndex]
-        else throw IngredientUserInputException("The Guess Number is Not In Range from 1 to 3")
+        else
+            throw IngredientUserInputException("The Guess Number is Not In Range from 1 to 3")
 
         val isGuessIngredientCorrect = ingredientGameDetails.meal
             .ingredients
@@ -67,19 +68,20 @@ class GuessIngredientGameUseCase(
     private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?> {
 
         val correctIngredients = mealsRepository.getAllMeals()
+            .ifEmpty{throw  IngredientRandomMealGenerationException("The Meal list is null or empty") }
             .first { it.id == correctMealId }
             .ingredients
             ?.random()
-            ?.ifEmpty { throw EmptyRandomMealException("The Correct Ingredients List is null or empty") }
+            ?:throw EmptyRandomMealException("The Correct Ingredients List is null or empty")
 
         val wrongIngredient = mealsRepository.getAllMeals()
             .takeLast(20)
             .shuffled()
             .filter { it.id != correctMealId }
+            .ifEmpty{throw EmptyRandomMealException("The Wrong Ingredients List is null or empty")}
             .random()
             .ingredients
-            ?.takeLast(2)
-            ?.ifEmpty { throw EmptyRandomMealException("The Wrong Ingredients List is null or empty") }
+            ?.take(2)
 
         val ingredients = wrongIngredient
             ?.plus(correctIngredients)
