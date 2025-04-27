@@ -47,11 +47,10 @@ class IngredientGuessGameUiController(
             } while (counter <= 15)
         } catch (e: IngredientsOptionsException) {
             exceptionViewer.viewExceptionMessage(e)
-            scoreViewer.viewDetails(scoreOfUser)
         } catch (e: IngredientUserInputException) {
             exceptionViewer.viewExceptionMessage(e)
-            scoreViewer.viewDetails(scoreOfUser)
         } finally {
+            scoreViewer.viewDetails(scoreOfUser)
             println(END_MESSAGE)
         }
 
