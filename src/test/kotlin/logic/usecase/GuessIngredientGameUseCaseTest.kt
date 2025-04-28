@@ -40,7 +40,7 @@ class GuessIngredientGameUseCaseTest {
     }
 
     @Test
-    fun `getGameDetails should throw IngredientRandomMealGenerationException when the ingredient of meal is null or empty`() {
+    fun `getGameDetails should throw EmptyRandomMealException when the ingredient of meal is null or empty`() {
         // stubs
         every { mealsRepository.getAllMeals() } returns listOf(
             Meal(
@@ -59,7 +59,31 @@ class GuessIngredientGameUseCaseTest {
             )
         )
         // when & then
-        assertThrows<IngredientRandomMealGenerationException> {
+        assertThrows<EmptyRandomMealException> {
+            guessIngredientGameUseCase.getGameDetails()
+        }
+    }
+    @Test
+    fun `getGameDetails should throw EmptyRandomMealException when the name of meal is null or empty`() {
+        // stubs
+        every { mealsRepository.getAllMeals() } returns listOf(
+            Meal(
+                name = null,
+                id = 2L,
+                minutes = null,
+                contributorId = 2L,
+                submitted = Date(),
+                tags = null,
+                nutrition = null,
+                numberOfSteps = null,
+                steps = null,
+                description = null,
+                ingredients = listOf("1"),
+                numberOfIngredients =1
+            )
+        )
+        // when & then
+        assertThrows<EmptyRandomMealException> {
             guessIngredientGameUseCase.getGameDetails()
         }
     }
