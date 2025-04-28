@@ -15,14 +15,36 @@ class GuessIngredientGameUseCase(
 
     fun getGameDetails(): IngredientGameDetails {
 
-        val randomMeal = getRandomMeal()
-        val ingredients =
-            getIngredientsByCorrectMealId(randomMeal.id!!)
+        val randomMeal = mealsRepository.getAllMeals()
+            .filter(::filterNameAndIngredients)
+            .ifEmpty { throw IngredientRandomMealGenerationException("The Meal list is null or empty") }
+            .shuffled()
+            .random()
+
+        val ingredientOfRandomMeal = randomMeal.ingredients!!.first()
+
+        val ingredients = mealsRepository.getAllMeals()
+            .filter { meal -> meal.id != randomMeal.id && filterNameAndIngredients(meal) }
+            .ifEmpty { throw EmptyRandomMealException("The Wrong Ingredients List is null or empty") }
+            .random()
+            .ingredients!!
+            .take(2)
+            .plus(ingredientOfRandomMeal)
+            .shuffled()
+
 
         return IngredientGameDetails(
             meal = randomMeal,
             ingredients = ingredients,
         )
+    }
+
+    private fun filterNameAndIngredients(meal: Meal): Boolean {
+        val check = meal.name != null && meal.ingredients != null == true
+        return if (check)
+            true
+        else
+            throw EmptyRandomMealException("The Name And Ingredients List is null or empty")
     }
 
     fun guessGame(
@@ -50,47 +72,6 @@ class GuessIngredientGameUseCase(
     fun updateScore(score: Int): Int {
         return if (score == FINAL_SCORE) FINAL_SCORE
         else score.plus(SCORE_INCREMENT)
-    }
-
-
-    private fun getRandomMeal(): Meal {
-        return mealsRepository.getAllMeals()
-            .filter(::filterNameAndIngredients)
-            .ifEmpty { throw IngredientRandomMealGenerationException("The Meal list is null or empty") }
-            .shuffled()
-            .random()
-    }
-
-    private fun filterNameAndIngredients(meal: Meal): Boolean {
-        return meal.name != null && meal.ingredients != null
-    }
-
-    private fun getIngredientsByCorrectMealId(correctMealId: Long): List<String?> {
-
-        val correctIngredients = mealsRepository.getAllMeals()
-            .ifEmpty{throw  IngredientRandomMealGenerationException("The Meal list is null or empty") }
-            .first { it.id == correctMealId }
-            .ingredients
-            ?.random()
-            ?:throw EmptyRandomMealException("The Correct Ingredients List is null or empty")
-
-        val wrongIngredient = mealsRepository.getAllMeals()
-            .takeLast(20)
-            .shuffled()
-            .filter { it.id != correctMealId }
-            .ifEmpty{throw EmptyRandomMealException("The Wrong Ingredients List is null or empty")}
-            .random()
-            .ingredients
-            ?.take(2)
-
-        val ingredients = wrongIngredient
-            ?.plus(correctIngredients)
-            ?.shuffled()
-            .takeIf { items -> items?.size == 3 }
-            ?: throw EmptyRandomMealException("The size of meal is less than 3 or empty")
-
-        return ingredients
-
     }
 
 
